@@ -1,4 +1,4 @@
-// Legacy wrapper
+// Legacy wrapper with retry
 import cookieV2 from './BlooketFlooder/src/common/cookieV2.js';
 import join from './BlooketFlooder/src/legacy/join.js';
 
@@ -6,6 +6,7 @@ const pin = process.env.PIN;
 const name = process.env.NAME || 'Bot';
 const amount = Math.min(parseInt(process.env.AMOUNT) || 10, 500);
 const BATCH = 20;
+const MAX_RETRIES = 3;
 
 if (!pin) { console.error('missing PIN'); process.exit(1); }
 
@@ -22,25 +23,32 @@ console.log('verified! mode: ' + mode);
 
 let success = 0, fail = 0;
 
-// Run in parallel batches of 20 with 50ms between waves (was sequential 300ms each)
+async function tryJoin(i, retries) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        const result = await new Promise(resolve => {
+            try {
+                join(redirectUrl, pin, name + (i === 1 ? '' : i), (r) => resolve(r));
+            } catch(e) { resolve(0); }
+        });
+        if (result == 2) { success++; return; }
+        if (attempt < retries) {
+            await new Promise(r => setTimeout(r, 200 * (attempt + 1)));
+        }
+    }
+    fail++;
+}
+
 for (let i = 1; i <= amount; i += BATCH) {
     const wave = [];
     for (let j = i; j < Math.min(i + BATCH, amount + 1); j++) {
-        wave.push(new Promise(resolve => {
-            join(redirectUrl, pin, name + (j === 1 ? '' : j), (result) => {
-                if (result == 2) success++; else fail++;
-                if (success + fail == amount) {
-                    console.log(`${success} bots joined!`);
-                    console.log(`${fail} bots failed to join.`);
-                }
-                resolve();
-            });
-        }));
+        wave.push(tryJoin(j, MAX_RETRIES));
     }
     await Promise.all(wave);
     console.log(`Wave ${Math.ceil(i/BATCH)}: ${success} joined, ${fail} failed`);
     if (i + BATCH <= amount) await new Promise(r => setTimeout(r, 50));
 }
 
+console.log(`${success} bots joined!`);
+console.log(`${fail} bots failed to join.`);
 await new Promise(r => setTimeout(r, 5 * 60 * 1000));
 process.exit(0);
