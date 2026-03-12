@@ -51,6 +51,7 @@ input::placeholder{color:#2a2a2a}
 .sn{width:20px;height:20px;border:1px solid #222;border-radius:50%;color:#555;font-size:0.58rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .st{font-size:0.72rem;color:#555;line-height:1.5}
 .st strong{color:#fff}
+.proxy-status{font-size:0.65rem;text-align:center;margin-top:4px;min-height:1.2em}
 @media(max-width:480px){.g2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
@@ -63,8 +64,7 @@ input::placeholder{color:#2a2a2a}
   <div class="tabs">
     <button class="tab active" onclick="show('flooder',this)">Flood</button>
     <button class="tab" onclick="show('hacks',this)">Hacks</button>
-    <button class="tab" onclick="show('proxy',this)">Proxy</button>
-    <button class="tab" onclick="show('install',this)">Install</button>
+    <button class="tab" onclick="show('proxy",this)">Proxy</button>
   </div>
 </nav>
 
@@ -116,69 +116,26 @@ input::placeholder{color:#2a2a2a}
   </div>
 </div>
 
-<!-- INSTALL -->
-<div class="panel" id="panel-install">
-  <h1>AUTO<br><span>INSTALL</span></h1>
-  <div class="card" style="margin-bottom:12px">
-    <button class="btn bw" onclick="dlSetup()">Download setup.sh</button>
-    <div style="font-size:0.62rem;color:#555;margin-bottom:14px;text-align:center">then run this one command:</div>
-    <div style="background:#000;border:1px solid #1a1a1a;border-radius:6px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-      <code style="font-family:'DM Mono',monospace;font-size:0.8rem;color:#fff">bash setup.sh</code>
-      <button onclick="copyCmd(this)" style="background:transparent;border:1px solid #222;color:#666;font-family:'DM Mono',monospace;font-size:0.58rem;padding:4px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all 0.12s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#666'">copy</button>
-    </div>
-  </div>
-  <div class="card">
-    <div class="steps">
-      <div class="step"><div class="sn">1</div><div class="st">Click <strong>Download setup.sh</strong> above</div></div>
-      <div class="step"><div class="sn">2</div><div class="st">Open a terminal in the same folder</div></div>
-      <div class="step"><div class="sn">3</div><div class="st">Run <strong>bash setup.sh</strong> — it does everything automatically</div></div>
-    </div>
-  </div>
-</div>
-
-<script>
-function dlSetup() {
-  var script = '#!/bin/bash\n' +
-    'echo "Installing Bun..."\n' +
-    'curl -fsSL https://bun.sh/install | bash\n' +
-    'export BUN_INSTALL="$HOME/.bun"\n' +
-    'export PATH="$BUN_INSTALL/bin:$PATH"\n' +
-    'echo "Cloning BlooketFlooder..."\n' +
-    'git clone https://github.com/VillainsRule/BlooketFlooder\n' +
-    'cd BlooketFlooder\n' +
-    'echo "Installing dependencies..."\n' +
-    'bun i\n' +
-    'echo "Starting flooder..."\n' +
-    'bun .\n';
-  var blob = new Blob([script], { type: 'text/plain' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'setup.sh';
-  a.click();
-}
-function copyCmd(btn) {
-  navigator.clipboard.writeText('bash setup.sh').catch(function(){});
-  btn.textContent = 'copied!';
-  setTimeout(function(){ btn.textContent = 'copy'; }, 2000);
-}
-</script>
+<!-- PROXY -->
 <div class="panel" id="panel-proxy">
   <h1>UV<br><span>PROXY</span></h1>
-  <div class="card" style="margin-bottom:12px">
-    <button class="btn bw" onclick="launchProxy()">Launch Blooket</button>
+  <div class="card">
+    <button class="btn bw" id="proxyBtn" onclick="launchProxy()">Launch Blooket</button>
+    <div id="proxyStatus" class="proxy-status linf"></div>
   </div>
   <div class="card">
     <div class="steps">
       <div class="step"><div class="sn">1</div><div class="st">Click <strong>Launch Blooket</strong> above</div></div>
-      <div class="step"><div class="sn">2</div><div class="st">Blooket loads through the proxy — <strong>unblocked</strong></div></div>
+      <div class="step"><div class="sn">2</div><div class="st">Blooket loads through a <strong>UV proxy</strong> — bypasses school blocks</div></div>
+      <div class="step"><div class="sn">3</div><div class="st">X-GUI hacks are <strong>auto-injected</strong> into every page</div></div>
     </div>
   </div>
 </div>
 
 <script>
 function show(id, el) {
-  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
   el.classList.add('active');
 }
@@ -189,7 +146,7 @@ var floodTimer = null, rateTimer = null;
 
 function setMode(m, el) {
   mode = m;
-  document.querySelectorAll('.mb').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.mb').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
 }
 function setN(n) { document.getElementById('botName').value = n; }
@@ -215,37 +172,16 @@ function upd() {
 var BN = ['Ace','Blaze','Crypt','Dusk','Echo','Flux','Ghost','Haze','Ion','Jinx','Lox','Myth','Nix','Pyro','Rift','Vex','Warp','Zap'];
 function rn(base) { return (base || BN[Math.floor(Math.random()*BN.length)]) + Math.floor(Math.random()*9999); }
 
-var BARE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'https://bare.operatorequals.net/' : '/bare/';
-
-function bh() {
-  var h = {};
-  h['Host'] = 'play.blooket.com';
-  h['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
-  h['Accept'] = 'application/json, text/plain, */*';
-  h['Accept-Language'] = 'en-US,en;q=0.9';
-  h['Origin'] = 'https://play.blooket.com';
-  h['Referer'] = 'https://play.blooket.com/';
-  h['sec-ch-ua-mobile'] = '?0';
-  h['sec-ch-ua-platform'] = 'Windows';
-  h['sec-fetch-dest'] = 'empty';
-  h['sec-fetch-mode'] = 'cors';
-  h['sec-fetch-site'] = 'same-site';
-  h['Content-Type'] = 'application/json';
-  return JSON.stringify(h);
-}
-
 function joinBot(gc, name) {
-  var path = mode === 'colyseus' ? '/api/players/join' : '/api/games/join';
-  fetch(BARE, {
+  fetch('/api/flood', {
     method: 'POST',
-    headers: { 'x-bare-host':'play.blooket.com','x-bare-port':'443','x-bare-protocol':'https:','x-bare-path':path,'x-bare-headers':bh(),'Content-Type':'application/json' },
-    body: JSON.stringify({ gameCode: gc, name: name, avatar: Math.floor(Math.random()*50)+1 })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gameCode: gc, name: name, mode: mode })
   }).then(function(r) {
-    if (r.ok || r.status === 200 || r.status === 201) { joined++; active++; addLog(name + ' joined', 'lok'); }
+    if (r.ok) { joined++; active++; addLog(name + ' joined', 'lok'); }
     else { failed++; addLog(name + ' failed (' + r.status + ')', 'lerr'); }
     upd();
-  }).catch(function(e) { failed++; addLog(name + ' error', 'lerr'); upd(); });
+  }).catch(function() { failed++; addLog(name + ' error', 'lerr'); upd(); });
 }
 
 function toggleFlood() {
@@ -266,7 +202,7 @@ function toggleFlood() {
   startTime = Date.now(); upd();
   var b = document.getElementById('floodBtn');
   b.className = 'btn br'; b.innerHTML = '&#9632; Stop';
-  addLog('Flooding ' + gc + ' with ' + cnt + ' bots...', 'linf');
+  addLog('Flooding ' + gc + ' with ' + cnt + ' bots (' + mode + ')...', 'linf');
   var sent = 0;
   rateTimer = setInterval(upd, 1000);
   floodTimer = setInterval(function() {
@@ -275,23 +211,45 @@ function toggleFlood() {
       if (flooding) {
         flooding = false; active = 0; upd();
         b.className = 'btn bw'; b.innerHTML = '&#9654; Start';
-        addLog('Done — ' + joined + ' joined', 'linf');
+        addLog('Done — ' + joined + ' joined, ' + failed + ' failed', 'linf');
       }
       return;
     }
     joinBot(gc, rn(nb)); sent++;
-  }, 120);
+  }, 150);
 }
 
-function launchProxy() {
-  if (!navigator.serviceWorker) { alert('Use Chrome or Edge.'); return; }
-  navigator.serviceWorker.register('/uv/sw.js', { scope: '/uv/service/' }).then(function() {
-    var encoded = __uv$config.encodeUrl('https://play.blooket.com/play');
+async function launchProxy() {
+  var status = document.getElementById('proxyStatus');
+  var btn = document.getElementById('proxyBtn');
+  if (!navigator.serviceWorker) {
+    status.textContent = 'Error: use Chrome or Edge';
+    status.className = 'proxy-status lerr';
+    return;
+  }
+  try {
+    btn.textContent = 'Loading...';
+    btn.disabled = true;
+    status.textContent = 'Registering service worker...';
+    status.className = 'proxy-status linf';
+
+    await navigator.serviceWorker.register('/uv/sw.js', { scope: '/uv/service/' });
+    await navigator.serviceWorker.ready;
+
+    status.textContent = 'Launching...';
+
+    // Encode the URL with X-GUI injection param
+    var encoded = __uv$config.encodeUrl('https://play.blooket.com/play?x-gui');
     window.location.href = '/uv/service/' + encoded;
-  }).catch(function(e) { alert('Deploy on Render first.'); });
+  } catch(e) {
+    btn.textContent = 'Launch Blooket';
+    btn.disabled = false;
+    status.textContent = 'Error: ' + e.message;
+    status.className = 'proxy-status lerr';
+  }
 }
 </script>
-<script src="/uv/uv.bundle.js" onerror="void 0"></script>
-<script src="/uv/uv.config.js" onerror="void 0"></script>
+<script src="/uv/uv.bundle.js"></script>
+<script src="/uv/uv.config.js"></script>
 </body>
 </html>
