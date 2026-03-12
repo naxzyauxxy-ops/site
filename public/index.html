@@ -200,6 +200,19 @@ async function launchProxy(){
     s.textContent='Error: '+e.message;
   }
 }
+
+// Block page close / navigation (GoGuardian protection)
+window.addEventListener('beforeunload', function(e) {
+  e.preventDefault();
+  e.returnValue = '';
+  return '';
+});
+// Also block visibility change attempts
+document.addEventListener('visibilitychange', function(e) {
+  if(document.visibilityState === 'hidden') {
+    window.focus();
+  }
+});
 </script>
 <script src="/uv/uv.bundle.js"></script>
 <script src="/uv/uv.config.js"></script>
