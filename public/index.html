@@ -212,47 +212,85 @@ async function toggleFlood(){
 }
 
 var proxyTimeout=null;
+var swReady=false;
+
+// Preload UV scripts + register SW immediately on page load
+(async function preloadProxy(){
+  if(!navigator.serviceWorker) return;
+  try{
+    // Load uv scripts eagerly so they're cached
+    await new Promise((res,rej)=>{
+      if(window.Ultraviolet){res();return;}
+      var s=document.createElement('script');
+      s.src='/uv/uv.bundle.js';
+      s.onload=res; s.onerror=rej;
+      document.head.appendChild(s);
+    });
+    await new Promise((res,rej)=>{
+      var s=document.createElement('script');
+      s.src='/uv/uv.config.js';
+      s.onload=res; s.onerror=rej;
+      document.head.appendChild(s);
+    });
+    // Register SW once, keep it alive
+    await navigator.serviceWorker.register('/uv/sw.js',{scope:'/uv/service/'});
+    await navigator.serviceWorker.ready;
+    swReady=true;
+    document.getElementById('proxyStatus').textContent='Ready';
+  }catch(e){
+    document.getElementById('proxyStatus').textContent='Proxy unavailable';
+    console.warn('SW preload failed:',e);
+  }
+})();
+
+function setProxy(url){
+  document.getElementById('proxyInput').value=url;
+  launchProxy();
+}
+
+function resolveUrl(raw){
+  raw=(raw||'').trim();
+  if(!raw) return null;
+  if(/^https?:\/\//i.test(raw)) return raw;
+  if(/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(raw)&&!raw.includes(' ')) return 'https://'+raw;
+  return 'https://www.google.com/search?q='+encodeURIComponent(raw);
+}
 
 async function launchProxy(){
   var s=document.getElementById('proxyStatus');
   var b=document.getElementById('proxyBtn');
   if(!navigator.serviceWorker){s.textContent='Requires Chrome or Edge';return;}
 
+  var raw=document.getElementById('proxyInput').value;
+  var url=resolveUrl(raw);
+  if(!url){s.textContent='Enter a URL or search term';return;}
+
   proxyTimeout=setTimeout(()=>{
     document.getElementById('maint-page').classList.add('show');
-  }, 300000);
+  },300000);
 
   try{
-    b.textContent='Loading...';b.disabled=true;s.textContent='Loading proxy files...';
+    b.textContent='...';b.disabled=true;
+    s.textContent=swReady?'Launching...':'Registering...';
 
-    // Dynamically load uv.bundle.js to get Ultraviolet codec
-    await new Promise((res,rej)=>{
-      if(window.Ultraviolet){res();return;}
-      var s2=document.createElement('script');
-      s2.src='/uv/uv.bundle.js';
-      s2.onload=res;s2.onerror=()=>rej(new Error('Failed to load uv.bundle.js'));
-      document.head.appendChild(s2);
-    });
+    if(!swReady){
+      // SW not ready yet — wait for it (max 8s)
+      await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('SW timeout')),8000))
+      ]);
+      swReady=true;
+    }
 
-    // Load uv.config.js so __uv$config.encodeUrl uses the real Ultraviolet codec
-    await new Promise((res,rej)=>{
-      var s2=document.createElement('script');
-      s2.src='/uv/uv.config.js?t='+Date.now();
-      s2.onload=res;s2.onerror=()=>rej(new Error('Failed to load uv.config.js'));
-      document.head.appendChild(s2);
-    });
+    if(!window.__uv$config||!window.__uv$config.encodeUrl){
+      throw new Error('UV config not loaded');
+    }
 
-    s.textContent='Registering service worker...';
-    // Unregister old SW first to avoid stale cache issues
-    const regs=await navigator.serviceWorker.getRegistrations();
-    for(const r of regs){ if(r.scope.includes('/uv/')) await r.unregister(); }
-
-    const reg=await navigator.serviceWorker.register('/uv/sw.js',{scope:'/uv/service/'});
-    await navigator.serviceWorker.ready;
     clearTimeout(proxyTimeout);
-    s.textContent='Launching...';
-    var encoded=window.__uv$config.encodeUrl('https://play.blooket.com/play');
-    window.location.href='/uv/service/'+encoded;
+    var enc=window.__uv$config.encodeUrl(url);
+    window.open('/uv/service/'+enc,'_blank');
+    b.textContent='Go';b.disabled=false;
+    s.textContent='Opened → '+url.replace(/^https?:\/\//,'').slice(0,30);
   }catch(e){
     clearTimeout(proxyTimeout);
     b.textContent='Go';b.disabled=false;
