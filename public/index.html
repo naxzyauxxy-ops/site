@@ -115,7 +115,7 @@ input::placeholder{color:#2a2a2a}
     </div>
     <div class="g2">
       <div class="field"><label>Game Code</label><input id="gameCode" placeholder="123456" maxlength="8"/></div>
-      <div class="field"><label>Bot Count</label><input type="number" id="botCount" value="10" min="1" max="200"/></div>
+      <div class="field"><label>Bot Count</label><input type="number" id="botCount" value="10" min="1" max="30"/></div>
     </div>
     <div class="field"><label>Bot Name</label><input id="botName" placeholder="Bot"/></div>
     <div class="pills">
@@ -186,7 +186,7 @@ async function poll(){
     r.logs.slice(lastLog).forEach(l=>{log(l,l.includes('joined')?'lok':l.includes('fail')?'lerr':'linf');});
     lastLog=r.logs.length;
     stats(r.joined,r.failed,r.elapsed);
-    if(r.done){clearInterval(pollTimer);floodId=null;var b=document.getElementById('floodBtn');b.className='btn bw';b.innerHTML='&#9654; Start';b.disabled=false;}
+    if(r.done){clearInterval(pollTimer);floodId=null;var b=document.getElementById('floodBtn');if(r.failed===0&&r.joined>0){b.className='btn bw';b.innerHTML='&#9654; Start';b.disabled=false;log('All '+r.joined+' bots joined!','lok');}else{b.className='btn bw';b.innerHTML='&#9654; Start';b.disabled=false;}}
   }catch{}
 }
 
