@@ -1,4 +1,4 @@
-// Beta — max speed, all bots fire simultaneously with retry
+// Beta — with cookieV2 timeout + retry
 import cookieV2 from './BlooketFlooder/src/common/cookieV2.js';
 import join from './BlooketFlooder/src/beta/join.js';
 
@@ -10,15 +10,41 @@ const MAX_RETRIES = 3;
 if (!pin) { console.error('missing PIN'); process.exit(1); }
 console.log(`VoidHub — ${amount} bots on ${pin} (new modes)`);
 
-const cfV2Res = await cookieV2('https://play.blooket.com/play?id=' + pin, 'beta');
+function withTimeout(promise, ms) {
+    return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
+    ]);
+}
+
+let cfV2Res;
+for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+        console.log(`connecting... (attempt ${attempt}/3)`);
+        cfV2Res = await withTimeout(
+            cookieV2('https://play.blooket.com/play?id=' + pin, 'beta'),
+            8000
+        );
+        if (cfV2Res) break;
+    } catch (e) {
+        console.log(`attempt ${attempt} failed: ${e.message}`);
+        if (attempt === 3) { console.log('Failed to connect after 3 attempts.'); process.exit(1); }
+        await new Promise(r => setTimeout(r, 500));
+    }
+}
+
 if (cfV2Res.incorrectType) { console.log('Wrong mode — try Classic.'); process.exit(0); }
+console.log('connected! launching bots...');
 
 let success = 0, fail = 0, done = 0;
 
 async function tryJoin(i) {
     for (let a = 0; a <= MAX_RETRIES; a++) {
         try {
-            const r = await join({ pin, name, amount }, cfV2Res, i);
+            const r = await Promise.race([
+                join({ pin, name, amount }, cfV2Res, i),
+                new Promise(r => setTimeout(() => r(0), 6000))
+            ]);
             if (r == 2) { success++; done++; console.log(`[${done}/${amount}] Bot${i} joined`); return; }
         } catch {}
         if (a < MAX_RETRIES) await new Promise(r => setTimeout(r, 150));
@@ -27,9 +53,7 @@ async function tryJoin(i) {
     console.log(`[${done}/${amount}] Bot${i} failed`);
 }
 
-// Fire ALL bots at once — no waves, no delays
 await Promise.all(Array.from({length: amount}, (_, i) => tryJoin(i + 1)));
-
 console.log(`${success} bots joined!`);
 console.log(`${fail} bots failed to join.`);
 await new Promise(r => setTimeout(r, 5 * 60 * 1000));
