@@ -33,20 +33,6 @@ if (!existsSync(flooderDir)) {
   console.log('BlooketFlooder present');
 }
 
-// Bootstrap BlooketFlooder if missing — runs at server start regardless of build cmd
-const flooderDir = path.join(__dirname, 'BlooketFlooder');
-if (!existsSync(flooderDir)) {
-  console.log('BlooketFlooder missing — cloning now...');
-  try {
-    execSync('git clone https://github.com/VillainsRule/BlooketFlooder ' + flooderDir, { stdio: 'inherit' });
-    execSync(BUN + ' i', { cwd: flooderDir, stdio: 'inherit' });
-    console.log('BlooketFlooder ready');
-  } catch(e) {
-    console.error('Failed to clone BlooketFlooder:', e.message);
-  }
-} else {
-  console.log('BlooketFlooder present at', flooderDir);
-}
 const uvDist = path.join(__dirname, 'node_modules', '@titaniumnetwork-dev', 'ultraviolet', 'dist');
 
 // ── Performance: inline gzip compression ───────────────────
