@@ -183,7 +183,15 @@ async function poll(){
   if(!floodId)return;
   try{
     const r=await fetch('/api/flood/status/'+floodId).then(r=>r.json());
-    r.logs.slice(lastLog).forEach(l=>{log(l,l.includes('joined')?'lok':l.includes('fail')?'lerr':'linf');});
+    r.logs.slice(lastLog).forEach(l=>{
+      var cls=l.includes('joined')?'lok':l.includes('fail')||l.includes('ERR')?'lerr':'linf';
+      log(l,cls);
+      if(l.toLowerCase().includes('cloudflare')||l.includes('ERR: error: Cannot find')){
+        log('⚠ Cloudflare is blocking us... Please wait while we fix this. An issue has been opened on GitHub.','lerr');
+        clearInterval(pollTimer);floodId=null;
+        var b=document.getElementById('floodBtn');b.className='btn bw';b.innerHTML='&#9654; Start';b.disabled=false;
+      }
+    });
     lastLog=r.logs.length;
     stats(r.joined,r.failed,r.elapsed);
     if(r.done){clearInterval(pollTimer);floodId=null;var b=document.getElementById('floodBtn');if(r.failed===0&&r.joined>0){b.className='btn bw';b.innerHTML='&#9654; Start';b.disabled=false;log('All '+r.joined+' bots joined!','lok');}else{b.className='btn bw';b.innerHTML='&#9654; Start';b.disabled=false;}}
