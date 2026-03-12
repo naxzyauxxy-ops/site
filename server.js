@@ -9,11 +9,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const bareServer = createBareServer('/bare/');
 const PORT = process.env.PORT || 3000;
-const FLOODER_DIR = path.join(__dirname, 'BlooketFlooder');
 const BUN = process.env.HOME + '/.bun/bin/bun';
 
 app.use(express.json());
 
+// UV proxy files
 const uvPath = path.join(__dirname, 'node_modules', '@titaniumnetwork-dev', 'ultraviolet', 'dist');
 app.use('/uv', express.static(uvPath));
 app.get('/uv/uv.config.js', (req, res) => {
@@ -29,35 +29,39 @@ app.post('/api/flood/start', async (req, res) => {
   if (!gameCode) return res.status(400).json({ error: 'missing gameCode' });
 
   const id = Date.now().toString();
-  const entry = mode === 'legacy'
-    ? path.join(FLOODER_DIR, 'src', 'legacy', 'index.js')
-    : path.join(FLOODER_DIR, 'src', 'beta', 'index.js');
+  const wrapper = mode === 'legacy'
+    ? path.join(__dirname, 'run-legacy.mjs')
+    : path.join(__dirname, 'run-beta.mjs');
 
-  const proc = spawn(BUN, ['run', entry], {
-    cwd: FLOODER_DIR,
-    env: { ...process.env, FORCE_COLOR: '0' },
-    stdio: ['pipe', 'pipe', 'pipe']
+  const proc = spawn(BUN, ['run', wrapper], {
+    cwd: __dirname,
+    env: {
+      ...process.env,
+      FORCE_COLOR: '0',
+      PIN: gameCode,
+      NAME: name || 'Bot',
+      AMOUNT: String(amount || 10)
+    },
+    stdio: ['ignore', 'pipe', 'pipe']
   });
-
-  // Answer the 3 enquirer prompts: pin, name, amount
-  setTimeout(() => proc.stdin.write(gameCode + '\n'), 300);
-  setTimeout(() => proc.stdin.write((name || 'Bot') + '\n'), 600);
-  setTimeout(() => proc.stdin.write(String(amount || 10) + '\n'), 900);
 
   const logs = [];
   proc.stdout.on('data', d => {
     d.toString().replace(/\x1b\[[0-9;]*m/g, '').split('\n').forEach(l => {
-      if (l.trim()) logs.push(l.trim());
+      if (l.trim()) { logs.push(l.trim()); console.log('[flood]', l.trim()); }
     });
   });
   proc.stderr.on('data', d => {
     d.toString().replace(/\x1b\[[0-9;]*m/g, '').split('\n').forEach(l => {
-      if (l.trim()) logs.push('ERR: ' + l.trim());
+      if (l.trim()) { logs.push('ERR: ' + l.trim()); }
     });
   });
 
   floods.set(id, { proc, logs, done: false, start: Date.now() });
-  proc.on('close', () => { const f = floods.get(id); if (f) f.done = true; });
+  proc.on('close', code => {
+    const f = floods.get(id);
+    if (f) { f.done = true; f.logs.push(`Process exited (code ${code})`); }
+  });
 
   res.json({ ok: true, id });
 });
@@ -68,7 +72,7 @@ app.get('/api/flood/status/:id', (req, res) => {
   let joined = 0, failed = 0;
   f.logs.forEach(l => {
     const m = l.match(/(\d+) bots joined/); if (m) joined = +m[1];
-    if (l.includes('failed to join')) { const m2 = l.match(/(\d+) bots failed/); if (m2) failed = +m2[1]; }
+    const m2 = l.match(/(\d+) bots failed/); if (m2) failed = +m2[1];
   });
   res.json({ done: f.done, logs: f.logs.slice(-60), joined, failed, elapsed: Math.floor((Date.now() - f.start) / 1000) });
 });
