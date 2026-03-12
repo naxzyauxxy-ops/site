@@ -1,4 +1,4 @@
-// Beta wrapper
+// Beta wrapper with retry
 import cookieV2 from './BlooketFlooder/src/common/cookieV2.js';
 import join from './BlooketFlooder/src/beta/join.js';
 
@@ -6,6 +6,7 @@ const pin = process.env.PIN;
 const name = process.env.NAME || 'Bot';
 const amount = Math.min(parseInt(process.env.AMOUNT) || 10, 500);
 const BATCH = 20;
+const MAX_RETRIES = 3;
 
 if (!pin) { console.error('missing PIN'); process.exit(1); }
 
@@ -19,14 +20,29 @@ if (cfV2Res.incorrectType) {
 
 let success = 0, fail = 0;
 
+async function tryJoin(i, retries) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            const r = await join({ pin, name, amount }, cfV2Res, i);
+            if (r == 2) { success++; return; }
+            if (attempt < retries) {
+                await new Promise(r => setTimeout(r, 200 * (attempt + 1)));
+                continue;
+            }
+        } catch (e) {
+            if (attempt < retries) {
+                await new Promise(r => setTimeout(r, 200 * (attempt + 1)));
+                continue;
+            }
+        }
+        fail++;
+    }
+}
+
 for (let i = 1; i <= amount; i += BATCH) {
     const wave = [];
     for (let j = i; j < Math.min(i + BATCH, amount + 1); j++) {
-        wave.push(
-            join({ pin, name, amount }, cfV2Res, j)
-                .then(r => { if (r == 2) success++; else fail++; })
-                .catch(() => { fail++; })
-        );
+        wave.push(tryJoin(j, MAX_RETRIES));
     }
     await Promise.all(wave);
     console.log(`Wave ${Math.ceil(i/BATCH)}: ${success} joined, ${fail} failed`);
