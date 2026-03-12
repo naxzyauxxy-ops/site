@@ -5,7 +5,8 @@ import { fileURLToPath } from 'url';
 import { createBareServer } from '@tomphttp/bare-server-node';
 import { spawn } from 'child_process';
 import { createServer as createNetServer } from 'net';
-import compression from 'compression';
+import zlib from 'zlib';
+import { pipeline } from 'stream';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -14,8 +15,25 @@ const PORT = process.env.PORT || 3000;
 const BUN = process.env.HOME + '/.bun/bin/bun';
 const uvDist = path.join(__dirname, 'node_modules', '@titaniumnetwork-dev', 'ultraviolet', 'dist');
 
-// ── Performance: compression + optimized JSON parsing ──────
-app.use(compression());
+// ── Performance: inline gzip compression ───────────────────
+app.use((req, res, next) => {
+  const ae = req.headers['accept-encoding'] || '';
+  if (!ae.includes('gzip')) return next();
+  const _json = res.json.bind(res);
+  const _send = res.send.bind(res);
+  res.send = function(body) {
+    if (!body || res.headersSent) return _send(body);
+    const buf = Buffer.isBuffer(body) ? body : Buffer.from(String(body));
+    if (buf.length < 1024) return _send(body); // skip tiny responses
+    res.setHeader('Content-Encoding', 'gzip');
+    res.removeHeader('Content-Length');
+    zlib.gzip(buf, (err, gz) => {
+      if (err) return _send(body);
+      _send(gz);
+    });
+  };
+  next();
+});
 app.use(express.json({ limit: '10kb' }));
 
 // ── Flood state ────────────────────────────────────────────
