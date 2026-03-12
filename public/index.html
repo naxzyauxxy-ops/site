@@ -231,7 +231,7 @@ async function launchProxy(){
     window.location.href='/uv/service/'+encoded;
   }catch(e){
     clearTimeout(proxyTimeout);
-    b.textContent='Open Blooket';b.disabled=false;
+    b.textContent='Go';b.disabled=false;
     s.textContent='Error: '+e.message;
     console.error(e);
   }
