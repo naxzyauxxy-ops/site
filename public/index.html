@@ -321,184 +321,84 @@ document.addEventListener('keydown', function() { closeAttemptTime = null; });
 
 <script>
 (function(){
-  // ── Minecraft sounds via Web Audio API ──────────────────
-  var AC = null;
-  function getAC(){
-    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
-    return AC;
+  var AC,started=false;
+  function note(freq,type,vol,t,dur){
+    var o=AC.createOscillator(),g=AC.createGain();
+    o.connect(g);g.connect(AC.destination);
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,t);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.start(t);o.stop(t+dur+0.05);
   }
-
-  function playXPOrb(t){
-    var ac = getAC();
-    var o = ac.createOscillator();
-    var g = ac.createGain();
-    o.connect(g); g.connect(ac.destination);
-    o.type = 'sine';
-    o.frequency.setValueAtTime(600, t);
-    o.frequency.exponentialRampToValueAtTime(1400, t+0.08);
-    g.gain.setValueAtTime(0.18, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t+0.12);
-    o.start(t); o.stop(t+0.12);
+  function noise(lp,vol,t,dur){
+    var buf=AC.createBuffer(1,Math.ceil(AC.sampleRate*dur),AC.sampleRate);
+    var d=buf.getChannelData(0);
+    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
+    var src=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
+    f.type='lowpass';f.frequency.value=lp;
+    g.gain.setValueAtTime(vol,t);g.gain.linearRampToValueAtTime(0,t+dur);
+    src.buffer=buf;src.connect(f);f.connect(g);g.connect(AC.destination);
+    src.start(t);src.stop(t+dur);
   }
-
-  function playLevelUp(t){
-    var ac = getAC();
-    var notes = [523,659,784,1047];
-    notes.forEach(function(f,i){
-      var o = ac.createOscillator();
-      var g = ac.createGain();
-      o.connect(g); g.connect(ac.destination);
-      o.type = 'square';
-      o.frequency.value = f;
-      g.gain.setValueAtTime(0, t+i*0.1);
-      g.gain.linearRampToValueAtTime(0.12, t+i*0.1+0.02);
-      g.gain.exponentialRampToValueAtTime(0.001, t+i*0.1+0.18);
-      o.start(t+i*0.1); o.stop(t+i*0.1+0.2);
-    });
+  function playAll(){
+    var t=AC.currentTime+0.05;
+    noise(100,0.3,t,1.5);
+    noise(900,0.2,t+0.3,0.08);noise(700,0.18,t+0.42,0.08);
+    for(var i=0;i<8;i++){note(500+i*120,'sine',0.18,t+0.6+i*0.08,0.12);note(800+i*180,'sine',0.1,t+0.63+i*0.08,0.08);}
+    [523,659,784,1047].forEach(function(f,i){note(f,'square',0.12,t+1.9+i*0.1,0.25);});
+    note(1760,'sine',0.22,t+2.7,0.06);note(880,'sine',0.18,t+2.76,0.45);
+    for(var i=0;i<4;i++)note(600+i*200,'sine',0.14,t+2.82+i*0.07,0.09);
   }
-
-  function playCaveAmbience(t){
-    var ac = getAC();
-    // low rumble
-    var buf = ac.createBuffer(1, ac.sampleRate*1.5, ac.sampleRate);
-    var d = buf.getChannelData(0);
-    for(var i=0;i<d.length;i++) d[i] = (Math.random()*2-1)*0.04;
-    var src = ac.createBufferSource();
-    src.buffer = buf;
-    var bq = ac.createBiquadFilter();
-    bq.type = 'lowpass'; bq.frequency.value = 120;
-    var g = ac.createGain();
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.4, t+0.5);
-    g.gain.linearRampToValueAtTime(0, t+1.5);
-    src.connect(bq); bq.connect(g); g.connect(ac.destination);
-    src.start(t); src.stop(t+1.5);
+  function spawnPx(n){
+    var px=document.getElementById('loaderPx');if(!px)return;
+    for(var i=0;i<n;i++)(function(){
+      var el=document.createElement('div');el.className='px';
+      el.style.left=Math.random()*100+'%';el.style.top=Math.random()*100+'%';
+      el.style.animationDelay=Math.random()*0.4+'s';
+      el.style.width=el.style.height=(Math.random()*4+2)+'px';
+      px.appendChild(el);setTimeout(function(){el.remove();},1200);
+    })();
   }
-
-  function playDoorOpen(t){
-    var ac = getAC();
-    // creaky door — two pitched noise bursts
-    [0, 0.12].forEach(function(dt){
-      var buf = ac.createBuffer(1, ac.sampleRate*0.15, ac.sampleRate);
-      var d = buf.getChannelData(0);
-      for(var i=0;i<d.length;i++) d[i] = (Math.random()*2-1);
-      var src = ac.createBufferSource();
-      src.buffer = buf;
-      var bq = ac.createBiquadFilter();
-      bq.type = 'bandpass'; bq.frequency.value = 800+dt*1000; bq.Q.value = 8;
-      var g = ac.createGain();
-      g.gain.setValueAtTime(0.15, t+dt);
-      g.gain.exponentialRampToValueAtTime(0.001, t+dt+0.15);
-      src.connect(bq); bq.connect(g); g.connect(ac.destination);
-      src.start(t+dt); src.stop(t+dt+0.2);
-    });
-  }
-
-  function playDing(t){
-    var ac = getAC();
-    var o = ac.createOscillator();
-    var g = ac.createGain();
-    o.connect(g); g.connect(ac.destination);
-    o.type = 'sine';
-    o.frequency.setValueAtTime(1760, t);
-    o.frequency.exponentialRampToValueAtTime(880, t+0.3);
-    g.gain.setValueAtTime(0.2, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t+0.4);
-    o.start(t); o.stop(t+0.4);
-  }
-
-  // ── Pixel burst effect ────────────────────────────────────
-  function spawnPixels(n){
-    var px = document.getElementById('loaderPx');
-    for(var i=0;i<n;i++){
-      (function(){
-        var el = document.createElement('div');
-        el.className = 'px';
-        el.style.left = (Math.random()*100)+'%';
-        el.style.top = (Math.random()*100)+'%';
-        el.style.animationDelay = (Math.random()*0.4)+'s';
-        el.style.width = el.style.height = (Math.random()*4+2)+'px';
-        el.style.opacity = Math.random()*0.6+0.2;
-        px.appendChild(el);
-        setTimeout(function(){ el.remove(); }, 1200);
-      })();
-    }
-  }
-
-  // ── Loading sequence ──────────────────────────────────────
-  var steps = [
-    'initializing...',
-    'loading assets...',
-    'connecting server...',
-    'preparing proxy...',
-    'almost ready...',
-    'done.'
-  ];
-
-  var logo = document.getElementById('loaderLogo');
-  var sub = document.getElementById('loaderSub');
-  var barWrap = document.getElementById('loaderBarWrap');
-  var bar = document.getElementById('loaderBar');
-  var loader = document.getElementById('loader');
-
-  var progress = 0;
-  var stepIdx = 0;
-  var started = false;
-
+  var steps=['initializing...','loading assets...','connecting server...','preparing proxy...','almost ready...','done.'];
   function startLoader(){
-    if(started) return;
-    started = true;
-    var ac = getAC();
-    var t = ac.currentTime;
-
-    // Play sounds mixed together
-    playCaveAmbience(t);
-    playDoorOpen(t + 0.3);
-    for(var i=0;i<8;i++) playXPOrb(t + 0.5 + i*0.07);
-    playLevelUp(t + 1.8);
-    playDing(t + 2.6);
-    for(var i=0;i<4;i++) playXPOrb(t + 2.65 + i*0.06);
-
-    // Show logo
-    setTimeout(function(){ logo.classList.add('show'); }, 100);
-    setTimeout(function(){ sub.classList.add('show'); barWrap.classList.add('show'); }, 400);
-
-    // Animate progress bar
-    var interval = setInterval(function(){
-      progress += Math.random()*12 + 4;
-      if(progress > 100) progress = 100;
-      bar.style.width = progress+'%';
-      spawnPixels(3);
-
-      // Update step text
-      var idx = Math.floor((progress/100) * steps.length);
-      if(idx !== stepIdx && idx < steps.length){
-        stepIdx = idx;
-        sub.textContent = steps[stepIdx];
-        playXPOrb(getAC().currentTime);
+    if(started)return;started=true;
+    AC=new(window.AudioContext||window.webkitAudioContext)();
+    AC.resume().then(playAll);
+    var progress=0,stepIdx=0;
+    var iv=setInterval(function(){
+      progress+=Math.random()*12+4;if(progress>100)progress=100;
+      document.getElementById('loaderBar').style.width=progress+'%';
+      spawnPx(3);
+      var idx=Math.min(Math.floor(progress/100*steps.length),steps.length-1);
+      if(idx!==stepIdx){stepIdx=idx;document.getElementById('loaderSub').textContent=steps[idx];}
+      if(progress>=100){
+        clearInterval(iv);
+        document.getElementById('loaderSub').textContent='done.';
+        spawnPx(30);
+        setTimeout(function(){document.getElementById('loader').classList.add('hidden');},700);
       }
-
-      if(progress >= 100){
-        clearInterval(interval);
-        sub.textContent = 'done.';
-        spawnPixels(30);
-        setTimeout(function(){
-          playDing(getAC().currentTime);
-          setTimeout(function(){
-            loader.classList.add('hidden');
-          }, 400);
-        }, 300);
-      }
-    }, 120);
+    },120);
   }
-
-  // Start on first interaction OR after 500ms (whichever comes first)
-  // AudioContext needs user gesture on some browsers
-  document.addEventListener('click', function(){ startLoader(); }, {once:true});
-  document.addEventListener('keydown', function(){ startLoader(); }, {once:true});
-  window.addEventListener('load', function(){
-    setTimeout(function(){ startLoader(); }, 300);
-  });
+  // Show logo immediately
+  setTimeout(function(){
+    var l=document.getElementById('loaderLogo');if(l)l.classList.add('show');
+  },100);
+  setTimeout(function(){
+    var s=document.getElementById('loaderSub'),b=document.getElementById('loaderBarWrap');
+    if(s)s.classList.add('show');if(b)b.classList.add('show');
+    // Add click prompt
+    var p=document.createElement('div');
+    p.style.cssText='position:absolute;bottom:48px;left:50%;transform:translateX(-50%);font-family:"DM Mono",monospace;font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:#444;cursor:pointer';
+    p.id='clickPrompt';p.textContent='click anywhere to enter';
+    p.style.animation='blink2 1.2s infinite';
+    document.getElementById('loader').appendChild(p);
+    var st=document.createElement('style');
+    st.textContent='@keyframes blink2{0%,100%{opacity:.2}50%{opacity:1}}';
+    document.head.appendChild(st);
+  },400);
+  function onGesture(){var p=document.getElementById('clickPrompt');if(p)p.remove();startLoader();}
+  document.addEventListener('click',onGesture,{once:true});
+  document.addEventListener('keydown',onGesture,{once:true});
 })();
 </script>
 
