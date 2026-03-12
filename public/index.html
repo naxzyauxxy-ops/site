@@ -224,18 +224,23 @@ async function launchProxy(){
   }
 }
 
-// Block page close / navigation (GoGuardian protection)
+// Block page close for 30 seconds on each attempt
+var closeAttemptTime = null;
 window.addEventListener('beforeunload', function(e) {
-  e.preventDefault();
-  e.returnValue = '';
-  return '';
-});
-// Also block visibility change attempts
-document.addEventListener('visibilitychange', function(e) {
-  if(document.visibilityState === 'hidden') {
-    window.focus();
+  if(!closeAttemptTime) closeAttemptTime = Date.now();
+  var elapsed = (Date.now() - closeAttemptTime) / 1000;
+  if(elapsed < 30) {
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
   }
 });
+document.addEventListener('visibilitychange', function() {
+  if(document.visibilityState === 'hidden') { window.focus(); }
+});
+// Reset timer if they stay on page
+document.addEventListener('mousemove', function() { closeAttemptTime = null; });
+document.addEventListener('keydown', function() { closeAttemptTime = null; });
 </script>
 
 </body>
