@@ -3,7 +3,8 @@ import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createBareServer } from '@tomphttp/bare-server-node';
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
+import { existsSync } from 'fs';
 import { createServer as createNetServer } from 'net';
 import zlib from 'zlib';
 import { pipeline } from 'stream';
@@ -12,7 +13,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const bareServer = createBareServer('/bare/');
 const PORT = process.env.PORT || 3000;
-const BUN = process.env.HOME + '/.bun/bin/bun';
+// Find bun - try multiple paths
+let BUN = process.env.HOME + '/.bun/bin/bun';
+if (!existsSync(BUN)) {
+  try { BUN = execSync('which bun').toString().trim(); } catch {}
+}
+if (!existsSync(BUN)) BUN = '/root/.bun/bin/bun';
+console.log('BUN path:', BUN, 'exists:', existsSync(BUN));
 const uvDist = path.join(__dirname, 'node_modules', '@titaniumnetwork-dev', 'ultraviolet', 'dist');
 
 // ── Performance: inline gzip compression ───────────────────
@@ -63,6 +70,7 @@ app.post('/api/flood/start', (req, res) => {
     ? path.join(__dirname, 'run-legacy.mjs')
     : path.join(__dirname, 'run-beta.mjs');
 
+  console.log(`[flood] spawning: ${BUN} run ${wrapper} PIN=${gameCode} AMOUNT=${Math.min(parseInt(amount)||10,500)}`);
   const proc = spawn(BUN, ['run', wrapper], {
     cwd: __dirname,
     env: {
@@ -70,9 +78,15 @@ app.post('/api/flood/start', (req, res) => {
       FORCE_COLOR: '0',
       PIN: gameCode,
       NAME: name || 'Bot',
-      AMOUNT: String(Math.min(parseInt(amount) || 10, 500)) // cap per-session
+      AMOUNT: String(Math.min(parseInt(amount) || 10, 500))
     },
     stdio: ['ignore', 'pipe', 'pipe']
+  });
+  proc.on('error', err => {
+    const f = floods.get(id);
+    if (f) { f.done = true; f.logs.push('Spawn error: ' + err.message); }
+    activeFloods = Math.max(0, activeFloods - 1);
+    console.error('[flood] spawn error:', err);
   });
 
   const state = { proc, logs: [], done: false, start: Date.now(), joined: 0, failed: 0 };
