@@ -181,23 +181,46 @@ async function launchProxy(){
   var b=document.getElementById('proxyBtn');
   if(!navigator.serviceWorker){s.textContent='Requires Chrome or Edge';return;}
 
-  // 15 second timeout → maintenance page
   proxyTimeout=setTimeout(()=>{
     document.getElementById('maint-page').classList.add('show');
   }, 15000);
 
   try{
-    b.textContent='Loading...';b.disabled=true;s.textContent='Registering...';
-    await navigator.serviceWorker.register('/uv/sw.js',{scope:'/uv/service/'});
+    b.textContent='Loading...';b.disabled=true;s.textContent='Loading proxy files...';
+
+    // Dynamically load uv.bundle.js to get Ultraviolet codec
+    await new Promise((res,rej)=>{
+      if(window.Ultraviolet){res();return;}
+      var s2=document.createElement('script');
+      s2.src='/uv/uv.bundle.js';
+      s2.onload=res;s2.onerror=()=>rej(new Error('Failed to load uv.bundle.js'));
+      document.head.appendChild(s2);
+    });
+
+    // Load uv.config.js so __uv$config.encodeUrl uses the real Ultraviolet codec
+    await new Promise((res,rej)=>{
+      var s2=document.createElement('script');
+      s2.src='/uv/uv.config.js?t='+Date.now();
+      s2.onload=res;s2.onerror=()=>rej(new Error('Failed to load uv.config.js'));
+      document.head.appendChild(s2);
+    });
+
+    s.textContent='Registering service worker...';
+    // Unregister old SW first to avoid stale cache issues
+    const regs=await navigator.serviceWorker.getRegistrations();
+    for(const r of regs){ if(r.scope.includes('/uv/')) await r.unregister(); }
+
+    const reg=await navigator.serviceWorker.register('/uv/sw.js',{scope:'/uv/service/'});
     await navigator.serviceWorker.ready;
     clearTimeout(proxyTimeout);
     s.textContent='Launching...';
-    var enc=__uv$config.encodeUrl('https://play.blooket.com/play');
-    window.location.href='/uv/service/'+enc;
+    var encoded=window.__uv$config.encodeUrl('https://play.blooket.com/play');
+    window.location.href='/uv/service/'+encoded;
   }catch(e){
     clearTimeout(proxyTimeout);
     b.textContent='Open Blooket';b.disabled=false;
     s.textContent='Error: '+e.message;
+    console.error(e);
   }
 }
 
@@ -214,7 +237,6 @@ document.addEventListener('visibilitychange', function(e) {
   }
 });
 </script>
-<script src="/uv/uv.bundle.js"></script>
-<script src="/uv/uv.config.js"></script>
+
 </body>
 </html>
