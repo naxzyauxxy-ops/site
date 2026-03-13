@@ -45,12 +45,10 @@ input::placeholder{color:#2a2a2a}
 .sl{font-size:0.44rem;letter-spacing:0.15em;text-transform:uppercase;color:#444}
 .log{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 14px;height:150px;overflow-y:auto;font-size:0.64rem;line-height:2;scrollbar-width:thin}
 .ll{display:block}.lok{color:#00e676}.lerr{color:#ff3c5a}.linf{color:#555}.lwrn{color:#888}
-/* proxy */
 .proxy-row{display:flex;gap:8px}
 .proxy-row input{flex:1}
 .proxy-row .btn{width:auto;padding:9px 18px;margin:0;white-space:nowrap}
 .proxy-status{font-size:0.62rem;color:#555;margin-top:6px;text-align:center}
-/* games */
 .games-search{margin-bottom:14px}
 .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .game-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .15s}
@@ -59,7 +57,6 @@ input::placeholder{color:#2a2a2a}
 .game-img-none{background-color:#111}
 .game-name{font-family:'Unbounded',sans-serif;font-size:0.52rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;margin:8px 10px 2px;line-height:1.3}
 .game-tag{font-size:0.44rem;color:#333;text-transform:uppercase;letter-spacing:0.1em;margin:0 10px 8px}
-/* settings */
 .scard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:10px}
 .scard h3{font-family:'Unbounded',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
 .scard p{font-size:0.6rem;color:#555;line-height:1.7;margin-bottom:10px}
@@ -76,7 +73,6 @@ input::placeholder{color:#2a2a2a}
 .tbtn{font-family:'Unbounded',sans-serif;font-size:0.48rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:var(--bg);border:1px solid var(--border);color:#444;padding:7px 12px;border-radius:4px;cursor:pointer;transition:all .12s}
 .tbtn:hover{border-color:#333;color:#aaa}
 .tbtn.active{border-color:var(--acc);color:var(--acc)}
-/* themes */
 body.th-midnight{--bg:#07080f;--bg2:#0b0d1a;--border:#151825;--acc:#7c8cf8}
 body.th-red{--acc:#ff3c5a;--border:#2a0a0f}
 body.th-blue{--acc:#3c8eff;--border:#0a1a2a}
@@ -86,8 +82,6 @@ body.th-inverted{--bg:#fff;--bg2:#f0f0f0;--border:#ddd;--text:#000;--muted:#999;
 body.th-mocha{--bg:#1e1e2e;--bg2:#181825;--border:#313244;--acc:#cba6f7}
 body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 @media(max-width:480px){.g2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.games-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}}
-
-/* ── Loading Screen ───────────────────────────────────────── */
 #loader{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,visibility .6s ease}
 #loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
 .loader-logo{font-family:'Unbounded',sans-serif;font-size:clamp(2rem,6vw,4rem);font-weight:900;letter-spacing:-0.04em;text-transform:uppercase;color:#fff;opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
@@ -103,7 +97,6 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 </style>
 </head>
 <body>
-
 
 <div id="loader">
   <div class="loader-pixels" id="loaderPx"></div>
@@ -160,6 +153,13 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 <!-- FLOOD TAB -->
 <div class="panel" id="panel-flood">
   <h1>BOT<br><span>FLOODER</span></h1>
+
+  <!-- CAUTION CARD -->
+  <div class="scard" style="border-color:#ff3c5a44;margin-bottom:14px">
+    <h3 style="color:#ff3c5a">⚠ Caution</h3>
+    <p>The bot flooder may sometimes have problems not working. If it doesn't work, keep trying — wait a few seconds and start again.</p>
+  </div>
+
   <div class="card">
     <div class="mrow">
       <div class="mb active" onclick="setMode('beta',this)">New Modes</div>
@@ -189,7 +189,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
 <!-- SETTINGS TAB -->
 <div class="panel" id="panel-settings">
-  <h1>BLOOKET<br><span>BOT FLOODER</span></h1>
+  <h1>SETTINGS</h1>
 
   <div class="scard">
     <h3>About:Blank Cloaking</h3>
@@ -279,16 +279,11 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="kbtn" onclick="exportData()">Export Save</button>
     <button class="kbtn" onclick="importData()">Import Save</button>
   </div>
-
-  <div class="scard" style="border-color:#ff3c5a44">
-    <h3 style="color:#ff3c5a">Caution</h3>
-    <p>The bot flooder may sometimes have problems not working. If it doesn't work, keep trying — wait a few seconds and start again.</p>
-  </div>
 </div>
 
 <script>
-// ── Games list (from Interstellar + extras) ───────────────────────────────
 const GAMES = [
+  // — Reliable .io multiplayer —
   {name:"1v1.LOL",url:"https://1v1.lol",tag:"shooter"},
   {name:"Shell Shockers",url:"https://shellshock.io/",tag:"shooter"},
   {name:"Smash Karts",url:"https://smashkarts.io/",tag:"racing"},
@@ -299,7 +294,6 @@ const GAMES = [
   {name:"Paper.io",url:"https://paper-io.com/",tag:"io"},
   {name:"MooMoo.io",url:"https://moomoo.io",tag:"io"},
   {name:"Zombs Royale",url:"https://zombsroyale.io",tag:"io"},
-  {name:"Zombs.io",url:"https://zombs.io/",tag:"io"},
   {name:"Narrow One",url:"https://narrow.one",tag:"shooter"},
   {name:"Kirka.io",url:"https://kirka.io",tag:"shooter"},
   {name:"Venge.io",url:"https://venge.io",tag:"shooter"},
@@ -308,101 +302,83 @@ const GAMES = [
   {name:"Tetr.io",url:"https://tetr.io/",tag:"puzzle"},
   {name:"Starblast",url:"https://starblast.io",tag:"shooter"},
   {name:"Territorial.io",url:"https://territorial.io",tag:"strategy"},
-  {name:"Taming.io",url:"https://taming.io/",tag:"io"},
   {name:"Bloxd.io",url:"https://bloxd.io",tag:"sandbox"},
   {name:"Swordbattle.io",url:"https://swordbattle.io/",tag:"io"},
   {name:"YoHoHo.io",url:"https://yohoho.io/",tag:"io"},
-  {name:"DigDig.io",url:"https://digdig.io/",tag:"io"},
-  {name:"Hordes.io",url:"https://hordes.io",tag:"rpg"},
   {name:"Skribbl.io",url:"https://skribbl.io/",tag:"multiplayer"},
   {name:"Gartic Phone",url:"https://garticphone.com",tag:"multiplayer"},
   {name:"Bomb Party",url:"https://jklm.fun",tag:"multiplayer"},
-  {name:"Pokemon Showdown",url:"https://play.pokemonshowdown.com",tag:"multiplayer"},
-  {name:"Moto X3M",url:"https://html5.gamedistribution.com/rvvASMiM/5b0abd4c0faa4f5eb190a9a16d/",tag:"racing"},
-  {name:"Moto X3M Spooky",url:"https://html5.gamedistribution.com/rvvASMiM/b8a342904608470a9f3382337a/",tag:"racing"},
-  {name:"Rooftop Snipers",url:"https://html5.gamedistribution.com/rvvASMiM/c3a70ae98547407a92ebedca8b/",tag:"shooter"},
-  {name:"Snow Rider 3D",url:"https://html5.gamedistribution.com/rvvASMiM/3b79a8537ebc414fb4f9672a9b/",tag:"racing"},
-  {name:"Basket Random",url:"https://html5.gamedistribution.com/rvvASMiM/bf1268dccb5d43e7970bb3edaa/",tag:"sports"},
-  {name:"Basketball Stars",url:"https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/",tag:"sports"},
-  {name:"Parkour Block 3D",url:"https://html5.gamedistribution.com/1461d40bb77f48e6be72489959a1ac04/",tag:"platformer"},
-  {name:"Time Shooter 2",url:"https://html5.gamedistribution.com/62a72f2da7cb4b609579a47653546e6a/",tag:"shooter"},
-  {name:"Merge Fruit",url:"https://html5.gamedistribution.com/2dee9d404697435aa76111eb4015e1d5/",tag:"puzzle"},
-  {name:"Survivor.io",url:"https://html5.gamedistribution.com/rvvASMiM/f1c451e586c04b4c8cba01b0c5/",tag:"shooter"},
-  {name:"Gunspin",url:"https://html5.gamedistribution.com/rvvASMiM/917cce8c44c44638a8cdc2a179/",tag:"arcade"},
-  {name:"Stickman Archero",url:"https://html5.gamedistribution.com/rvvASMiM/3f4c166817ad4fd4b5b05d9adb/",tag:"shooter"},
-  {name:"Helix Jump",url:"https://helix-jump.game-files.crazygames.com/helix-jump/1/index.html",tag:"arcade"},
-  {name:"Age of War",url:"https://age-of-war.game-files.crazygames.com/ruffle/ageofwar.html",tag:"strategy"},
-  {name:"The Impossible Quiz",url:"https://the-impossible-quiz.game-files.crazygames.com/ruffle/theimpossiblequiz.html",tag:"puzzle"},
-  {name:"Riddle School 3",url:"https://riddle-school-3.game-files.crazygames.com/ruffle/riddleschool3.html",tag:"adventure"},
-  {name:"Riddle School 4",url:"https://riddle-school-4.game-files.crazygames.com/ruffle/riddleschool4.html",tag:"adventure"},
-  {name:"Riddle School 5",url:"https://riddle-school-5.game-files.crazygames.com/ruffle/riddleschool5.html",tag:"adventure"},
-  {name:"Happy Wheels",url:"https://files.crazygames.com/ruffle/happywheels.html",tag:"arcade"},
-  {name:"Sandtrix",url:"https://files.crazygames.com/sandtrix/16/index.html",tag:"puzzle"},
-  {name:"Papa's Scooperia",url:"https://files.crazygames.com/ruffle/papasscooperia.html",tag:"sim"},
-  {name:"Papa's Sushiria",url:"https://files.crazygames.com/ruffle/papassushiria.html",tag:"sim"},
-  {name:"Haunted School",url:"https://games.crazygames.com/en_US/haunted-school---horror-game/index.html",tag:"horror"},
-  {name:"Madalin Cars Multi",url:"https://games.crazygames.com/en_US/madalin-cars-multiplayer/index.html",tag:"racing"},
+  {name:"Snowball.io",url:"https://games.crazygames.com/en_US/snowball-io/index.html",tag:"io"},
+  // — Poki (very reliable, rarely blocked) —
+  {name:"Subway Surfers",url:"https://poki.com/en/g/subway-surfers",tag:"arcade"},
+  {name:"Temple Run 2",url:"https://poki.com/en/g/temple-run-2",tag:"arcade"},
+  {name:"Stickman Hook",url:"https://poki.com/en/g/stickman-hook",tag:"arcade"},
+  {name:"Getaway Shootout",url:"https://poki.com/en/g/getaway-shootout",tag:"shooter"},
+  {name:"Fireboy & Watergirl",url:"https://poki.com/en/g/fireboy-and-watergirl-the-forest-temple",tag:"platformer"},
+  {name:"Bob the Robber",url:"https://poki.com/en/g/bob-the-robber",tag:"adventure"},
+  {name:"Moto X3M",url:"https://poki.com/en/g/moto-x3m",tag:"racing"},
+  {name:"Merge Master",url:"https://poki.com/en/g/merge-master",tag:"puzzle"},
+  {name:"Crazy Cars",url:"https://poki.com/en/g/crazy-cars",tag:"racing"},
+  {name:"Gun Mayhem Redux",url:"https://poki.com/en/g/gun-mayhem-redux",tag:"shooter"},
+  {name:"Rooftop Snipers",url:"https://poki.com/en/g/rooftop-snipers",tag:"shooter"},
+  {name:"Basketball Stars",url:"https://poki.com/en/g/basketball-stars",tag:"sports"},
+  {name:"Soccer Random",url:"https://poki.com/en/g/soccer-random",tag:"sports"},
+  {name:"Basket Random",url:"https://poki.com/en/g/basket-random",tag:"sports"},
+  {name:"Penalty Kick Online",url:"https://poki.com/en/g/penalty-kick-online",tag:"sports"},
+  {name:"Drift Boss",url:"https://poki.com/en/g/drift-boss",tag:"racing"},
+  {name:"Hill Climb Racing",url:"https://poki.com/en/g/hill-climb-racing",tag:"racing"},
+  {name:"Dino Game",url:"https://poki.com/en/g/dino-game",tag:"arcade"},
+  {name:"2048",url:"https://poki.com/en/g/2048",tag:"puzzle"},
+  {name:"Helix Jump",url:"https://poki.com/en/g/helix-jump",tag:"arcade"},
+  {name:"Crossword",url:"https://poki.com/en/g/crossword",tag:"classic"},
+  // — CrazyGames (HTML5, very reliable) —
+  {name:"BuildNow GG",url:"https://games.crazygames.com/en_US/buildnow-gg/index.html",tag:"shooter"},
   {name:"Madalin Stunt Cars 2",url:"https://games.crazygames.com/en_US/madalin-stunt-cars-2/index.html",tag:"racing"},
   {name:"Madalin Stunt Cars 3",url:"https://games.crazygames.com/en_US/madalin-stunt-cars-3/index.html",tag:"racing"},
-  {name:"BuildNow GG",url:"https://games.crazygames.com/en_US/buildnow-gg/index.html",tag:"shooter"},
-  {name:"Snowball.io",url:"https://games.crazygames.com/en_US/snowball-io/index.html",tag:"io"},
+  {name:"Madalin Cars Multi",url:"https://games.crazygames.com/en_US/madalin-cars-multiplayer/index.html",tag:"racing"},
   {name:"Fancy Pants Adventure",url:"https://games.crazygames.com/en_US/fancy-pants-adventure-world/index.html",tag:"platformer"},
-  {name:"Super Mario 64",url:"https://f.kbhgames.com/r/n64/game.php?file=32112_super-mario-64-usa.zip",tag:"platformer"},
-  {name:"Mario Kart 64",url:"https://f.kbhgames.com/r/n64/game.php?file=mario-kart-64.zip",tag:"racing"},
-  {name:"GoldenEye 007",url:"https://f.kbhgames.com/r/n64/game.php?file=007-golden-eye.zip",tag:"shooter"},
-  {name:"Paper Mario 64",url:"https://f.kbhgames.com/r/n64/game.php?file=Paper%20Mario%20(USA).zip",tag:"rpg"},
-  {name:"Mortal Kombat 4",url:"https://f.kbhgames.com/r/n64/game.php?file=Mortal-Kombat-4-U.zip",tag:"fighting"},
-  {name:"Ace Attorney",url:"https://f.kbhgames.com/r/gba/?r=ace-attorney",tag:"adventure"},
-  {name:"Super Smash Flash",url:"https://f.kbhgames.com/RS/game.php?r=//f.kbhgames.com/2018/swf/smashflash.swf",tag:"fighting"},
-  {name:"Papa's Pizzeria",url:"https://f.silvergames.com/ruffle/player.php?id=1360",tag:"sim"},
-  {name:"Papa Louie 1",url:"https://f.silvergames.com/ruffle/player.php?id=1373",tag:"sim"},
-  {name:"Papa Louie 2",url:"https://f.silvergames.com/emu/waffle/?id=3042",tag:"sim"},
-  {name:"Papa Louie 3",url:"https://f.silvergames.com/emu/waffle/?id=4693",tag:"sim"},
-  {name:"Papa's Bakeria",url:"https://f.silvergames.com/emu/waffle/?id=5458",tag:"sim"},
-  {name:"Papa's Cupcakeria",url:"https://f.silvergames.com/emu/waffle/?id=3246",tag:"sim"},
-  {name:"The Impossible Quiz 2",url:"https://f.silvergames.com/ruffle/player.php?id=3742",tag:"puzzle"},
-  {name:"Burrito Bison",url:"https://f.silvergames.com/awayfl/index.html?swf=burrito-bison.swf",tag:"arcade"},
-  {name:"Interactive Buddy",url:"https://f.silvergames.com/ruffle/player.php?id=204",tag:"arcade"},
-  {name:"Riddle School 2",url:"https://f.silvergames.com/ruffle/player.php?id=8564",tag:"adventure"},
-  {name:"Rooftop Snipers 2",url:"https://h5cdn.github.io/s6/rooftop-snipers-2/",tag:"shooter"},
-  {name:"FNAF 2",url:"https://sussygamedeveloper.github.io/FNAF2/",tag:"horror"},
-  {name:"FNAF 3",url:"https://sussygamedeveloper.github.io/fnaf3/",tag:"horror"},
-  {name:"FNAF Web",url:"https://wellsousaaa.github.io/Five-Nights-at-Freddys-Web/",tag:"horror"},
-  {name:"Gladihoppers",url:"https://bonbang.github.io/store99/gladihoppers/index.html",tag:"fighting"},
-  {name:"Tube Jumpers",url:"https://unblocked76.github.io/tube-jumpers/",tag:"arcade"},
+  {name:"Haunted School",url:"https://games.crazygames.com/en_US/haunted-school---horror-game/index.html",tag:"horror"},
   {name:"Temple of Boom",url:"https://temple-of-boom.github.io/file/",tag:"shooter"},
-  {name:"DOOM",url:"https://browncha023.github.io/GBA/launcher.html#dm",tag:"shooter"},
-  {name:"DOOM 2",url:"https://browncha023.github.io/GBA/launcher.html#dm2",tag:"shooter"},
-  {name:"Pokemon Light Platinum",url:"https://browncha023.github.io/GBA/launcher.html#pokemonlp",tag:"rpg"},
-  {name:"South Park",url:"https://retrobowl-game.github.io/South-Park/",tag:"arcade"},
-  {name:"Drive Mad",url:"https://raw.githack.com/3kh0/3kh0-assets/main/drive-mad/index.html",tag:"racing"},
-  {name:"AC: Wild World",url:"https://static.arcadespot.com/retroemulator.php?system=nds&game=2017/10/Animal-Crossing-Wild-World-USA.nds",tag:"sim"},
-  {name:"Pokemon Heart Gold",url:"https://static.arcadespot.com/retroemulator.php?system=nds&game=2017/10/Pokemon-HeartGold-USA-Patched.nds",tag:"rpg"},
-  {name:"10 Minutes Till Dawn",url:"https://selenite.cc/semag/10minutestilldawn/index.html",tag:"shooter"},
-  {name:"World's Hardest Game",url:"https://selenite.cc/semag/worldshardestgame/index.html",tag:"arcade"},
-  {name:"World's Hardest Game 2",url:"https://selenite.cc/semag/worldshardestgame2/index.html",tag:"arcade"},
-  {name:"Super Mario 64 DS",url:"https://selenite.cc/semag/supermario64ds/index.html",tag:"platformer"},
-  {name:"Nintendogs",url:"https://selenite.cc/semag/nintendogs/index.html",tag:"sim"},
-  {name:"FNF Lofi Mod",url:"https://fnf.kdata1.com/lofi-funkin/2/",tag:"rhythm"},
-  {name:"FNF VS Snorlax",url:"https://fnf.kdata1.com/snorlax/1/",tag:"rhythm"},
-  {name:"GBA Emulator",url:"https://ds.44670.org/gba/",tag:"emulator"},
-  {name:"DS Emulator",url:"https://ds.44670.org/",tag:"emulator"},
+  // — Coolmath Games (almost never blocked) —
+  {name:"Run 3",url:"https://www.coolmathgames.com/0-run-3",tag:"arcade"},
+  {name:"Papa's Freezeria",url:"https://www.coolmathgames.com/0-papas-freezeria",tag:"sim"},
+  {name:"Papa's Pizzeria",url:"https://www.coolmathgames.com/0-papas-pizzeria",tag:"sim"},
+  {name:"Papa's Burgeria",url:"https://www.coolmathgames.com/0-papas-burgeria",tag:"sim"},
+  {name:"Snake",url:"https://www.coolmathgames.com/0-snake",tag:"classic"},
+  {name:"Idle Breakout",url:"https://www.coolmathgames.com/0-idle-breakout",tag:"idle"},
+  // — Standalone reliable hosts —
   {name:"Minecraft Classic",url:"https://classic.minecraft.net",tag:"sandbox"},
   {name:"Cookie Clicker",url:"https://orteil.dashnet.org/cookieclicker/",tag:"idle"},
   {name:"A Dark Room",url:"https://adarkroom.doublespeakgames.com",tag:"rpg"},
   {name:"Chess.com",url:"https://chess.com",tag:"classic"},
   {name:"Sandspiel",url:"https://sandspiel.club/",tag:"sandbox"},
-  {name:"Shapez.io",url:"https://shapez.io",tag:"puzzle"},
   {name:"Neal.Fun",url:"https://neal.fun",tag:"arcade"},
-  {name:"Eaglercraft 1.5",url:"https://interstellar-assets.pages.dev/minecraft-15/",tag:"sandbox"},
+  {name:"Pokemon Showdown",url:"https://play.pokemonshowdown.com",tag:"multiplayer"},
   {name:"Wordle Unlimited",url:"https://wordleunlimited.org/",tag:"classic"},
+  {name:"Eaglercraft 1.5",url:"https://interstellar-assets.pages.dev/minecraft-15/",tag:"sandbox"},
+  {name:"GBA Emulator",url:"https://ds.44670.org/gba/",tag:"emulator"},
+  {name:"DS Emulator",url:"https://ds.44670.org/",tag:"emulator"},
+  {name:"FNF Lofi Mod",url:"https://fnf.kdata1.com/lofi-funkin/2/",tag:"rhythm"},
+  {name:"10 Minutes Till Dawn",url:"https://selenite.cc/semag/10minutestilldawn/index.html",tag:"shooter"},
+  {name:"World's Hardest Game",url:"https://selenite.cc/semag/worldshardestgame/index.html",tag:"arcade"},
+  {name:"World's Hardest Game 2",url:"https://selenite.cc/semag/worldshardestgame2/index.html",tag:"arcade"},
+  {name:"Drive Mad",url:"https://raw.githack.com/3kh0/3kh0-assets/main/drive-mad/index.html",tag:"racing"},
   {name:"Among Us (Scratch)",url:"https://turbowarp.org/523967150/fullscreen",tag:"multiplayer"},
-  {name:"Mario Party",url:"https://classwork-heaven.pages.dev/g/marioparty/",tag:"multiplayer"},
+  {name:"Rooftop Snipers 2",url:"https://h5cdn.github.io/s6/rooftop-snipers-2/",tag:"shooter"},
+  {name:"Gladihoppers",url:"https://bonbang.github.io/store99/gladihoppers/index.html",tag:"fighting"},
+  {name:"Tube Jumpers",url:"https://unblocked76.github.io/tube-jumpers/",tag:"arcade"},
+  {name:"FNAF 2",url:"https://sussygamedeveloper.github.io/FNAF2/",tag:"horror"},
+  {name:"FNAF 3",url:"https://sussygamedeveloper.github.io/fnaf3/",tag:"horror"},
+  {name:"South Park",url:"https://retrobowl-game.github.io/South-Park/",tag:"arcade"},
+  {name:"Sandtrix",url:"https://files.crazygames.com/sandtrix/16/index.html",tag:"puzzle"},
+  {name:"Happy Wheels",url:"https://files.crazygames.com/ruffle/happywheels.html",tag:"arcade"},
+  {name:"The Impossible Quiz",url:"https://the-impossible-quiz.game-files.crazygames.com/ruffle/theimpossiblequiz.html",tag:"puzzle"},
+  {name:"Age of War",url:"https://age-of-war.game-files.crazygames.com/ruffle/ageofwar.html",tag:"strategy"},
 ];
 
 function buildGames(list){
   const g=document.getElementById('gamesGrid');
-  g.innerHTML=list.map(game=>`<div class="game-card" onclick="proxyGame(\'${game.url}\')">
+  g.innerHTML=list.map(game=>`<div class="game-card" onclick="proxyGame('${game.url}')">
     ${game.img?`<div class="game-img" style="background-image:url('${game.img}')"></div>`:'<div class="game-img game-img-none"></div>'}
     <div class="game-name">${game.name}</div>
     <div class="game-tag">${game.tag}</div>
@@ -414,7 +390,6 @@ function filterGames(q){
   buildGames(GAMES.filter(g=>g.name.toLowerCase().includes(q.toLowerCase())||g.tag.toLowerCase().includes(q.toLowerCase())));
 }
 
-// ── Tabs ─────────────────────────────────────────────────────────────────
 function show(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -422,15 +397,14 @@ function show(id,el){
   el.classList.add('active');
 }
 
-// ── Proxy ─────────────────────────────────────────────────────────────────
 var swReady = false;
 var proxyEngine = localStorage.getItem('engine') || 'https://www.google.com/search?q=';
 
 function resolveUrl(raw){
   raw=raw.trim();
   if(!raw) return null;
-  if(/^https?:\/\//i.test(raw)) return raw;
-  if(/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(raw)&&!raw.includes(' ')) return 'https://'+raw;
+  if(/^https?:///i.test(raw)) return raw;
+  if(/^[a-zA-Z0-9-]+.[a-zA-Z]{2,}/.test(raw)&&!raw.includes(' ')) return 'https://'+raw;
   return proxyEngine + encodeURIComponent(raw);
 }
 
@@ -452,7 +426,6 @@ async function launchProxy(){
 
 function proxyGame(url){
   if(!swReady){
-    // Try anyway
     try{
       var enc=__uv$config.encodeUrl(url);
       window.open('/a/'+enc,'_blank');
@@ -463,7 +436,6 @@ function proxyGame(url){
   window.open('/a/'+enc,'_blank');
 }
 
-// Register service worker (Interstellar style)
 (async function registerSW(){
   var s=document.getElementById('proxyStatus');
   if(!navigator.serviceWorker){s.textContent='⚠ Service workers not supported';return;}
@@ -477,12 +449,10 @@ function proxyGame(url){
   }catch(e){
     s.textContent='Proxy error: '+e.message;
     console.error('SW error',e);
-    // Retry once
     setTimeout(registerSW, 3000);
   }
 })();
 
-// ── Flood ─────────────────────────────────────────────────────────────────
 var mode='beta',floodId=null,pollTimer=null,lastLog=0;
 function setMode(m,el){mode=m;document.querySelectorAll('.mb').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
 function setN(n){document.getElementById('botName').value=n;}
@@ -513,7 +483,6 @@ async function toggleFlood(){
   }catch(e){addLog('Error: '+e.message,'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';}
 }
 
-// ── Settings ───────────────────────────────────────────────────────────────
 function toggleAB(){
   var on=document.getElementById('ab-switch').checked;
   localStorage.setItem('ab',on?'true':'false');
@@ -537,7 +506,6 @@ function openAB(){
   }catch(e){alert('Error: '+e.message);}
 }
 
-// Panic key
 var _panicKeys=[];
 document.addEventListener('keydown',function(e){
   var keys=JSON.parse(localStorage.getItem('panicKeys')||'[]');
@@ -556,7 +524,6 @@ function savePanic(){
   alert('Panic key saved!');
 }
 
-// Tab cloak
 function handleCloakDropdown(sel){
   if(!sel.value)return;
   var parts=sel.value.split('|');
@@ -578,7 +545,6 @@ function resetCloak(){
   document.getElementById('cloakIcon').value='';
 }
 
-// Background
 function saveBg(){
   var url=document.getElementById('bgInput').value.trim();
   if(!url)return;
@@ -592,13 +558,11 @@ function resetBg(){
   document.getElementById('bgInput').value='';
 }
 
-// Search engine
 function saveEngine(sel){
   localStorage.setItem('engine',sel.value);
   proxyEngine=sel.value;
 }
 
-// Themes
 function setTheme(cls,el){
   document.body.className=cls;
   var bg=localStorage.getItem('backgroundImage');
@@ -608,7 +572,6 @@ function setTheme(cls,el){
   localStorage.setItem('theme',cls);
 }
 
-// Export/import
 function exportData(){
   var data={localStorage:{}};
   for(var k in localStorage)if(Object.hasOwn(localStorage,k))data.localStorage[k]=localStorage.getItem(k);
@@ -629,39 +592,25 @@ function importData(){
   };inp.click();
 }
 
-// ── Load saved settings on start ──────────────────────────────────────────
 (function loadSaved(){
-  // Theme
   var t=localStorage.getItem('theme');
   if(t){document.body.className=t;var el=document.getElementById('th-'+(t||'default'));if(el){document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}}
-
-  // Background
   var bg=localStorage.getItem('backgroundImage');
   if(bg){document.body.style.backgroundImage='url('+bg+')';document.body.style.backgroundSize='cover';}
-
-  // Cloak
   var cn=localStorage.getItem('CustomName');var ci=localStorage.getItem('CustomIcon');
   if(cn){document.getElementById('page-title').textContent=cn;document.getElementById('cloakTitle').value=cn;}
   if(ci){document.getElementById('tab-favicon').href=ci;document.getElementById('cloakIcon').value=ci;}
-
-  // Panic
   var pk=localStorage.getItem('eventKeyRaw');if(pk)document.getElementById('panicKeyInput').value=pk;
   var pl=localStorage.getItem('pLink');if(pl)document.getElementById('panicLinkInput').value=pl;
-
-  // AB switch
   var ab=localStorage.getItem('ab');
   if(ab==='true')document.getElementById('ab-switch').checked=true;
-
-  // Engine
   var eng=localStorage.getItem('engine');
   if(eng){document.getElementById('engineSelect').value=eng;proxyEngine=eng;}
 })();
 
-// Auto open about:blank
 (function(){
   try{var inFrame=window!==top;}catch(e){var inFrame=true;}
   if(!inFrame&&!navigator.userAgent.includes('Firefox')&&localStorage.getItem('ab')==='true'){
-    // Only auto-open if enabled
     var popup=open('about:blank','_blank');
     setTimeout(()=>{
       if(!popup||popup.closed)return;
