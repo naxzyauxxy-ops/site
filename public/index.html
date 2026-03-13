@@ -3,142 +3,135 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Void Hub</title>
+<title id="page-title">Void Hub</title>
+<link rel="shortcut icon" id="tab-favicon" href="data:,"/>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=DM+Mono&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#000;color:#fff;font-family:'DM Mono',monospace;min-height:100vh}
-nav{position:sticky;top:0;z-index:100;background:#000;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px}
+:root{--bg:#000;--bg2:#0d0d0d;--border:#1a1a1a;--text:#fff;--muted:#444;--acc:#fff}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;transition:background .3s}
+nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px}
 .logo{font-family:'Unbounded',sans-serif;font-size:0.72rem;font-weight:900;letter-spacing:0.12em}
 .tabs{display:flex;height:100%}
-.tab{font-family:'Unbounded',sans-serif;font-size:0.55rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#444;background:transparent;border:none;border-bottom:2px solid transparent;padding:0 16px;height:100%;cursor:pointer;transition:color .15s,border-color .15s}
+.tab{font-family:'Unbounded',sans-serif;font-size:0.52rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);background:transparent;border:none;border-bottom:2px solid transparent;padding:0 14px;height:100%;cursor:pointer;transition:color .15s,border-color .15s}
 .tab:hover{color:#aaa}
-.tab.active{color:#fff;border-bottom-color:#fff}
-
-.panel{display:none;max-width:560px;margin:0 auto;padding:48px 24px 80px}
-.panel.active{display:block;animation:fu .2s ease both}
-@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-h1{font-family:'Unbounded',sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;line-height:1;letter-spacing:-0.03em;text-transform:uppercase;margin-bottom:28px}
+.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+.panel{display:none;max-width:600px;margin:0 auto;padding:40px 24px 80px}
+.panel.active{display:block;animation:fu .18s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+h1{font-family:'Unbounded',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;line-height:1;letter-spacing:-0.03em;text-transform:uppercase;margin-bottom:24px}
 h1 span{color:#333}
-.card{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:10px;padding:20px;margin-bottom:12px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
-label{font-size:0.5rem;letter-spacing:0.15em;text-transform:uppercase;color:#555}
-input{background:#000;border:1px solid #222;border-radius:6px;padding:10px 12px;color:#fff;font-family:'DM Mono',monospace;font-size:0.82rem;outline:none;transition:border-color .15s;width:100%}
-input:focus{border-color:#555}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+label{font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;color:#555}
+input,select{background:var(--bg);border:1px solid #222;border-radius:6px;padding:9px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.8rem;outline:none;transition:border-color .15s;width:100%}
+input:focus,select:focus{border-color:#555}
 input::placeholder{color:#2a2a2a}
-.pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
-.pill{font-size:0.6rem;background:#000;border:1px solid #1a1a1a;color:#555;padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .12s}
+.pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.pill{font-size:0.58rem;background:var(--bg);border:1px solid var(--border);color:#555;padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .12s}
 .pill:hover{border-color:#444;color:#fff}
-.mrow{display:flex;gap:6px;margin-bottom:14px}
-.mb{flex:1;font-family:'Unbounded',sans-serif;font-size:0.52rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:#000;border:1px solid #1a1a1a;color:#444;padding:9px;border-radius:6px;cursor:pointer;transition:all .12s;text-align:center}
+.mrow{display:flex;gap:6px;margin-bottom:12px}
+.mb{flex:1;font-family:'Unbounded',sans-serif;font-size:0.5rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:var(--bg);border:1px solid var(--border);color:#444;padding:9px;border-radius:6px;cursor:pointer;transition:all .12s;text-align:center}
 .mb.active{border-color:#444;color:#fff}
-.btn{display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border:none;border-radius:6px;padding:13px;cursor:pointer;transition:opacity .12s,transform .1s;width:100%;margin-bottom:10px}
+.btn{display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-size:0.56rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border:none;border-radius:6px;padding:12px;cursor:pointer;transition:opacity .12s,transform .1s;width:100%;margin-bottom:10px}
 .btn:active{transform:scale(0.98)}
 .bw{background:#fff;color:#000}.bw:hover{opacity:.85}
 .br{background:#ff3c5a;color:#fff}
-.bg{background:transparent;border:1px solid #222;color:#fff}.bg:hover{background:#111}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
-.stat{background:#000;border:1px solid #1a1a1a;border-radius:6px;padding:10px 6px;text-align:center}
-.sv{font-family:'Unbounded',sans-serif;font-size:1.3rem;font-weight:900;line-height:1;margin-bottom:3px}
+.stat{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 6px;text-align:center}
+.sv{font-family:'Unbounded',sans-serif;font-size:1.2rem;font-weight:900;line-height:1;margin-bottom:3px}
 .sv.g{color:#00e676}.sv.r{color:#ff3c5a}
-.sl{font-size:0.46rem;letter-spacing:0.15em;text-transform:uppercase;color:#444}
-.log{background:#000;border:1px solid #1a1a1a;border-radius:6px;padding:12px 14px;height:150px;overflow-y:auto;font-size:0.66rem;line-height:2;scrollbar-width:thin;scrollbar-color:#1a1a1a transparent}
+.sl{font-size:0.44rem;letter-spacing:0.15em;text-transform:uppercase;color:#444}
+.log{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 14px;height:150px;overflow-y:auto;font-size:0.64rem;line-height:2;scrollbar-width:thin}
 .ll{display:block}.lok{color:#00e676}.lerr{color:#ff3c5a}.linf{color:#555}.lwrn{color:#888}
 /* proxy */
-.proxy-note{font-size:0.65rem;color:#555;margin-top:8px;text-align:center}
-/* maintenance page */
-#maint-page{display:none;position:fixed;inset:0;background:#000;z-index:999;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px}
-#maint-page.show{display:flex}
-#maint-page h2{font-family:'Unbounded',sans-serif;font-size:clamp(1.2rem,3vw,1.8rem);font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;margin-bottom:16px;color:#fff}
-#maint-page p{font-size:0.75rem;color:#555;max-width:360px;line-height:1.9}
-#maint-page .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#333;margin:20px 4px 0;animation:blink 1.4s infinite}
-#maint-page .dot:nth-child(2){animation-delay:.2s}
-#maint-page .dot:nth-child(3){animation-delay:.4s}
-@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
-/* coming soon badge */
-.cs-badge{display:inline-block;font-size:0.42rem;font-family:'Unbounded',sans-serif;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;background:#111;border:1px solid #222;color:#444;padding:3px 8px;border-radius:3px;vertical-align:middle;margin-left:8px;position:relative;top:-1px}
-/* games panel */
-.cs-card{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:10px;padding:40px 20px;text-align:center}
-.cs-title{font-family:'Unbounded',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#333;margin-bottom:12px}
-.cs-big{font-family:'Unbounded',sans-serif;font-size:clamp(1.4rem,3vw,2rem);font-weight:900;letter-spacing:-0.02em;text-transform:uppercase;color:#222}
-@media(max-width:480px){.g2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
-
-/* ── Loading Screen ───────────────────────────────────────── */
-#loader{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,visibility .6s ease}
-#loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
-.loader-logo{font-family:'Unbounded',sans-serif;font-size:clamp(2rem,6vw,4rem);font-weight:900;letter-spacing:-0.04em;text-transform:uppercase;color:#fff;opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
-.loader-logo.show{opacity:1;transform:translateY(0)}
-.loader-sub{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:#333;margin-top:12px;opacity:0;transition:opacity .4s ease .2s}
-.loader-sub.show{opacity:1}
-.loader-bar-wrap{width:min(320px,70vw);height:2px;background:#111;border-radius:1px;margin-top:32px;overflow:hidden;opacity:0;transition:opacity .3s ease}
-.loader-bar-wrap.show{opacity:1}
-.loader-bar{height:100%;width:0%;background:#fff;border-radius:1px;transition:width .08s linear}
-.loader-pixels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.px{position:absolute;width:4px;height:4px;background:#fff;opacity:0;animation:pxfall 1s ease forwards}
-@keyframes pxfall{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(40px)}}
-
+.proxy-row{display:flex;gap:8px}
+.proxy-row input{flex:1}
+.proxy-row .btn{width:auto;padding:9px 18px;margin:0;white-space:nowrap}
+.proxy-status{font-size:0.62rem;color:#555;margin-top:6px;text-align:center}
 /* games */
-.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-.game-card{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:14px 12px;cursor:pointer;transition:all .15s}
-.game-card:hover{border-color:#333;background:#111;transform:translateY(-1px)}
-.game-name{font-family:'Unbounded',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:4px}
-.game-url{font-size:0.5rem;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.games-search{margin-bottom:14px}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.game-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 12px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.game-card:hover{border-color:#333;background:#111;transform:translateY(-2px)}
+.game-name{font-family:'Unbounded',sans-serif;font-size:0.56rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:3px}
+.game-tag{font-size:0.46rem;color:#333;text-transform:uppercase;letter-spacing:0.1em}
 /* settings */
-.setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.setting-label{font-family:'Unbounded',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px}
-.setting-desc{font-size:0.58rem;color:#444;line-height:1.5}
+.scard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:10px}
+.scard h3{font-family:'Unbounded',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
+.scard p{font-size:0.6rem;color:#555;line-height:1.7;margin-bottom:10px}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .toggle{position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0}
 .slider{position:absolute;cursor:pointer;inset:0;background:#1a1a1a;border-radius:20px;transition:.2s}
 .slider:before{position:absolute;content:"";height:14px;width:14px;left:3px;bottom:3px;background:#444;border-radius:50%;transition:.2s}
 .toggle input:checked+.slider{background:#fff}
 .toggle input:checked+.slider:before{background:#000;transform:translateX(16px)}
-.theme-row{display:flex;flex-wrap:wrap;gap:6px}
-.theme-btn{font-family:'Unbounded',sans-serif;font-size:0.5rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:#000;border:1px solid #1a1a1a;color:#444;padding:7px 12px;border-radius:4px;cursor:pointer;transition:all .12s}
-.theme-btn:hover{border-color:#333;color:#aaa}
-.theme-btn.active{border-color:#fff;color:#fff}
+.kbtn{font-family:'Unbounded',sans-serif;font-size:0.48rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:var(--bg);border:1px solid #333;color:#888;padding:7px 14px;border-radius:4px;cursor:pointer;transition:all .12s;margin-top:8px;margin-right:6px}
+.kbtn:hover{border-color:#666;color:#fff}
+.theme-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tbtn{font-family:'Unbounded',sans-serif;font-size:0.48rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:var(--bg);border:1px solid var(--border);color:#444;padding:7px 12px;border-radius:4px;cursor:pointer;transition:all .12s}
+.tbtn:hover{border-color:#333;color:#aaa}
+.tbtn.active{border-color:var(--acc);color:var(--acc)}
 /* themes */
-body.theme-midnight{--bg:#07080f;--card:#0b0d1a;--border:#151825}
-body.theme-midnight,body.theme-midnight nav{background:var(--bg)}
-body.theme-midnight .card,body.theme-midnight .stat,body.theme-midnight .log{background:var(--card);border-color:var(--border)}
-body.theme-red{--acc:#ff3c5a}
-body.theme-red nav{border-color:#1a0008}
-body.theme-red .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
-body.theme-blue{--acc:#3c8eff}
-body.theme-blue .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
-body.theme-green{--acc:#00e676}
-body.theme-green .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+body.th-midnight{--bg:#07080f;--bg2:#0b0d1a;--border:#151825;--acc:#7c8cf8}
+body.th-red{--acc:#ff3c5a;--border:#2a0a0f}
+body.th-blue{--acc:#3c8eff;--border:#0a1a2a}
+body.th-green{--acc:#00e676;--border:#0a2a15}
+body.th-sky{--bg:#0a1628;--bg2:#0f1e35;--border:#1a2e4a;--acc:#60b8ff}
+body.th-inverted{--bg:#fff;--bg2:#f0f0f0;--border:#ddd;--text:#000;--muted:#999;--acc:#000}
+body.th-mocha{--bg:#1e1e2e;--bg2:#181825;--border:#313244;--acc:#cba6f7}
+body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
+@media(max-width:480px){.g2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.games-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}}
 </style>
 </head>
 <body>
 
-
-<div id="loader">
-  <div class="loader-pixels" id="loaderPx"></div>
-  <div class="loader-logo" id="loaderLogo">VOID HUB</div>
-  <div class="loader-sub" id="loaderSub">initializing...</div>
-  <div class="loader-bar-wrap" id="loaderBarWrap">
-    <div class="loader-bar" id="loaderBar"></div>
-  </div>
-</div>
-
-<div id="maint-page">
-  <h2>Not Available</h2>
-  <p>This is either not working or is in maintenance at the moment. Please wait!</p>
-  <div><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-</div>
-
 <nav>
   <div class="logo">VOID HUB</div>
   <div class="tabs">
+    <button class="tab" onclick="show('proxy',this)">Proxy</button>
+    <button class="tab active" onclick="show('games',this)">Games</button>
     <button class="tab" onclick="show('flood',this)">Flood</button>
-    <button class="tab active" onclick="show('proxy',this)">Proxy</button>
-    <button class="tab" onclick="show('games',this)">Games</button>
     <button class="tab" onclick="show('settings',this)">Settings</button>
   </div>
 </nav>
 
+<!-- PROXY TAB -->
+<div class="panel" id="panel-proxy">
+  <h1>UV<br><span>PROXY</span></h1>
+  <div class="card">
+    <p style="font-size:0.68rem;color:#555;margin-bottom:14px;line-height:1.8">Browse any site — bypasses school filters.</p>
+    <div class="field" style="margin-bottom:10px">
+      <label>URL or Search</label>
+      <div class="proxy-row">
+        <input id="proxyInput" placeholder="google.com or search anything..." onkeydown="if(event.key==='Enter')launchProxy()"/>
+        <button class="btn bw proxy-row" onclick="launchProxy()" style="width:auto;padding:9px 18px;margin:0">Go</button>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill" onclick="setProxy('https://google.com')">Google</span>
+      <span class="pill" onclick="setProxy('https://blooket.com')">Blooket</span>
+      <span class="pill" onclick="setProxy('https://youtube.com')">YouTube</span>
+      <span class="pill" onclick="setProxy('https://discord.com')">Discord</span>
+      <span class="pill" onclick="setProxy('https://reddit.com')">Reddit</span>
+      <span class="pill" onclick="setProxy('https://github.com')">GitHub</span>
+    </div>
+    <div class="proxy-status" id="proxyStatus">Loading proxy...</div>
+  </div>
+</div>
+
+<!-- GAMES TAB -->
+<div class="panel active" id="panel-games">
+  <h1>GAMES<br><span>ARCADE</span></h1>
+  <div class="field games-search">
+    <input id="gameSearch" placeholder="Search games..." oninput="filterGames(this.value)"/>
+  </div>
+  <div class="games-grid" id="gamesGrid"></div>
+</div>
+
+<!-- FLOOD TAB -->
 <div class="panel" id="panel-flood">
   <h1>BOT<br><span>FLOODER</span></h1>
   <div class="card">
@@ -148,7 +141,7 @@ body.theme-green .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
     </div>
     <div class="g2">
       <div class="field"><label>Game Code</label><input id="gameCode" placeholder="123456" maxlength="8"/></div>
-      <div class="field"><label>Bot Count</label><input type="number" id="botCount" value="10" min="1" max="30"/></div>
+      <div class="field"><label>Bot Count (max 30)</label><input type="number" id="botCount" value="10" min="1" max="30"/></div>
     </div>
     <div class="field"><label>Bot Name</label><input id="botName" placeholder="Bot"/></div>
     <div class="pills">
@@ -168,417 +161,413 @@ body.theme-green .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
   </div>
 </div>
 
-<div class="panel active" id="panel-proxy">
-  <h1>UV<br><span>PROXY</span></h1>
-  <div class="card">
-    <p style="font-size:0.7rem;color:#555;margin-bottom:16px;line-height:1.7">Browse any site through the proxy — bypasses school filters.</p>
-    <div class="field" style="margin-bottom:10px">
-      <label>URL or Search</label>
-      <div style="display:flex;gap:8px">
-        <input id="proxyInput" placeholder="google.com or search something..." onkeydown="if(event.key==='Enter')launchProxy()" style="flex:1"/>
-        <button class="btn bw" id="proxyBtn" onclick="launchProxy()" style="width:auto;padding:10px 18px;margin:0;white-space:nowrap">Go</button>
-      </div>
-    </div>
-    <div class="pills" style="margin-bottom:6px">
-      <span class="pill" onclick="setProxy('https://blooket.com')">Blooket</span>
-      <span class="pill" onclick="setProxy('https://google.com')">Google</span>
-      <span class="pill" onclick="setProxy('https://youtube.com')">YouTube</span>
-      <span class="pill" onclick="setProxy('https://reddit.com')">Reddit</span>
-      <span class="pill" onclick="setProxy('https://discord.com')">Discord</span>
-    </div>
-    <p class="proxy-note" id="proxyStatus"></p>
-  </div>
-</div>
+<!-- SETTINGS TAB -->
+<div class="panel" id="panel-settings">
+  <h1>SETTINGS<br><span>CONFIG</span></h1>
 
-<div class="panel" id="panel-games">
-  <h1>GAMES<br><span>ARCADE</span></h1>
-  <div class="games-grid">
-    <div class="game-card" onclick="proxyGame('https://slope-game.github.io')"><div class="game-name">Slope</div><div class="game-url">slope-game.github.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://1v1.lol')"><div class="game-name">1v1.lol</div><div class="game-url">1v1.lol</div></div>
-    <div class="game-card" onclick="proxyGame('https://retrobowl.me')"><div class="game-name">Retro Bowl</div><div class="game-url">retrobowl.me</div></div>
-    <div class="game-card" onclick="proxyGame('https://ovo-game.org')"><div class="game-name">OvO</div><div class="game-url">ovo-game.org</div></div>
-    <div class="game-card" onclick="proxyGame('https://smashkarts.io')"><div class="game-name">Smash Karts</div><div class="game-url">smashkarts.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://drive-mad.io')"><div class="game-name">Drive Mad</div><div class="game-url">drive-mad.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://orteil.dashnet.org/cookieclicker')"><div class="game-name">Cookie Clicker</div><div class="game-url">orteil.dashnet.org/cookieclicker</div></div>
-    <div class="game-card" onclick="proxyGame('https://www.driftboss.io')"><div class="game-name">Drift Boss</div><div class="game-url">www.driftboss.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://shellshock.io')"><div class="game-name">Shell Shockers</div><div class="game-url">shellshock.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://krunker.io')"><div class="game-name">Krunker</div><div class="game-url">krunker.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://classic.minecraft.net')"><div class="game-name">Minecraft Classic</div><div class="game-url">classic.minecraft.net</div></div>
-    <div class="game-card" onclick="proxyGame('https://paper-io.com')"><div class="game-name">Paper.io 2</div><div class="game-url">paper-io.com</div></div>
-    <div class="game-card" onclick="proxyGame('https://agar.io')"><div class="game-name">Agar.io</div><div class="game-url">agar.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://play2048.co')"><div class="game-name">2048</div><div class="game-url">play2048.co</div></div>
-    <div class="game-card" onclick="proxyGame('https://run3.io')"><div class="game-name">Run 3</div><div class="game-url">run3.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://tetris.com/play-tetris')"><div class="game-name">Tetris</div><div class="game-url">tetris.com/play-tetris</div></div>
-    <div class="game-card" onclick="proxyGame('https://www.google.com/logos/2010/pacman10-i.html')"><div class="game-name">Pac-Man</div><div class="game-url">www.google.com/logos/2010/pacman10-i.html</div></div>
-    <div class="game-card" onclick="proxyGame('https://fridaynightfunkin.net')"><div class="game-name">FNF</div><div class="game-url">fridaynightfunkin.net</div></div>
-    <div class="game-card" onclick="proxyGame('https://moto-x3m.io')"><div class="game-name">Moto X3M</div><div class="game-url">moto-x3m.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://poki.com/en/g/subway-surfers')"><div class="game-name">Subway Surfers</div><div class="game-url">poki.com/en/g/subway-surfers</div></div>
-    <div class="game-card" onclick="proxyGame('https://playsnake.org')"><div class="game-name">Snake</div><div class="game-url">playsnake.org</div></div>
-    <div class="game-card" onclick="proxyGame('https://flappybird.io')"><div class="game-name">Flappy Bird</div><div class="game-url">flappybird.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://geometrydash.io')"><div class="game-name">Geometry Dash</div><div class="game-url">geometrydash.io</div></div>
-    <div class="game-card" onclick="proxyGame('https://innersloth.itch.io/among-us')"><div class="game-name">Among Us</div><div class="game-url">innersloth.itch.io/among-us</div></div>
+  <div class="scard">
+    <h3>About:Blank Cloaking</h3>
+    <p>Cloak the site in an about:blank tab and toggle on startup (enabled by default).</p>
+    <div class="srow">
+      <label class="toggle"><input type="checkbox" id="ab-switch" onchange="toggleAB()"><span class="slider"></span></label>
+      <button class="kbtn" onclick="openAB()">Open Popup</button>
+    </div>
+  </div>
+
+  <div class="scard">
+    <h3>Panic Key</h3>
+    <p>Quick-redirect with one keypress. Separate multiple keys with commas: A,B,C</p>
+    <div class="field"><label>Panic Keys</label><input id="panicKeyInput" placeholder="Escape, F1, ` etc."/></div>
+    <div class="field"><label>Panic URL</label><input id="panicLinkInput" placeholder="https://classroom.google.com" value="https://classroom.google.com"/></div>
+    <button class="kbtn" onclick="savePanic()">Save</button>
+  </div>
+
+  <div class="scard">
+    <h3>Tab Cloaker</h3>
+    <p>Change the title and icon of the tab.</p>
+    <select id="cloakDropdown" onchange="handleCloakDropdown(this)" style="margin-bottom:10px">
+      <option value="">Custom</option>
+      <option value="Google Classroom|https://ssl.gstatic.com/classroom/favicon.png">Google Classroom</option>
+      <option value="Google|https://www.google.com/favicon.ico">Google</option>
+      <option value="Google Drive|https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png">Google Drive</option>
+      <option value="Google Docs|https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico">Google Docs</option>
+      <option value="Gmail|https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico">Gmail</option>
+      <option value="Google Meet|https://fonts.gstatic.com/s/i/productlogos/meet_2020q4/v1/favicon.ico">Google Meet</option>
+      <option value="Khan Academy|https://www.khanacademy.org/favicon.ico">Khan Academy</option>
+      <option value="Canvas|https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico">Canvas</option>
+      <option value="Clever|https://clever.com/favicon.ico">Clever</option>
+      <option value="Schoology|https://asset-cdn.schoology.com/sites/all/themes/schoology_theme/favicon.ico">Schoology</option>
+      <option value="IXL|https://www.ixl.com/favicon.ico">IXL</option>
+      <option value="Edpuzzle|https://edpuzzle.imgix.net/favicons/favicon-96x96.png">Edpuzzle</option>
+      <option value="Nearpod|https://nearpod.com/favicon.ico">Nearpod</option>
+      <option value="Wikipedia|https://www.wikipedia.org/favicon.ico">Wikipedia</option>
+      <option value="DeltaMath|https://www.deltamath.com/favicon.ico">DeltaMath</option>
+      <option value="Quizlet|https://quizlet.com/favicon.ico">Quizlet</option>
+    </select>
+    <div class="field"><label>Custom Title</label><input id="cloakTitle" placeholder="My Drive - Google Drive"/></div>
+    <div class="field"><label>Custom Icon URL</label><input id="cloakIcon" placeholder="https://..."/></div>
+    <button class="kbtn" onclick="saveCloak()">Save</button>
+    <button class="kbtn" onclick="resetCloak()">Reset</button>
+  </div>
+
+  <div class="scard">
+    <h3>Background Image</h3>
+    <p>Change the site's background image.</p>
+    <div class="field"><input id="bgInput" placeholder="Enter image URL"/></div>
+    <button class="kbtn" onclick="saveBg()">Save</button>
+    <button class="kbtn" onclick="resetBg()">Reset</button>
+  </div>
+
+  <div class="scard">
+    <h3>Search Engine</h3>
+    <p>Change the search engine used in the proxy.</p>
+    <select id="engineSelect" onchange="saveEngine(this)">
+      <option value="https://www.google.com/search?q=">Google (Default)</option>
+      <option value="https://www.bing.com/search?q=">Bing</option>
+      <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+      <option value="https://www.qwant.com/?q=">Qwant</option>
+      <option value="https://www.startpage.com/search?q=">Startpage</option>
+      <option value="https://www.ecosia.org/search?q=">Ecosia</option>
+    </select>
+  </div>
+
+  <div class="scard">
+    <h3>Themes</h3>
+    <p>Pick a theme to customize your experience.</p>
+    <div class="theme-row">
+      <div class="tbtn active" id="th-default" onclick="setTheme('',this)">Dark</div>
+      <div class="tbtn" id="th-midnight" onclick="setTheme('th-midnight',this)">Midnight</div>
+      <div class="tbtn" id="th-sky" onclick="setTheme('th-sky',this)">Sky</div>
+      <div class="tbtn" id="th-red" onclick="setTheme('th-red',this)">Red</div>
+      <div class="tbtn" id="th-blue" onclick="setTheme('th-blue',this)">Blue</div>
+      <div class="tbtn" id="th-green" onclick="setTheme('th-green',this)">Green</div>
+      <div class="tbtn" id="th-inverted" onclick="setTheme('th-inverted',this)">Inverted</div>
+      <div class="tbtn" id="th-mocha" onclick="setTheme('th-mocha',this)">Mocha</div>
+      <div class="tbtn" id="th-macchiato" onclick="setTheme('th-macchiato',this)">Macchiato</div>
+    </div>
+  </div>
+
+  <div class="scard">
+    <h3>Save Data</h3>
+    <p>Export your settings and import on another device.</p>
+    <button class="kbtn" onclick="exportData()">Export Save</button>
+    <button class="kbtn" onclick="importData()">Import Save</button>
   </div>
 </div>
 
 <script>
-var mode='beta', floodId=null, pollTimer=null, lastLog=0;
+// ── Games list (from Interstellar + extras) ───────────────────────────────
+const GAMES = [
+  {name:"Slope",url:"https://slope-game.github.io",tag:"racing"},
+  {name:"1v1.lol",url:"https://1v1.lol",tag:"shooter"},
+  {name:"Retro Bowl",url:"https://retrobowl.me",tag:"sports"},
+  {name:"OvO",url:"https://ovo-game.org",tag:"platformer"},
+  {name:"Smash Karts",url:"https://smashkarts.io",tag:"racing"},
+  {name:"Drive Mad",url:"https://drive-mad.io",tag:"racing"},
+  {name:"Shell Shockers",url:"https://shellshock.io",tag:"shooter"},
+  {name:"Krunker",url:"https://krunker.io",tag:"shooter"},
+  {name:"Minecraft Classic",url:"https://classic.minecraft.net",tag:"sandbox"},
+  {name:"Paper.io 2",url:"https://paper-io.com",tag:"io"},
+  {name:"Agar.io",url:"https://agar.io",tag:"io"},
+  {name:"Slither.io",url:"https://slither.io",tag:"io"},
+  {name:"Wormate.io",url:"https://wormate.io",tag:"io"},
+  {name:"Cookie Clicker",url:"https://orteil.dashnet.org/cookieclicker",tag:"idle"},
+  {name:"2048",url:"https://play2048.co",tag:"puzzle"},
+  {name:"Tetris",url:"https://tetris.com/play-tetris",tag:"puzzle"},
+  {name:"Pac-Man",url:"https://www.google.com/logos/2010/pacman10-i.html",tag:"classic"},
+  {name:"Run 3",url:"https://run3.io",tag:"endless"},
+  {name:"Geometry Dash",url:"https://geometrydash.io",tag:"rhythm"},
+  {name:"FNF",url:"https://fridaynightfunkin.net",tag:"rhythm"},
+  {name:"Moto X3M",url:"https://moto-x3m.io",tag:"racing"},
+  {name:"Drift Boss",url:"https://www.driftboss.io",tag:"racing"},
+  {name:"Flappy Bird",url:"https://flappybird.io",tag:"classic"},
+  {name:"Snake",url:"https://playsnake.org",tag:"classic"},
+  {name:"Subway Surfers",url:"https://poki.com/en/g/subway-surfers",tag:"endless"},
+  {name:"Temple Run",url:"https://poki.com/en/g/temple-run-2",tag:"endless"},
+  {name:"Among Us",url:"https://innersloth.itch.io/among-us",tag:"social"},
+  {name:"Roblox",url:"https://www.roblox.com",tag:"sandbox"},
+  {name:"Skribbl.io",url:"https://skribbl.io",tag:"social"},
+  {name:"Gartic Phone",url:"https://garticphone.com",tag:"social"},
+  {name:"GeoGuessr",url:"https://www.geoguessr.com",tag:"trivia"},
+  {name:"Sporcle",url:"https://www.sporcle.com",tag:"trivia"},
+];
 
+function buildGames(list){
+  const g=document.getElementById('gamesGrid');
+  g.innerHTML=list.map(game=>`<div class="game-card" onclick="proxyGame('${game.url}')"><div class="game-name">${game.name}</div><div class="game-tag">${game.tag}</div></div>`).join('');
+}
+buildGames(GAMES);
+function filterGames(q){
+  if(!q.trim()){buildGames(GAMES);return;}
+  buildGames(GAMES.filter(g=>g.name.toLowerCase().includes(q.toLowerCase())||g.tag.toLowerCase().includes(q.toLowerCase())));
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────────────
 function show(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
 }
+
+// ── Proxy ─────────────────────────────────────────────────────────────────
+var swReady = false;
+var proxyEngine = localStorage.getItem('engine') || 'https://www.google.com/search?q=';
+
+function resolveUrl(raw){
+  raw=raw.trim();
+  if(!raw) return null;
+  if(/^https?:\/\//i.test(raw)) return raw;
+  if(/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(raw)&&!raw.includes(' ')) return 'https://'+raw;
+  return proxyEngine + encodeURIComponent(raw);
+}
+
+function setProxy(url){document.getElementById('proxyInput').value=url;}
+
+async function launchProxy(){
+  var raw=document.getElementById('proxyInput').value;
+  var url=resolveUrl(raw);
+  var s=document.getElementById('proxyStatus');
+  if(!url){s.textContent='Enter a URL or search term';return;}
+  if(!swReady){s.textContent='Proxy still loading, please wait...';return;}
+  try{
+    var enc=__uv$config.encodeUrl(url);
+    window.open('/a/'+enc,'_blank');
+    s.textContent='Opened in new tab ✓';
+    setTimeout(()=>s.textContent='',3000);
+  }catch(e){s.textContent='Error: '+e.message;}
+}
+
+function proxyGame(url){
+  if(!swReady){
+    // Try anyway
+    try{
+      var enc=__uv$config.encodeUrl(url);
+      window.open('/a/'+enc,'_blank');
+    }catch(e){alert('Proxy not ready yet — try again in a second.');}
+    return;
+  }
+  var enc=__uv$config.encodeUrl(url);
+  window.open('/a/'+enc,'_blank');
+}
+
+// Register service worker (Interstellar style)
+(async function registerSW(){
+  var s=document.getElementById('proxyStatus');
+  if(!navigator.serviceWorker){s.textContent='⚠ Service workers not supported';return;}
+  try{
+    s.textContent='Registering proxy...';
+    var reg=await navigator.serviceWorker.register('/sw.js',{scope:'/'});
+    await navigator.serviceWorker.ready;
+    swReady=true;
+    s.textContent='Proxy ready ✓';
+    setTimeout(()=>{if(s.textContent==='Proxy ready ✓')s.textContent='';},2000);
+  }catch(e){
+    s.textContent='Proxy error: '+e.message;
+    console.error('SW error',e);
+    // Retry once
+    setTimeout(registerSW, 3000);
+  }
+})();
+
+// ── Flood ─────────────────────────────────────────────────────────────────
+var mode='beta',floodId=null,pollTimer=null,lastLog=0;
 function setMode(m,el){mode=m;document.querySelectorAll('.mb').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
 function setN(n){document.getElementById('botName').value=n;}
-function log(msg,cls){var b=document.getElementById('logBox');var s=document.createElement('span');s.className='ll'+(cls?' '+cls:'');s.textContent=msg;b.appendChild(s);if(b.children.length>200)b.removeChild(b.firstChild);b.scrollTop=b.scrollHeight;}
+function addLog(msg,cls){var b=document.getElementById('logBox');var s=document.createElement('span');s.className='ll'+(cls?' '+cls:'');s.textContent=msg;b.appendChild(s);if(b.children.length>200)b.removeChild(b.firstChild);b.scrollTop=b.scrollHeight;}
 function stats(j,f,e){document.getElementById('sJ').textContent=j;document.getElementById('sF').textContent=f;document.getElementById('sE').textContent=e!=null?e+'s':'-';}
-
 async function poll(){
   if(!floodId)return;
   try{
     const r=await fetch('/api/flood/status/'+floodId).then(r=>r.json());
-    r.logs.slice(lastLog).forEach(l=>{
-      var cls=l.includes('joined')?'lok':l.includes('fail')||l.includes('ERR')?'lerr':'linf';
-      log(l,cls);
-      if(l.toLowerCase().includes('cloudflare')||l.includes('ERR: error: Cannot find')){
-        log('⚠ Cloudflare is blocking us... Please wait while we fix this. An issue has been opened on GitHub.','lerr');
-        clearInterval(pollTimer);floodId=null;
-        var b=document.getElementById('floodBtn');b.className='btn bw';b.innerHTML='&#9654; Start';b.disabled=false;
-      }
-    });
-    lastLog=r.logs.length;
-    stats(r.joined,r.failed,r.elapsed);
-    if(r.done){clearInterval(pollTimer);floodId=null;var b=document.getElementById('floodBtn');if(r.failed===0&&r.joined>0){b.className='btn bw';b.innerHTML='&#9654; Start';b.disabled=false;log('All '+r.joined+' bots joined!','lok');}else{b.className='btn bw';b.innerHTML='&#9654; Start';b.disabled=false;}}
+    r.logs.slice(lastLog).forEach(l=>{addLog(l,l.includes('joined')?'lok':l.includes('fail')||l.startsWith('ERR')?'lerr':'linf');});
+    lastLog=r.logs.length;stats(r.joined,r.failed,r.elapsed);
+    if(r.done){clearInterval(pollTimer);floodId=null;var b=document.getElementById('floodBtn');b.className='btn bw';b.innerHTML='&#9654; Start';b.disabled=false;}
   }catch{}
 }
-
 async function toggleFlood(){
   var btn=document.getElementById('floodBtn');
-  if(floodId){
-    await fetch('/api/flood/stop/'+floodId,{method:'POST'});
-    clearInterval(pollTimer);floodId=null;
-    btn.className='btn bw';btn.innerHTML='&#9654; Start';btn.disabled=false;
-    log('Stopped','lwrn');return;
-  }
+  if(floodId){await fetch('/api/flood/stop/'+floodId,{method:'POST'});clearInterval(pollTimer);floodId=null;btn.className='btn bw';btn.innerHTML='&#9654; Start';btn.disabled=false;addLog('Stopped','lwrn');return;}
   var gc=document.getElementById('gameCode').value.trim();
-  var cnt=parseInt(document.getElementById('botCount').value)||10;
+  var cnt=Math.min(parseInt(document.getElementById('botCount').value)||10,30);
   var nb=document.getElementById('botName').value.trim()||'Bot';
-  if(!gc){log('Enter a game code','lerr');return;}
+  if(!gc){addLog('Enter a game code','lerr');return;}
   btn.className='btn br';btn.innerHTML='&#9632; Stop';btn.disabled=false;
-  log('Starting...','linf');lastLog=0;stats(0,0,0);
+  addLog('Starting...','linf');lastLog=0;stats(0,0,0);
   try{
     const r=await fetch('/api/flood/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gameCode:gc,name:nb,amount:cnt,mode})}).then(r=>r.json());
-    if(!r.ok){log('Error: '+(r.error||'failed'),'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';return;}
+    if(!r.ok){addLog('Error: '+(r.error||'failed'),'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';return;}
     floodId=r.id;pollTimer=setInterval(poll,800);
-  }catch(e){log('Error: '+e.message,'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';}
+  }catch(e){addLog('Error: '+e.message,'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';}
 }
 
-var proxyTimeout=null;
-var swReady=false;
-
-// Preload UV scripts + register SW immediately on page load
-(async function preloadProxy(){
-  if(!navigator.serviceWorker) return;
+// ── Settings ───────────────────────────────────────────────────────────────
+function toggleAB(){
+  var on=document.getElementById('ab-switch').checked;
+  localStorage.setItem('ab',on?'true':'false');
+}
+function openAB(){
   try{
-    // Load uv scripts eagerly so they're cached
-    await new Promise((res,rej)=>{
-      if(window.Ultraviolet){res();return;}
-      var s=document.createElement('script');
-      s.src='/uv/uv.bundle.js';
-      s.onload=res; s.onerror=rej;
-      document.head.appendChild(s);
-    });
-    await new Promise((res,rej)=>{
-      var s=document.createElement('script');
-      s.src='/uv/uv.config.js';
-      s.onload=res; s.onerror=rej;
-      document.head.appendChild(s);
-    });
-    // Register SW once, keep it alive
-    await navigator.serviceWorker.register('/uv/sw.js',{scope:'/uv/service/'});
-    await navigator.serviceWorker.ready;
-    swReady=true;
-    document.getElementById('proxyStatus').textContent='Ready';
-  }catch(e){
-    document.getElementById('proxyStatus').textContent='Proxy unavailable';
-    console.warn('SW preload failed:',e);
-  }
-})();
-
-function setProxy(url){
-  document.getElementById('proxyInput').value=url;
-  launchProxy();
+    var popup=open('about:blank','_blank');
+    if(!popup||popup.closed){alert('Allow popups for this site.');return;}
+    var doc=popup.document;
+    var name=localStorage.getItem('name')||'My Drive - Google Drive';
+    var icon=localStorage.getItem('icon')||'https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png';
+    doc.title=name;
+    var lnk=doc.createElement('link');lnk.rel='icon';lnk.href=icon;
+    var ifr=doc.createElement('iframe');
+    ifr.src=location.href;ifr.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;border:none';
+    var scr=doc.createElement('script');
+    scr.textContent='window.onbeforeunload=function(e){var m="Leave Site?";(e||window.event).returnValue=m;return m;};';
+    doc.head.appendChild(lnk);doc.head.appendChild(scr);doc.body.appendChild(ifr);
+    var pLink=localStorage.getItem('pLink')||'https://classroom.google.com';
+    location.replace(pLink);
+  }catch(e){alert('Error: '+e.message);}
 }
 
-function resolveUrl(raw){
-  raw=(raw||'').trim();
-  if(!raw) return null;
-  if(/^https?:\/\//i.test(raw)) return raw;
-  if(/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(raw)&&!raw.includes(' ')) return 'https://'+raw;
-  return 'https://www.google.com/search?q='+encodeURIComponent(raw);
-}
-
-async function launchProxy(){
-  var s=document.getElementById('proxyStatus');
-  var b=document.getElementById('proxyBtn');
-  if(!navigator.serviceWorker){s.textContent='Requires Chrome or Edge';return;}
-
-  var raw=document.getElementById('proxyInput').value;
-  var url=resolveUrl(raw);
-  if(!url){s.textContent='Enter a URL or search term';return;}
-
-  proxyTimeout=setTimeout(()=>{
-    document.getElementById('maint-page').classList.add('show');
-  },300000);
-
-  try{
-    b.textContent='...';b.disabled=true;
-    s.textContent=swReady?'Launching...':'Registering...';
-
-    if(!swReady){
-      // SW not ready yet — wait for it (max 8s)
-      await Promise.race([
-        navigator.serviceWorker.ready,
-        new Promise((_,rej)=>setTimeout(()=>rej(new Error('SW timeout')),8000))
-      ]);
-      swReady=true;
-    }
-
-    if(!window.__uv$config||!window.__uv$config.encodeUrl){
-      throw new Error('UV config not loaded');
-    }
-
-    clearTimeout(proxyTimeout);
-    var enc=window.__uv$config.encodeUrl(url);
-    window.open('/uv/service/'+enc,'_blank');
-    b.textContent='Go';b.disabled=false;
-    s.textContent='Opened → '+url.replace(/^https?:\/\//,'').slice(0,30);
-  }catch(e){
-    clearTimeout(proxyTimeout);
-    b.textContent='Go';b.disabled=false;
-    s.textContent='Error: '+e.message;
-    console.error(e);
-  }
-}
-
-// Block page close for 30 seconds on each attempt
-var closeAttemptTime = null;
-window.addEventListener('beforeunload', function(e) {
-  if(!closeAttemptTime) closeAttemptTime = Date.now();
-  var elapsed = (Date.now() - closeAttemptTime) / 1000;
-  if(elapsed < 30) {
-    e.preventDefault();
-    e.returnValue = '';
-    return '';
-  }
-});
-document.addEventListener('visibilitychange', function() {
-  if(document.visibilityState === 'hidden') { window.focus(); }
-});
-// Reset timer if they stay on page
-document.addEventListener('mousemove', function() { closeAttemptTime = null; });
-document.addEventListener('keydown', function() { closeAttemptTime = null; });
-</script>
-
-
-<script>
-(function(){
-  var AC,started=false;
-  function note(freq,type,vol,t,dur){
-    var o=AC.createOscillator(),g=AC.createGain();
-    o.connect(g);g.connect(AC.destination);
-    o.type=type;o.frequency.value=freq;
-    g.gain.setValueAtTime(vol,t);
-    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-    o.start(t);o.stop(t+dur+0.05);
-  }
-  function noise(lp,vol,t,dur){
-    var buf=AC.createBuffer(1,Math.ceil(AC.sampleRate*dur),AC.sampleRate);
-    var d=buf.getChannelData(0);
-    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
-    var src=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
-    f.type='lowpass';f.frequency.value=lp;
-    g.gain.setValueAtTime(vol,t);g.gain.linearRampToValueAtTime(0,t+dur);
-    src.buffer=buf;src.connect(f);f.connect(g);g.connect(AC.destination);
-    src.start(t);src.stop(t+dur);
-  }
-  function playAll(){
-    var t=AC.currentTime+0.05;
-    noise(100,0.3,t,1.5);
-    noise(900,0.2,t+0.3,0.08);noise(700,0.18,t+0.42,0.08);
-    for(var i=0;i<8;i++){note(500+i*120,'sine',0.18,t+0.6+i*0.08,0.12);note(800+i*180,'sine',0.1,t+0.63+i*0.08,0.08);}
-    [523,659,784,1047].forEach(function(f,i){note(f,'square',0.12,t+1.9+i*0.1,0.25);});
-    note(1760,'sine',0.22,t+2.7,0.06);note(880,'sine',0.18,t+2.76,0.45);
-    for(var i=0;i<4;i++)note(600+i*200,'sine',0.14,t+2.82+i*0.07,0.09);
-  }
-  function spawnPx(n){
-    var px=document.getElementById('loaderPx');if(!px)return;
-    for(var i=0;i<n;i++)(function(){
-      var el=document.createElement('div');el.className='px';
-      el.style.left=Math.random()*100+'%';el.style.top=Math.random()*100+'%';
-      el.style.animationDelay=Math.random()*0.4+'s';
-      el.style.width=el.style.height=(Math.random()*4+2)+'px';
-      px.appendChild(el);setTimeout(function(){el.remove();},1200);
-    })();
-  }
-  var steps=['initializing...','loading assets...','connecting server...','preparing proxy...','almost ready...','done.'];
-  function startLoader(){
-    if(started)return;started=true;
-    AC=new(window.AudioContext||window.webkitAudioContext)();
-    AC.resume().then(playAll);
-    var progress=0,stepIdx=0;
-    var iv=setInterval(function(){
-      progress+=Math.random()*12+4;if(progress>100)progress=100;
-      document.getElementById('loaderBar').style.width=progress+'%';
-      spawnPx(3);
-      var idx=Math.min(Math.floor(progress/100*steps.length),steps.length-1);
-      if(idx!==stepIdx){stepIdx=idx;document.getElementById('loaderSub').textContent=steps[idx];}
-      if(progress>=100){
-        clearInterval(iv);
-        document.getElementById('loaderSub').textContent='done.';
-        spawnPx(30);
-        setTimeout(function(){document.getElementById('loader').classList.add('hidden');},700);
-      }
-    },120);
-  }
-  // Show logo immediately
-  setTimeout(function(){
-    var l=document.getElementById('loaderLogo');if(l)l.classList.add('show');
-  },100);
-  setTimeout(function(){
-    var s=document.getElementById('loaderSub'),b=document.getElementById('loaderBarWrap');
-    if(s)s.classList.add('show');if(b)b.classList.add('show');
-    // Add click prompt
-    var p=document.createElement('div');
-    p.style.cssText='position:absolute;bottom:48px;left:50%;transform:translateX(-50%);font-family:"DM Mono",monospace;font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:#444;cursor:pointer';
-    p.id='clickPrompt';p.textContent='click anywhere to enter';
-    p.style.animation='blink2 1.2s infinite';
-    document.getElementById('loader').appendChild(p);
-    var st=document.createElement('style');
-    st.textContent='@keyframes blink2{0%,100%{opacity:.2}50%{opacity:1}}';
-    document.head.appendChild(st);
-  },400);
-  function onGesture(){var p=document.getElementById('clickPrompt');if(p)p.remove();startLoader();}
-  document.addEventListener('click',onGesture,{once:true});
-  document.addEventListener('keydown',onGesture,{once:true});
-})();
-</script>
-
-
-<div class="panel" id="panel-settings">
-  <h1>SETTINGS<br><span>CONFIG</span></h1>
-  <div class="card">
-    <div class="setting-row">
-      <div>
-        <div class="setting-label">Tab Cloaking</div>
-        <div class="setting-desc">Change the tab title and icon to hide this page</div>
-      </div>
-      <label class="toggle"><input type="checkbox" id="tabCloak" onchange="applyTabCloak()"><span class="slider"></span></label>
-    </div>
-    <div id="tabCloakOptions" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #1a1a1a">
-      <div class="field" style="margin-bottom:8px"><label>Tab Title</label><input id="clkTitle" placeholder="Google" value="Google"/></div>
-      <div class="field"><label>Tab Icon URL</label><input id="clkIcon" placeholder="https://google.com/favicon.ico" value="https://google.com/favicon.ico"/></div>
-      <button class="btn bw" style="margin-top:8px" onclick="saveTabCloak()">Apply</button>
-    </div>
-  </div>
-  <div class="card">
-    <div class="setting-row">
-      <div>
-        <div class="setting-label">About:Blank Cloaking</div>
-        <div class="setting-desc">Opens site in an about:blank tab that looks empty to anyone watching</div>
-      </div>
-      <button class="btn bw" style="width:auto;padding:8px 16px;margin:0;font-size:0.5rem" onclick="openAboutBlank()">Open</button>
-    </div>
-  </div>
-  <div class="card">
-    <div class="setting-row">
-      <div>
-        <div class="setting-label">Panic Key</div>
-        <div class="setting-desc">Press this key to instantly switch to a safe page</div>
-      </div>
-      <select id="panicKey" onchange="savePanicKey()" style="background:#000;border:1px solid #222;border-radius:6px;padding:6px 10px;color:#fff;font-family:'DM Mono',monospace;font-size:0.75rem">
-        <option value="">Off</option>
-        <option value="Escape">Escape</option>
-        <option value="F1">F1</option>
-        <option value="F2">F2</option>
-        <option value="Tab">Tab</option>
-        <option value="Backquote">`</option>
-      </select>
-    </div>
-    <div class="field" style="margin-top:10px"><label>Panic URL</label><input id="panicUrl" placeholder="https://google.com" value="https://google.com" onchange="savePanicKey()"/></div>
-  </div>
-  <div class="card">
-    <div class="setting-label" style="margin-bottom:10px">Theme</div>
-    <div class="theme-row">
-      <div class="theme-btn active" id="theme-dark" onclick="setTheme('dark',this)">Dark</div>
-      <div class="theme-btn" id="theme-midnight" onclick="setTheme('midnight',this)">Midnight</div>
-      <div class="theme-btn" id="theme-red" onclick="setTheme('red',this)">Red</div>
-      <div class="theme-btn" id="theme-blue" onclick="setTheme('blue',this)">Blue</div>
-      <div class="theme-btn" id="theme-green" onclick="setTheme('green',this)">Green</div>
-    </div>
-  </div>
-</div>
-
-<script>
-// ── Settings JS ──────────────────────────────────────────
-function applyTabCloak(){
-  var on=document.getElementById('tabCloak').checked;
-  document.getElementById('tabCloakOptions').style.display=on?'block':'none';
-  if(!on){document.title='Void Hub';var l=document.querySelector("link[rel*='icon']");if(l)l.href='/favicon.ico';}
-  localStorage.setItem('tabCloak',on?'1':'0');
-}
-function saveTabCloak(){
-  var t=document.getElementById('clkTitle').value||'Google';
-  var i=document.getElementById('clkIcon').value||'https://google.com/favicon.ico';
-  document.title=t;
-  var l=document.querySelector("link[rel*='icon']")||document.createElement('link');
-  l.rel='shortcut icon';l.href=i;document.head.appendChild(l);
-  localStorage.setItem('clkTitle',t);localStorage.setItem('clkIcon',i);
-}
-function openAboutBlank(){
-  var w=window.open('about:blank','_blank');
-  var d=w.document;
-  d.open();
-  d.write('<html><head><title>'+document.title+'</title></head><body style="margin:0;background:#fff"><iframe src="'+location.href+'" style="border:none;width:100vw;height:100vh"></iframe></body></html>');
-  d.close();
-}
-function savePanicKey(){
-  localStorage.setItem('panicKey',document.getElementById('panicKey').value);
-  localStorage.setItem('panicUrl',document.getElementById('panicUrl').value);
-}
+// Panic key
+var _panicKeys=[];
 document.addEventListener('keydown',function(e){
-  var k=localStorage.getItem('panicKey');
-  if(k&&e.code===k){
-    var u=localStorage.getItem('panicUrl')||'https://google.com';
-    window.location.replace(u);
+  var keys=JSON.parse(localStorage.getItem('panicKeys')||'[]');
+  if(keys.length&&keys.some(k=>k.toLowerCase()===e.key.toLowerCase())){
+    var url=localStorage.getItem('pLink')||'https://classroom.google.com';
+    window.location.replace(url);
   }
 });
-function setTheme(t,el){
-  document.body.className=t==='dark'?'':'theme-'+t;
-  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
+function savePanic(){
+  var raw=document.getElementById('panicKeyInput').value;
+  var link=document.getElementById('panicLinkInput').value||'https://classroom.google.com';
+  var keys=raw.split(',').map(k=>k.trim()).filter(Boolean);
+  localStorage.setItem('panicKeys',JSON.stringify(keys));
+  localStorage.setItem('eventKeyRaw',raw);
+  localStorage.setItem('pLink',link);
+  alert('Panic key saved!');
+}
+
+// Tab cloak
+function handleCloakDropdown(sel){
+  if(!sel.value)return;
+  var parts=sel.value.split('|');
+  document.getElementById('cloakTitle').value=parts[0]||'';
+  document.getElementById('cloakIcon').value=parts[1]||'';
+}
+function saveCloak(){
+  var t=document.getElementById('cloakTitle').value;
+  var i=document.getElementById('cloakIcon').value;
+  if(t){document.getElementById('page-title').textContent=t;localStorage.setItem('CustomName',t);localStorage.setItem('name',t);}
+  if(i){document.getElementById('tab-favicon').href=i;localStorage.setItem('CustomIcon',i);localStorage.setItem('icon',i);}
+}
+function resetCloak(){
+  localStorage.removeItem('CustomName');localStorage.removeItem('CustomIcon');
+  localStorage.removeItem('name');localStorage.removeItem('icon');
+  document.getElementById('page-title').textContent='Void Hub';
+  document.getElementById('tab-favicon').href='data:,';
+  document.getElementById('cloakTitle').value='';
+  document.getElementById('cloakIcon').value='';
+}
+
+// Background
+function saveBg(){
+  var url=document.getElementById('bgInput').value.trim();
+  if(!url)return;
+  localStorage.setItem('backgroundImage',url);
+  document.body.style.backgroundImage='url('+url+')';
+  document.body.style.backgroundSize='cover';
+}
+function resetBg(){
+  localStorage.removeItem('backgroundImage');
+  document.body.style.backgroundImage='';
+  document.getElementById('bgInput').value='';
+}
+
+// Search engine
+function saveEngine(sel){
+  localStorage.setItem('engine',sel.value);
+  proxyEngine=sel.value;
+}
+
+// Themes
+function setTheme(cls,el){
+  document.body.className=cls;
+  var bg=localStorage.getItem('backgroundImage');
+  if(bg){document.body.style.backgroundImage='url('+bg+')';document.body.style.backgroundSize='cover';}
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
-  localStorage.setItem('theme',t);
+  localStorage.setItem('theme',cls);
 }
-function proxyGame(url){
-  if(typeof __uv$config==='undefined'){alert('Proxy not ready yet, try again in a second.');return;}
-  var enc=__uv$config.encodeUrl(url);
-  window.open('/uv/service/'+enc,'_blank');
+
+// Export/import
+function exportData(){
+  var data={localStorage:{}};
+  for(var k in localStorage)if(Object.hasOwn(localStorage,k))data.localStorage[k]=localStorage.getItem(k);
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='voidhub-save.json';a.click();
 }
-// Load saved settings
+function importData(){
+  var inp=document.createElement('input');inp.type='file';inp.accept='application/json';
+  inp.onchange=function(e){
+    var file=e.target.files[0];if(!file)return;
+    var r=new FileReader();r.onload=function(ev){
+      try{
+        var d=JSON.parse(ev.target.result);
+        if(d.localStorage)Object.entries(d.localStorage).forEach(([k,v])=>localStorage.setItem(k,v));
+        alert('Save imported! Reloading...');location.reload();
+      }catch(err){alert('Invalid file.');}
+    };r.readAsText(file);
+  };inp.click();
+}
+
+// ── Load saved settings on start ──────────────────────────────────────────
+(function loadSaved(){
+  // Theme
+  var t=localStorage.getItem('theme');
+  if(t){document.body.className=t;var el=document.getElementById('th-'+(t||'default'));if(el){document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}}
+
+  // Background
+  var bg=localStorage.getItem('backgroundImage');
+  if(bg){document.body.style.backgroundImage='url('+bg+')';document.body.style.backgroundSize='cover';}
+
+  // Cloak
+  var cn=localStorage.getItem('CustomName');var ci=localStorage.getItem('CustomIcon');
+  if(cn){document.getElementById('page-title').textContent=cn;document.getElementById('cloakTitle').value=cn;}
+  if(ci){document.getElementById('tab-favicon').href=ci;document.getElementById('cloakIcon').value=ci;}
+
+  // Panic
+  var pk=localStorage.getItem('eventKeyRaw');if(pk)document.getElementById('panicKeyInput').value=pk;
+  var pl=localStorage.getItem('pLink');if(pl)document.getElementById('panicLinkInput').value=pl;
+
+  // AB switch
+  var ab=localStorage.getItem('ab');
+  if(ab==='true')document.getElementById('ab-switch').checked=true;
+
+  // Engine
+  var eng=localStorage.getItem('engine');
+  if(eng){document.getElementById('engineSelect').value=eng;proxyEngine=eng;}
+})();
+
+// Auto open about:blank
 (function(){
-  var t=localStorage.getItem('theme')||'dark';
-  if(t!=='dark'){document.body.className='theme-'+t;var el=document.getElementById('theme-'+t);if(el){document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}}
-  var pk=localStorage.getItem('panicKey');if(pk)document.getElementById('panicKey').value=pk;
-  var pu=localStorage.getItem('panicUrl');if(pu)document.getElementById('panicUrl').value=pu;
-  var tc=localStorage.getItem('tabCloak');
-  if(tc==='1'){document.getElementById('tabCloak').checked=true;document.getElementById('tabCloakOptions').style.display='block';
-    var ct=localStorage.getItem('clkTitle');var ci=localStorage.getItem('clkIcon');
-    if(ct){document.getElementById('clkTitle').value=ct;}
-    if(ci){document.getElementById('clkIcon').value=ci;}
-    saveTabCloak();
+  try{var inFrame=window!==top;}catch(e){var inFrame=true;}
+  if(!inFrame&&!navigator.userAgent.includes('Firefox')&&localStorage.getItem('ab')==='true'){
+    // Only auto-open if enabled
+    var popup=open('about:blank','_blank');
+    setTimeout(()=>{
+      if(!popup||popup.closed)return;
+      var doc=popup.document;
+      var name=localStorage.getItem('name')||'My Drive - Google Drive';
+      var icon=localStorage.getItem('icon')||'https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png';
+      doc.title=name;
+      var lnk=doc.createElement('link');lnk.rel='icon';lnk.href=icon;
+      var ifr=doc.createElement('iframe');
+      ifr.src=location.href;ifr.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;border:none';
+      doc.head.appendChild(lnk);doc.body.appendChild(ifr);
+      var pLink=localStorage.getItem('pLink')||'https://classroom.google.com';
+      location.replace(pLink);
+    },1000);
   }
 })();
 </script>
+<script src="/assets/mathematics/bundle.js"></script>
+<script src="/assets/mathematics/config.js"></script>
 </body>
 </html>
