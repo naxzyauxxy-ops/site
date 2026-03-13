@@ -153,13 +153,6 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 <!-- FLOOD TAB -->
 <div class="panel" id="panel-flood">
   <h1>BOT<br><span>FLOODER</span></h1>
-
-  <!-- ⚠ CAUTION moved here from Settings -->
-  <div class="scard" style="border-color:#ff3c5a44;margin-bottom:12px">
-    <h3 style="color:#ff3c5a">⚠ Caution</h3>
-    <p>The bot flooder may sometimes have problems not working. If it doesn't work, keep trying — wait a few seconds and start again.</p>
-  </div>
-
   <div class="card">
     <div class="mrow">
       <div class="mb active" onclick="setMode('beta',this)">New Modes</div>
@@ -189,7 +182,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
 <!-- SETTINGS TAB -->
 <div class="panel" id="panel-settings">
-  <h1>SETTINGS</h1>
+  <h1>BLOOKET<br><span>BOT FLOODER</span></h1>
 
   <div class="scard">
     <h3>About:Blank Cloaking</h3>
@@ -279,11 +272,15 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="kbtn" onclick="exportData()">Export Save</button>
     <button class="kbtn" onclick="importData()">Import Save</button>
   </div>
+
+  <div class="scard" style="border-color:#ff3c5a44">
+    <h3 style="color:#ff3c5a">Caution</h3>
+    <p>The bot flooder may sometimes have problems not working. If it doesn't work, keep trying — wait a few seconds and start again.</p>
+  </div>
 </div>
 
 <script>
 const GAMES = [
-  // ── Reliable .io games ──
   {name:"1v1.LOL",url:"https://1v1.lol",tag:"shooter"},
   {name:"Shell Shockers",url:"https://shellshock.io/",tag:"shooter"},
   {name:"Smash Karts",url:"https://smashkarts.io/",tag:"racing"},
@@ -294,6 +291,7 @@ const GAMES = [
   {name:"Paper.io",url:"https://paper-io.com/",tag:"io"},
   {name:"MooMoo.io",url:"https://moomoo.io",tag:"io"},
   {name:"Zombs Royale",url:"https://zombsroyale.io",tag:"io"},
+  {name:"Zombs.io",url:"https://zombs.io/",tag:"io"},
   {name:"Narrow One",url:"https://narrow.one",tag:"shooter"},
   {name:"Kirka.io",url:"https://kirka.io",tag:"shooter"},
   {name:"Venge.io",url:"https://venge.io",tag:"shooter"},
@@ -302,57 +300,62 @@ const GAMES = [
   {name:"Tetr.io",url:"https://tetr.io/",tag:"puzzle"},
   {name:"Starblast",url:"https://starblast.io",tag:"shooter"},
   {name:"Territorial.io",url:"https://territorial.io",tag:"strategy"},
+  {name:"Taming.io",url:"https://taming.io/",tag:"io"},
   {name:"Bloxd.io",url:"https://bloxd.io",tag:"sandbox"},
   {name:"Swordbattle.io",url:"https://swordbattle.io/",tag:"io"},
   {name:"YoHoHo.io",url:"https://yohoho.io/",tag:"io"},
+  {name:"DigDig.io",url:"https://digdig.io/",tag:"io"},
+  {name:"Hordes.io",url:"https://hordes.io",tag:"rpg"},
   {name:"Skribbl.io",url:"https://skribbl.io/",tag:"multiplayer"},
   {name:"Gartic Phone",url:"https://garticphone.com",tag:"multiplayer"},
   {name:"Bomb Party",url:"https://jklm.fun",tag:"multiplayer"},
   {name:"Pokemon Showdown",url:"https://play.pokemonshowdown.com",tag:"multiplayer"},
-  // ── Poki (very reliable) ──
-  {name:"Subway Surfers",url:"https://poki.com/en/g/subway-surfers",tag:"arcade"},
-  {name:"Stickman Hook",url:"https://poki.com/en/g/stickman-hook",tag:"arcade"},
-  {name:"Getaway Shootout",url:"https://poki.com/en/g/getaway-shootout",tag:"shooter"},
-  {name:"Fireboy & Watergirl",url:"https://poki.com/en/g/fireboy-and-watergirl-the-forest-temple",tag:"platformer"},
-  {name:"Bob the Robber",url:"https://poki.com/en/g/bob-the-robber",tag:"adventure"},
-  {name:"Moto X3M",url:"https://poki.com/en/g/moto-x3m",tag:"racing"},
-  {name:"Rooftop Snipers",url:"https://poki.com/en/g/rooftop-snipers",tag:"shooter"},
-  {name:"Basketball Stars",url:"https://poki.com/en/g/basketball-stars",tag:"sports"},
-  {name:"Soccer Random",url:"https://poki.com/en/g/soccer-random",tag:"sports"},
-  {name:"Basket Random",url:"https://poki.com/en/g/basket-random",tag:"sports"},
-  {name:"Drift Boss",url:"https://poki.com/en/g/drift-boss",tag:"racing"},
-  {name:"Hill Climb Racing",url:"https://poki.com/en/g/hill-climb-racing",tag:"racing"},
-  {name:"Dino Game",url:"https://poki.com/en/g/dino-game",tag:"arcade"},
-  {name:"2048",url:"https://poki.com/en/g/2048",tag:"puzzle"},
-  {name:"Helix Jump",url:"https://poki.com/en/g/helix-jump",tag:"arcade"},
-  {name:"Gun Mayhem Redux",url:"https://poki.com/en/g/gun-mayhem-redux",tag:"shooter"},
-  {name:"Snow Rider 3D",url:"https://poki.com/en/g/snow-rider-3d",tag:"racing"},
-  {name:"Time Shooter 2",url:"https://poki.com/en/g/time-shooter-2",tag:"shooter"},
-  {name:"Merge Fruit",url:"https://poki.com/en/g/suika-watermelon-game",tag:"puzzle"},
-  {name:"Parkour Block 3D",url:"https://poki.com/en/g/parkour-block-3d",tag:"platformer"},
-  // ── Coolmath (almost never blocked) ──
-  {name:"Run 3",url:"https://www.coolmathgames.com/0-run-3",tag:"arcade"},
-  {name:"Papa's Freezeria",url:"https://www.coolmathgames.com/0-papas-freezeria",tag:"sim"},
-  {name:"Papa's Pizzeria",url:"https://www.coolmathgames.com/0-papas-pizzeria",tag:"sim"},
-  {name:"Papa's Burgeria",url:"https://www.coolmathgames.com/0-papas-burgeria",tag:"sim"},
-  {name:"Papa's Scooperia",url:"https://www.coolmathgames.com/0-papas-scooperia",tag:"sim"},
-  {name:"Papa's Bakeria",url:"https://www.coolmathgames.com/0-papas-bakeria",tag:"sim"},
-  {name:"Snake",url:"https://www.coolmathgames.com/0-snake",tag:"classic"},
-  {name:"Idle Breakout",url:"https://www.coolmathgames.com/0-idle-breakout",tag:"idle"},
-  {name:"Fireboy & Watergirl 2",url:"https://www.coolmathgames.com/0-fireboy-and-watergirl-2",tag:"platformer"},
-  // ── CrazyGames HTML5 ──
-  {name:"BuildNow GG",url:"https://games.crazygames.com/en_US/buildnow-gg/index.html",tag:"shooter"},
+  {name:"Moto X3M",url:"https://html5.gamedistribution.com/rvvASMiM/5b0abd4c0faa4f5eb190a9a16d/",tag:"racing"},
+  {name:"Moto X3M Spooky",url:"https://html5.gamedistribution.com/rvvASMiM/b8a342904608470a9f3382337a/",tag:"racing"},
+  {name:"Rooftop Snipers",url:"https://html5.gamedistribution.com/rvvASMiM/c3a70ae98547407a92ebedca8b/",tag:"shooter"},
+  {name:"Snow Rider 3D",url:"https://html5.gamedistribution.com/rvvASMiM/3b79a8537ebc414fb4f9672a9b/",tag:"racing"},
+  {name:"Basket Random",url:"https://html5.gamedistribution.com/rvvASMiM/bf1268dccb5d43e7970bb3edaa/",tag:"sports"},
+  {name:"Basketball Stars",url:"https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/",tag:"sports"},
+  {name:"Parkour Block 3D",url:"https://html5.gamedistribution.com/1461d40bb77f48e6be72489959a1ac04/",tag:"platformer"},
+  {name:"Time Shooter 2",url:"https://html5.gamedistribution.com/62a72f2da7cb4b609579a47653546e6a/",tag:"shooter"},
+  {name:"Merge Fruit",url:"https://html5.gamedistribution.com/2dee9d404697435aa76111eb4015e1d5/",tag:"puzzle"},
+  {name:"Survivor.io",url:"https://html5.gamedistribution.com/rvvASMiM/f1c451e586c04b4c8cba01b0c5/",tag:"shooter"},
+  {name:"Gunspin",url:"https://html5.gamedistribution.com/rvvASMiM/917cce8c44c44638a8cdc2a179/",tag:"arcade"},
+  {name:"Stickman Archero",url:"https://html5.gamedistribution.com/rvvASMiM/3f4c166817ad4fd4b5b05d9adb/",tag:"shooter"},
+  {name:"Helix Jump",url:"https://helix-jump.game-files.crazygames.com/helix-jump/1/index.html",tag:"arcade"},
+  {name:"Age of War",url:"https://age-of-war.game-files.crazygames.com/ruffle/ageofwar.html",tag:"strategy"},
+  {name:"The Impossible Quiz",url:"https://the-impossible-quiz.game-files.crazygames.com/ruffle/theimpossiblequiz.html",tag:"puzzle"},
+  {name:"Riddle School 3",url:"https://riddle-school-3.game-files.crazygames.com/ruffle/riddleschool3.html",tag:"adventure"},
+  {name:"Riddle School 4",url:"https://riddle-school-4.game-files.crazygames.com/ruffle/riddleschool4.html",tag:"adventure"},
+  {name:"Riddle School 5",url:"https://riddle-school-5.game-files.crazygames.com/ruffle/riddleschool5.html",tag:"adventure"},
+  {name:"Happy Wheels",url:"https://files.crazygames.com/ruffle/happywheels.html",tag:"arcade"},
+  {name:"Sandtrix",url:"https://files.crazygames.com/sandtrix/16/index.html",tag:"puzzle"},
+  {name:"Papa's Scooperia",url:"https://files.crazygames.com/ruffle/papasscooperia.html",tag:"sim"},
+  {name:"Papa's Sushiria",url:"https://files.crazygames.com/ruffle/papassushiria.html",tag:"sim"},
+  {name:"Haunted School",url:"https://games.crazygames.com/en_US/haunted-school---horror-game/index.html",tag:"horror"},
+  {name:"Madalin Cars Multi",url:"https://games.crazygames.com/en_US/madalin-cars-multiplayer/index.html",tag:"racing"},
   {name:"Madalin Stunt Cars 2",url:"https://games.crazygames.com/en_US/madalin-stunt-cars-2/index.html",tag:"racing"},
   {name:"Madalin Stunt Cars 3",url:"https://games.crazygames.com/en_US/madalin-stunt-cars-3/index.html",tag:"racing"},
-  {name:"Madalin Cars Multi",url:"https://games.crazygames.com/en_US/madalin-cars-multiplayer/index.html",tag:"racing"},
-  {name:"Fancy Pants Adventure",url:"https://games.crazygames.com/en_US/fancy-pants-adventure-world/index.html",tag:"platformer"},
-  {name:"Haunted School",url:"https://games.crazygames.com/en_US/haunted-school---horror-game/index.html",tag:"horror"},
+  {name:"BuildNow GG",url:"https://games.crazygames.com/en_US/buildnow-gg/index.html",tag:"shooter"},
   {name:"Snowball.io",url:"https://games.crazygames.com/en_US/snowball-io/index.html",tag:"io"},
-  {name:"Age of War",url:"https://age-of-war.game-files.crazygames.com/ruffle/ageofwar.html",tag:"strategy"},
-  {name:"Happy Wheels",url:"https://files.crazygames.com/ruffle/happywheels.html",tag:"arcade"},
-  {name:"The Impossible Quiz",url:"https://the-impossible-quiz.game-files.crazygames.com/ruffle/theimpossiblequiz.html",tag:"puzzle"},
-  {name:"Sandtrix",url:"https://files.crazygames.com/sandtrix/16/index.html",tag:"puzzle"},
-  // ── GitHub hosted (reliable) ──
+  {name:"Fancy Pants Adventure",url:"https://games.crazygames.com/en_US/fancy-pants-adventure-world/index.html",tag:"platformer"},
+  {name:"Super Mario 64",url:"https://f.kbhgames.com/r/n64/game.php?file=32112_super-mario-64-usa.zip",tag:"platformer"},
+  {name:"Mario Kart 64",url:"https://f.kbhgames.com/r/n64/game.php?file=mario-kart-64.zip",tag:"racing"},
+  {name:"GoldenEye 007",url:"https://f.kbhgames.com/r/n64/game.php?file=007-golden-eye.zip",tag:"shooter"},
+  {name:"Paper Mario 64",url:"https://f.kbhgames.com/r/n64/game.php?file=Paper%20Mario%20(USA).zip",tag:"rpg"},
+  {name:"Mortal Kombat 4",url:"https://f.kbhgames.com/r/n64/game.php?file=Mortal-Kombat-4-U.zip",tag:"fighting"},
+  {name:"Ace Attorney",url:"https://f.kbhgames.com/r/gba/?r=ace-attorney",tag:"adventure"},
+  {name:"Super Smash Flash",url:"https://f.kbhgames.com/RS/game.php?r=//f.kbhgames.com/2018/swf/smashflash.swf",tag:"fighting"},
+  {name:"Papa's Pizzeria",url:"https://f.silvergames.com/ruffle/player.php?id=1360",tag:"sim"},
+  {name:"Papa Louie 1",url:"https://f.silvergames.com/ruffle/player.php?id=1373",tag:"sim"},
+  {name:"Papa Louie 2",url:"https://f.silvergames.com/emu/waffle/?id=3042",tag:"sim"},
+  {name:"Papa Louie 3",url:"https://f.silvergames.com/emu/waffle/?id=4693",tag:"sim"},
+  {name:"Papa's Bakeria",url:"https://f.silvergames.com/emu/waffle/?id=5458",tag:"sim"},
+  {name:"Papa's Cupcakeria",url:"https://f.silvergames.com/emu/waffle/?id=3246",tag:"sim"},
+  {name:"The Impossible Quiz 2",url:"https://f.silvergames.com/ruffle/player.php?id=3742",tag:"puzzle"},
+  {name:"Burrito Bison",url:"https://f.silvergames.com/awayfl/index.html?swf=burrito-bison.swf",tag:"arcade"},
+  {name:"Interactive Buddy",url:"https://f.silvergames.com/ruffle/player.php?id=204",tag:"arcade"},
+  {name:"Riddle School 2",url:"https://f.silvergames.com/ruffle/player.php?id=8564",tag:"adventure"},
   {name:"Rooftop Snipers 2",url:"https://h5cdn.github.io/s6/rooftop-snipers-2/",tag:"shooter"},
   {name:"FNAF 2",url:"https://sussygamedeveloper.github.io/FNAF2/",tag:"horror"},
   {name:"FNAF 3",url:"https://sussygamedeveloper.github.io/fnaf3/",tag:"horror"},
@@ -364,25 +367,26 @@ const GAMES = [
   {name:"DOOM 2",url:"https://browncha023.github.io/GBA/launcher.html#dm2",tag:"shooter"},
   {name:"Pokemon Light Platinum",url:"https://browncha023.github.io/GBA/launcher.html#pokemonlp",tag:"rpg"},
   {name:"South Park",url:"https://retrobowl-game.github.io/South-Park/",tag:"arcade"},
-  // ── Selenite (DS/NDS emulator games) ──
+  {name:"Drive Mad",url:"https://raw.githack.com/3kh0/3kh0-assets/main/drive-mad/index.html",tag:"racing"},
+  {name:"AC: Wild World",url:"https://static.arcadespot.com/retroemulator.php?system=nds&game=2017/10/Animal-Crossing-Wild-World-USA.nds",tag:"sim"},
+  {name:"Pokemon Heart Gold",url:"https://static.arcadespot.com/retroemulator.php?system=nds&game=2017/10/Pokemon-HeartGold-USA-Patched.nds",tag:"rpg"},
   {name:"10 Minutes Till Dawn",url:"https://selenite.cc/semag/10minutestilldawn/index.html",tag:"shooter"},
   {name:"World's Hardest Game",url:"https://selenite.cc/semag/worldshardestgame/index.html",tag:"arcade"},
   {name:"World's Hardest Game 2",url:"https://selenite.cc/semag/worldshardestgame2/index.html",tag:"arcade"},
   {name:"Super Mario 64 DS",url:"https://selenite.cc/semag/supermario64ds/index.html",tag:"platformer"},
   {name:"Nintendogs",url:"https://selenite.cc/semag/nintendogs/index.html",tag:"sim"},
-  // ── Standalones ──
-  {name:"Drive Mad",url:"https://raw.githack.com/3kh0/3kh0-assets/main/drive-mad/index.html",tag:"racing"},
   {name:"FNF Lofi Mod",url:"https://fnf.kdata1.com/lofi-funkin/2/",tag:"rhythm"},
   {name:"FNF VS Snorlax",url:"https://fnf.kdata1.com/snorlax/1/",tag:"rhythm"},
   {name:"GBA Emulator",url:"https://ds.44670.org/gba/",tag:"emulator"},
   {name:"DS Emulator",url:"https://ds.44670.org/",tag:"emulator"},
   {name:"Minecraft Classic",url:"https://classic.minecraft.net",tag:"sandbox"},
-  {name:"Eaglercraft 1.5",url:"https://interstellar-assets.pages.dev/minecraft-15/",tag:"sandbox"},
   {name:"Cookie Clicker",url:"https://orteil.dashnet.org/cookieclicker/",tag:"idle"},
   {name:"A Dark Room",url:"https://adarkroom.doublespeakgames.com",tag:"rpg"},
   {name:"Chess.com",url:"https://chess.com",tag:"classic"},
   {name:"Sandspiel",url:"https://sandspiel.club/",tag:"sandbox"},
+  {name:"Shapez.io",url:"https://shapez.io",tag:"puzzle"},
   {name:"Neal.Fun",url:"https://neal.fun",tag:"arcade"},
+  {name:"Eaglercraft 1.5",url:"https://interstellar-assets.pages.dev/minecraft-15/",tag:"sandbox"},
   {name:"Wordle Unlimited",url:"https://wordleunlimited.org/",tag:"classic"},
   {name:"Among Us (Scratch)",url:"https://turbowarp.org/523967150/fullscreen",tag:"multiplayer"},
   {name:"Mario Party",url:"https://classwork-heaven.pages.dev/g/marioparty/",tag:"multiplayer"},
