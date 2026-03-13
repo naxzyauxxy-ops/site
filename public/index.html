@@ -134,7 +134,8 @@ body.theme-green .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
   <div class="tabs">
     <button class="tab" onclick="show('flood',this)">Flood</button>
     <button class="tab active" onclick="show('proxy',this)">Proxy</button>
-    <button class="tab" onclick="show('games',this)">Games <span class="cs-badge">Soon</span></button>
+    <button class="tab" onclick="show('games',this)">Games</button>
+    <button class="tab" onclick="show('settings',this)">Settings</button>
   </div>
 </nav>
 
@@ -190,10 +191,32 @@ body.theme-green .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
 </div>
 
 <div class="panel" id="panel-games">
-  <h1>GAMES</h1>
-  <div class="cs-card">
-    <div class="cs-title">Coming Soon</div>
-    <div class="cs-big">Work in progress</div>
+  <h1>GAMES<br><span>ARCADE</span></h1>
+  <div class="games-grid">
+    <div class="game-card" onclick="proxyGame('https://slope-game.github.io')"><div class="game-name">Slope</div><div class="game-url">slope-game.github.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://1v1.lol')"><div class="game-name">1v1.lol</div><div class="game-url">1v1.lol</div></div>
+    <div class="game-card" onclick="proxyGame('https://retrobowl.me')"><div class="game-name">Retro Bowl</div><div class="game-url">retrobowl.me</div></div>
+    <div class="game-card" onclick="proxyGame('https://ovo-game.org')"><div class="game-name">OvO</div><div class="game-url">ovo-game.org</div></div>
+    <div class="game-card" onclick="proxyGame('https://smashkarts.io')"><div class="game-name">Smash Karts</div><div class="game-url">smashkarts.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://drive-mad.io')"><div class="game-name">Drive Mad</div><div class="game-url">drive-mad.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://orteil.dashnet.org/cookieclicker')"><div class="game-name">Cookie Clicker</div><div class="game-url">orteil.dashnet.org/cookieclicker</div></div>
+    <div class="game-card" onclick="proxyGame('https://www.driftboss.io')"><div class="game-name">Drift Boss</div><div class="game-url">www.driftboss.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://shellshock.io')"><div class="game-name">Shell Shockers</div><div class="game-url">shellshock.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://krunker.io')"><div class="game-name">Krunker</div><div class="game-url">krunker.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://classic.minecraft.net')"><div class="game-name">Minecraft Classic</div><div class="game-url">classic.minecraft.net</div></div>
+    <div class="game-card" onclick="proxyGame('https://paper-io.com')"><div class="game-name">Paper.io 2</div><div class="game-url">paper-io.com</div></div>
+    <div class="game-card" onclick="proxyGame('https://agar.io')"><div class="game-name">Agar.io</div><div class="game-url">agar.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://play2048.co')"><div class="game-name">2048</div><div class="game-url">play2048.co</div></div>
+    <div class="game-card" onclick="proxyGame('https://run3.io')"><div class="game-name">Run 3</div><div class="game-url">run3.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://tetris.com/play-tetris')"><div class="game-name">Tetris</div><div class="game-url">tetris.com/play-tetris</div></div>
+    <div class="game-card" onclick="proxyGame('https://www.google.com/logos/2010/pacman10-i.html')"><div class="game-name">Pac-Man</div><div class="game-url">www.google.com/logos/2010/pacman10-i.html</div></div>
+    <div class="game-card" onclick="proxyGame('https://fridaynightfunkin.net')"><div class="game-name">FNF</div><div class="game-url">fridaynightfunkin.net</div></div>
+    <div class="game-card" onclick="proxyGame('https://moto-x3m.io')"><div class="game-name">Moto X3M</div><div class="game-url">moto-x3m.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://poki.com/en/g/subway-surfers')"><div class="game-name">Subway Surfers</div><div class="game-url">poki.com/en/g/subway-surfers</div></div>
+    <div class="game-card" onclick="proxyGame('https://playsnake.org')"><div class="game-name">Snake</div><div class="game-url">playsnake.org</div></div>
+    <div class="game-card" onclick="proxyGame('https://flappybird.io')"><div class="game-name">Flappy Bird</div><div class="game-url">flappybird.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://geometrydash.io')"><div class="game-name">Geometry Dash</div><div class="game-url">geometrydash.io</div></div>
+    <div class="game-card" onclick="proxyGame('https://innersloth.itch.io/among-us')"><div class="game-name">Among Us</div><div class="game-url">innersloth.itch.io/among-us</div></div>
   </div>
 </div>
 
