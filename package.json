@@ -1,14 +1,13 @@
 {
-  "name": "blooket-hub",
+  "name": "void-hub",
   "version": "1.0.0",
   "type": "module",
-  "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "@tomphttp/bare-server-node": "2.0.2",
-    "@titaniumnetwork-dev/ultraviolet": "1.0.10",
-    "express": "4.18.2"
+    "@nebula-services/bare-server-node": "^2.0.4",
+    "@titaniumnetwork-dev/ultraviolet": "^1.0.10",
+    "express": "^4.18.2"
   }
 }
