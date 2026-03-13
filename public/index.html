@@ -77,6 +77,38 @@ input::placeholder{color:#2a2a2a}
 .loader-pixels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .px{position:absolute;width:4px;height:4px;background:#fff;opacity:0;animation:pxfall 1s ease forwards}
 @keyframes pxfall{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(40px)}}
+
+/* games */
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.game-card{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:14px 12px;cursor:pointer;transition:all .15s}
+.game-card:hover{border-color:#333;background:#111;transform:translateY(-1px)}
+.game-name{font-family:'Unbounded',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:4px}
+.game-url{font-size:0.5rem;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* settings */
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.setting-label{font-family:'Unbounded',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px}
+.setting-desc{font-size:0.58rem;color:#444;line-height:1.5}
+.toggle{position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#1a1a1a;border-radius:20px;transition:.2s}
+.slider:before{position:absolute;content:"";height:14px;width:14px;left:3px;bottom:3px;background:#444;border-radius:50%;transition:.2s}
+.toggle input:checked+.slider{background:#fff}
+.toggle input:checked+.slider:before{background:#000;transform:translateX(16px)}
+.theme-row{display:flex;flex-wrap:wrap;gap:6px}
+.theme-btn{font-family:'Unbounded',sans-serif;font-size:0.5rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:#000;border:1px solid #1a1a1a;color:#444;padding:7px 12px;border-radius:4px;cursor:pointer;transition:all .12s}
+.theme-btn:hover{border-color:#333;color:#aaa}
+.theme-btn.active{border-color:#fff;color:#fff}
+/* themes */
+body.theme-midnight{--bg:#07080f;--card:#0b0d1a;--border:#151825}
+body.theme-midnight,body.theme-midnight nav{background:var(--bg)}
+body.theme-midnight .card,body.theme-midnight .stat,body.theme-midnight .log{background:var(--card);border-color:var(--border)}
+body.theme-red{--acc:#ff3c5a}
+body.theme-red nav{border-color:#1a0008}
+body.theme-red .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+body.theme-blue{--acc:#3c8eff}
+body.theme-blue .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+body.theme-green{--acc:#00e676}
+body.theme-green .tab.active{color:var(--acc);border-bottom-color:var(--acc)}
 </style>
 </head>
 <body>
@@ -100,13 +132,13 @@ input::placeholder{color:#2a2a2a}
 <nav>
   <div class="logo">VOID HUB</div>
   <div class="tabs">
-    <button class="tab active" onclick="show('flood',this)">Flood</button>
-    <button class="tab" onclick="show('proxy',this)">Proxy</button>
+    <button class="tab" onclick="show('flood',this)">Flood</button>
+    <button class="tab active" onclick="show('proxy',this)">Proxy</button>
     <button class="tab" onclick="show('games',this)">Games <span class="cs-badge">Soon</span></button>
   </div>
 </nav>
 
-<div class="panel active" id="panel-flood">
+<div class="panel" id="panel-flood">
   <h1>BOT<br><span>FLOODER</span></h1>
   <div class="card">
     <div class="mrow">
@@ -135,7 +167,7 @@ input::placeholder{color:#2a2a2a}
   </div>
 </div>
 
-<div class="panel" id="panel-proxy">
+<div class="panel active" id="panel-proxy">
   <h1>UV<br><span>PROXY</span></h1>
   <div class="card">
     <p style="font-size:0.7rem;color:#555;margin-bottom:16px;line-height:1.7">Browse any site through the proxy — bypasses school filters.</p>
@@ -410,5 +442,120 @@ document.addEventListener('keydown', function() { closeAttemptTime = null; });
 })();
 </script>
 
+
+<div class="panel" id="panel-settings">
+  <h1>SETTINGS<br><span>CONFIG</span></h1>
+  <div class="card">
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Tab Cloaking</div>
+        <div class="setting-desc">Change the tab title and icon to hide this page</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="tabCloak" onchange="applyTabCloak()"><span class="slider"></span></label>
+    </div>
+    <div id="tabCloakOptions" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #1a1a1a">
+      <div class="field" style="margin-bottom:8px"><label>Tab Title</label><input id="clkTitle" placeholder="Google" value="Google"/></div>
+      <div class="field"><label>Tab Icon URL</label><input id="clkIcon" placeholder="https://google.com/favicon.ico" value="https://google.com/favicon.ico"/></div>
+      <button class="btn bw" style="margin-top:8px" onclick="saveTabCloak()">Apply</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">About:Blank Cloaking</div>
+        <div class="setting-desc">Opens site in an about:blank tab that looks empty to anyone watching</div>
+      </div>
+      <button class="btn bw" style="width:auto;padding:8px 16px;margin:0;font-size:0.5rem" onclick="openAboutBlank()">Open</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Panic Key</div>
+        <div class="setting-desc">Press this key to instantly switch to a safe page</div>
+      </div>
+      <select id="panicKey" onchange="savePanicKey()" style="background:#000;border:1px solid #222;border-radius:6px;padding:6px 10px;color:#fff;font-family:'DM Mono',monospace;font-size:0.75rem">
+        <option value="">Off</option>
+        <option value="Escape">Escape</option>
+        <option value="F1">F1</option>
+        <option value="F2">F2</option>
+        <option value="Tab">Tab</option>
+        <option value="Backquote">`</option>
+      </select>
+    </div>
+    <div class="field" style="margin-top:10px"><label>Panic URL</label><input id="panicUrl" placeholder="https://google.com" value="https://google.com" onchange="savePanicKey()"/></div>
+  </div>
+  <div class="card">
+    <div class="setting-label" style="margin-bottom:10px">Theme</div>
+    <div class="theme-row">
+      <div class="theme-btn active" id="theme-dark" onclick="setTheme('dark',this)">Dark</div>
+      <div class="theme-btn" id="theme-midnight" onclick="setTheme('midnight',this)">Midnight</div>
+      <div class="theme-btn" id="theme-red" onclick="setTheme('red',this)">Red</div>
+      <div class="theme-btn" id="theme-blue" onclick="setTheme('blue',this)">Blue</div>
+      <div class="theme-btn" id="theme-green" onclick="setTheme('green',this)">Green</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Settings JS ──────────────────────────────────────────
+function applyTabCloak(){
+  var on=document.getElementById('tabCloak').checked;
+  document.getElementById('tabCloakOptions').style.display=on?'block':'none';
+  if(!on){document.title='Void Hub';var l=document.querySelector("link[rel*='icon']");if(l)l.href='/favicon.ico';}
+  localStorage.setItem('tabCloak',on?'1':'0');
+}
+function saveTabCloak(){
+  var t=document.getElementById('clkTitle').value||'Google';
+  var i=document.getElementById('clkIcon').value||'https://google.com/favicon.ico';
+  document.title=t;
+  var l=document.querySelector("link[rel*='icon']")||document.createElement('link');
+  l.rel='shortcut icon';l.href=i;document.head.appendChild(l);
+  localStorage.setItem('clkTitle',t);localStorage.setItem('clkIcon',i);
+}
+function openAboutBlank(){
+  var w=window.open('about:blank','_blank');
+  var d=w.document;
+  d.open();
+  d.write('<html><head><title>'+document.title+'</title></head><body style="margin:0;background:#fff"><iframe src="'+location.href+'" style="border:none;width:100vw;height:100vh"></iframe></body></html>');
+  d.close();
+}
+function savePanicKey(){
+  localStorage.setItem('panicKey',document.getElementById('panicKey').value);
+  localStorage.setItem('panicUrl',document.getElementById('panicUrl').value);
+}
+document.addEventListener('keydown',function(e){
+  var k=localStorage.getItem('panicKey');
+  if(k&&e.code===k){
+    var u=localStorage.getItem('panicUrl')||'https://google.com';
+    window.location.replace(u);
+  }
+});
+function setTheme(t,el){
+  document.body.className=t==='dark'?'':'theme-'+t;
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  localStorage.setItem('theme',t);
+}
+function proxyGame(url){
+  if(typeof __uv$config==='undefined'){alert('Proxy not ready yet, try again in a second.');return;}
+  var enc=__uv$config.encodeUrl(url);
+  window.open('/uv/service/'+enc,'_blank');
+}
+// Load saved settings
+(function(){
+  var t=localStorage.getItem('theme')||'dark';
+  if(t!=='dark'){document.body.className='theme-'+t;var el=document.getElementById('theme-'+t);if(el){document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}}
+  var pk=localStorage.getItem('panicKey');if(pk)document.getElementById('panicKey').value=pk;
+  var pu=localStorage.getItem('panicUrl');if(pu)document.getElementById('panicUrl').value=pu;
+  var tc=localStorage.getItem('tabCloak');
+  if(tc==='1'){document.getElementById('tabCloak').checked=true;document.getElementById('tabCloakOptions').style.display='block';
+    var ct=localStorage.getItem('clkTitle');var ci=localStorage.getItem('clkIcon');
+    if(ct){document.getElementById('clkTitle').value=ct;}
+    if(ci){document.getElementById('clkIcon').value=ci;}
+    saveTabCloak();
+  }
+})();
+</script>
 </body>
 </html>
