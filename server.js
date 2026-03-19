@@ -112,7 +112,8 @@ app.post('/api/flood/stop/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-app.get('/api/health', (req, res) => res.json({ ok: true, floods: activeFloods, uptime: process.uptime() | 0 }));
+const BUILD_ID = Date.now().toString(36); // unique per server boot
+app.get('/api/health', (req, res) => res.json({ ok: true, floods: activeFloods, uptime: process.uptime() | 0, build: BUILD_ID }));
 
 // ── Auth / session API ─────────────────────────────────────
 
