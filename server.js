@@ -270,6 +270,25 @@ app.post('/api/admin/users/enable', requireAdmin, (req, res) => {
 // ── Static files (includes pre-built UV assets in public/) ──
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d', etag: true }));
 
+// ── Announcements ───────────────────────────────────────────
+let announcement = null; // { text, type }
+
+app.get('/api/announcement', (req, res) => {
+  res.json(announcement || {});
+});
+
+app.post('/api/admin/announcement', requireAdmin, (req, res) => {
+  const { text, type } = req.body || {};
+  if (!text) return res.json({ ok: false, error: 'text required' });
+  announcement = { text: String(text).slice(0, 300), type: type || 'info' };
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/announcement/clear', requireAdmin, (req, res) => {
+  announcement = null;
+  res.json({ ok: true });
+});
+
 // SW needs special headers
 app.get('/sw.js', (req, res) => {
   res.setHeader('Service-Worker-Allowed', '/');
