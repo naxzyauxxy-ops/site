@@ -1011,16 +1011,23 @@ async function doLogin(){
 async function checkSession(){
   var token = localStorage.getItem('vh_token');
   if(!token){ showLogin(); return false; }
+  // Skip check if tab is hidden — never kick someone just for switching tabs
+  if(document.hidden) return true;
   try{
+    var ctrl = new AbortController();
+    var tid = setTimeout(function(){ ctrl.abort(); }, 8000);
     var r = await fetch('/api/auth/check',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({token})
+      body:JSON.stringify({token:token}),
+      signal:ctrl.signal
     });
+    clearTimeout(tid);
     var d = await r.json();
     if(!d.ok){
       localStorage.removeItem('vh_token');
       localStorage.removeItem('vh_user');
+      localStorage.removeItem('vh_admin');
       showLogin();
       return false;
     }
@@ -1030,7 +1037,10 @@ async function checkSession(){
       if(t) t.style.display='';
     }
     return true;
-  } catch(e){ return true; }
+  } catch(e){
+    // Network error or server asleep — keep user logged in
+    return true;
+  }
 }
 
 // On load: if valid token skip login and go straight to VOID HUB animation
@@ -1048,8 +1058,8 @@ async function checkSession(){
   }
 })();
 
-// Kick every 60s if another session takes over
-setInterval(checkSession, 60000);
+// Recheck every 5 mins, only when tab is visible
+setInterval(function(){ if(!document.hidden) checkSession(); }, 5*60*1000);
 </script>
 
 
