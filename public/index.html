@@ -571,6 +571,12 @@ async function launchProxy(){
 
 // Proxy sites to try in order - if one fails, next one is used
 function proxyGame(url){
+  // Self-hosted games (/games/...) use /play wrapper - no login required
+  if(url.startsWith('/games/')){
+    window.open('/play?src='+encodeURIComponent(url),'_blank');
+    return;
+  }
+  // External URLs go through UV proxy if ready
   if(swReady){
     try{
       var enc=__uv$config.encodeUrl(url);
@@ -578,7 +584,6 @@ function proxyGame(url){
       return;
     }catch(e){}
   }
-  // fallback: open direct if proxy not ready
   window.open(url,'_blank');
 }
 
@@ -996,30 +1001,34 @@ async function adminLoadUsers(){
     var d = await adminAPI('/api/admin/users');
     if(!d.ok){ el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">'+d.error+'</div>'; return; }
     if(!d.users.length){ el.innerHTML='<div style="color:#555;font-size:0.7rem">No accounts yet</div>'; return; }
+    var isOwner = localStorage.getItem('vh_user') === 'naxzyauxxy';
     el.innerHTML = d.users.map(u => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;gap:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;gap:8px;flex-wrap:wrap">
         <div style="min-width:0">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <span style="font-size:0.8rem;font-weight:600;${u.disabled?'color:#555;text-decoration:line-through':''}">${u.username}</span>
-            ${u.isAdmin?'<span style="font-size:0.55rem;background:#ff3c5a22;color:#ff3c5a;padding:2px 7px;border-radius:4px">ADMIN</span>':''}
-            ${u.noLimit?'<span style="font-size:0.55rem;background:#4caf5022;color:#4caf50;padding:2px 7px;border-radius:4px">∞ no limit</span>':''}
+            ${u.username==='naxzyauxxy'?'<span style="font-size:0.55rem;background:#ff3c5a33;color:#ff3c5a;padding:2px 7px;border-radius:4px">OWNER</span>':''}
+            ${u.isAdmin&&u.username!=='naxzyauxxy'?'<span style="font-size:0.55rem;background:#ff980033;color:#ff9800;padding:2px 7px;border-radius:4px">ADMIN</span>':''}
+            ${u.noLimit&&!u.isAdmin?'<span style="font-size:0.55rem;background:#4caf5022;color:#4caf50;padding:2px 7px;border-radius:4px">∞</span>':''}
             ${u.disabled?'<span style="font-size:0.55rem;background:#ff980022;color:#ff9800;padding:2px 7px;border-radius:4px">DISABLED</span>':''}
           </div>
           <div style="font-size:0.6rem;margin-top:3px;color:${u.online?'#4caf50':'#444'}">${u.online?'● online now':'○ offline'}</div>
         </div>
-        ${u.isAdmin?'<span style="font-size:0.6rem;color:#333">owner</span>':`
-        <div style="display:flex;gap:5px;flex-shrink:0">
+        ${u.username==='naxzyauxxy'?'<span style="font-size:0.6rem;color:#555">owner</span>':`
+        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
+          ${isOwner&&!u.isAdmin?`<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminPromote('${u.username}')">Make Admin</button>`:''}
+          ${isOwner&&u.isAdmin?`<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#aaa;border-color:#aaa4" onclick="adminDemote('${u.username}')">Remove Admin</button>`:''}
           <button class="kbtn" style="padding:4px 8px;font-size:0.6rem" onclick="adminKick('${u.username}')">Kick</button>
           ${u.disabled
-            ? `<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle('${u.username}',false)">Enable</button>`
-            : `<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle('${u.username}',true)">Disable</button>`
+            ?`<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle('${u.username}',false)">Enable</button>`
+            :`<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle('${u.username}',true)">Disable</button>`
           }
           <button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="adminDelete('${u.username}')">Delete</button>
         </div>`}
       </div>
     `).join('');
   } catch(e) {
-    el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">Error loading users</div>';
+    el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">Error: '+e.message+'</div>';
   }
 }
 
@@ -1050,6 +1059,20 @@ async function adminDelete(username){
 
 async function adminToggle(username, disable){
   var d=await adminAPI('/api/admin/users/'+(disable?'disable':'enable'),{username});
+  if(d.ok) adminLoadUsers();
+  else alert('Error: '+d.error);
+}
+
+async function adminPromote(username){
+  if(!confirm('Make '+username+' an admin? They will have access to this panel.')) return;
+  var d=await adminAPI('/api/admin/users/promote',{username});
+  if(d.ok) adminLoadUsers();
+  else alert('Error: '+d.error);
+}
+
+async function adminDemote(username){
+  if(!confirm('Remove admin from '+username+'?')) return;
+  var d=await adminAPI('/api/admin/users/demote',{username});
   if(d.ok) adminLoadUsers();
   else alert('Error: '+d.error);
 }
