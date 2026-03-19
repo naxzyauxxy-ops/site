@@ -226,6 +226,9 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   <div class="scard">
     <h3>About:Blank Cloaking</h3>
     <p>Cloak the site in an about:blank tab and toggle on startup (enabled by default).</p>
+    <div class="srow">
+      <label class="toggle"><input type="checkbox" id="ab-switch" onchange="toggleAB()"><span class="slider"></span></label>
+      <button class="kbtn" onclick="openAB()">Open Popup</button>
     </div>
   </div>
 
@@ -535,6 +538,7 @@ function show(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
+  if(id==='admin') setTimeout(adminLoadUsers, 50);
 }
 
 // ── Proxy ─────────────────────────────────────────────────────────────────
