@@ -194,12 +194,12 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
       • By proceeding, you agree to these terms in full.
     </div>
 
-    <div class="terms-check-row" onclick="document.getElementById('terms-cb').click()">
+    <div class="terms-check-row">
       <input type="checkbox" id="terms-cb" onchange="document.getElementById('terms-agree-btn').disabled=!this.checked"/>
-      <label for="terms-cb">I have read and agree to the Terms of Service</label>
+      <label for="terms-cb" style="cursor:pointer">I have read and agree to the Terms of Service</label>
     </div>
 
-    <button class="terms-agree-btn" id="terms-agree-btn" disabled onclick="closePurchase()">I AGREE — PROCEED TO PAYMENT</button>
+    <a class="terms-agree-btn" id="terms-agree-btn" href="https://cash.app/$skylerondat" target="_blank" style="display:block;text-align:center;text-decoration:none;pointer-events:none;opacity:0.3">I AGREE — PROCEED TO PAYMENT</a>
 
     <div class="purchase-back" onclick="closePurchase()">← back to login</div>
   </div>
@@ -1342,8 +1342,20 @@ function closePurchase(){
   var cb = document.getElementById('terms-cb');
   var btn = document.getElementById('terms-agree-btn');
   if(cb) cb.checked = false;
-  if(btn) btn.disabled = true;
+  if(btn){ btn.style.pointerEvents='none'; btn.style.opacity='0.3'; }
 }
+
+// Terms checkbox enables the payment button
+document.addEventListener('DOMContentLoaded', function(){
+  var cb = document.getElementById('terms-cb');
+  var btn = document.getElementById('terms-agree-btn');
+  if(cb && btn){
+    cb.addEventListener('change', function(){
+      if(this.checked){ btn.style.pointerEvents=''; btn.style.opacity='1'; }
+      else { btn.style.pointerEvents='none'; btn.style.opacity='0.3'; }
+    });
+  }
+});
 
 // Warn before closing/leaving tab
 window.addEventListener('beforeunload', function(e){
