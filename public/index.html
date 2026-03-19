@@ -1583,39 +1583,84 @@ async function loadSuggestions(){
   if(!token){ setTimeout(loadSuggestions, 800); return; }
   el.innerHTML = '<div style="color:#555;font-size:0.7rem">Loading...</div>';
   try{
-    var r = await fetch('/api/suggestions');
-    var d = await r.json();
-    if(!Array.isArray(d) || !d.length){
+    var res = await fetch('/api/suggestions');
+    var data = await res.json();
+    if(!Array.isArray(data) || !data.length){
       el.innerHTML = '<div style="color:#aaa;font-size:0.75rem;padding:12px 0">No suggestions yet — maybe create one!</div>';
       return;
     }
     var user = (localStorage.getItem('vh_user')||'').toLowerCase();
     var isOwner = user === 'naxzyauxxy';
-    el.innerHTML = d.map(function(s){
+    var rows = '';
+    for(var i = 0; i < data.length; i++){
+      var s = data[i];
       var sid = s.id;
-      var voted = (s.voters||[]).map(function(x){return x.toLowerCase();}).indexOf(user) !== -1;
-      var dvoted = (s.downvoters||[]).map(function(x){return x.toLowerCase();}).indexOf(user) !== -1;
-      var vCol = voted ? 'var(--acc)' : '#555';
-      var dCol = dvoted ? '#ff3c5a' : '#555';
-      var sCol = s.votes > 0 ? 'var(--acc)' : s.votes < 0 ? '#ff3c5a' : '#555';
-      var out = '<div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;gap:12px;align-items:flex-start">';
-      out += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:32px">';
-      out += '<button id="vup-'+sid+'" onclick="voteSug(''+sid+'',1)" style="background:none;border:none;color:'+vCol+';font-size:1.2rem;cursor:pointer;padding:2px">&#9650;</button>';
-      out += '<span style="font-size:0.75rem;font-weight:700;color:'+sCol+'">'+s.votes+'</span>';
-      out += '<button id="vdn-'+sid+'" onclick="voteSug(''+sid+'',-1)" style="background:none;border:none;color:'+dCol+';font-size:1.2rem;cursor:pointer;padding:2px">&#9660;</button>';
-      out += '</div>';
-      out += '<div style="flex:1;min-width:0">';
-      out += '<div style="font-size:0.8rem;font-weight:600;margin-bottom:3px">'+s.title+'</div>';
-      if(s.desc) out += '<div style="font-size:0.65rem;color:#555;margin-bottom:5px">'+s.desc+'</div>';
-      out += '<div style="font-size:0.55rem;color:#333">by '+s.user+' &middot; '+new Date(s.at).toLocaleDateString()+'</div>';
-      out += '</div>';
-      if(isOwner) out += '<button id="del-'+sid+'" onclick="deleteSug(''+sid+'')" class="kbtn" style="padding:3px 8px;font-size:0.55rem;color:#ff3c5a;border-color:#ff3c5a33;flex-shrink:0;align-self:flex-start">&#10005;</button>';
-      out += '</div>';
-      return out;
-    }).join('');
+      var voted   = (s.voters||[]).map(function(x){return x.toLowerCase();}).indexOf(user) !== -1;
+      var dvoted  = (s.downvoters||[]).map(function(x){return x.toLowerCase();}).indexOf(user) !== -1;
+      var vCol    = voted  ? 'var(--acc)' : '#555';
+      var dCol    = dvoted ? '#ff3c5a'    : '#555';
+      var sCol    = s.votes > 0 ? 'var(--acc)' : s.votes < 0 ? '#ff3c5a' : '#555';
+      var row = '<div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;gap:12px;align-items:flex-start">';
+      row += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:32px">';
+      row += '<button onclick="voteSug(\'' + sid + '\',1)" style="background:none;border:none;color:' + vCol + ';font-size:1.2rem;cursor:pointer;padding:2px">&#9650;</button>';
+      row += '<span style="font-size:0.75rem;font-weight:700;color:' + sCol + '">' + s.votes + '</span>';
+      row += '<button onclick="voteSug(\'' + sid + '\',-1)" style="background:none;border:none;color:' + dCol + ';font-size:1.2rem;cursor:pointer;padding:2px">&#9660;</button>';
+      row += '</div>';
+      row += '<div style="flex:1;min-width:0">';
+      row += '<div style="font-size:0.8rem;font-weight:600;margin-bottom:3px">' + s.title + '</div>';
+      if(s.desc) row += '<div style="font-size:0.65rem;color:#555;margin-bottom:5px">' + s.desc + '</div>';
+      row += '<div style="font-size:0.55rem;color:#333">by ' + s.user + ' &middot; ' + new Date(s.at).toLocaleDateString() + '</div>';
+      row += '</div>';
+      if(isOwner) row += '<button onclick="deleteSug(\'' + sid + '\')" class="kbtn" style="padding:3px 8px;font-size:0.55rem;color:#ff3c5a;border-color:#ff3c5a33;flex-shrink:0;align-self:flex-start">&#10005;</button>';
+      row += '</div>';
+      rows += row;
+    }
+    el.innerHTML = rows;
   } catch(e){
-    el.innerHTML = '<div style="color:#ff3c5a;font-size:0.7rem">Error: '+e.message+'</div>';
+    el.innerHTML = '<div style="color:#ff3c5a;font-size:0.7rem">Error: ' + e.message + '</div>';
   }
+}
+
+async function submitSuggestion(){
+  var title = document.getElementById('sug-title').value.trim();
+  var desc  = document.getElementById('sug-desc').value.trim();
+  var msg   = document.getElementById('sug-msg');
+  if(!title){ msg.style.color='#ff3c5a'; msg.textContent='Enter a title'; return; }
+  if(hasBadWord(title)||hasBadWord(desc)){ msg.style.color='#ff3c5a'; msg.textContent='Inappropriate language'; return; }
+  var token = localStorage.getItem('vh_token');
+  try{
+    var r = await fetch('/api/suggestions', {method:'POST', headers:{'Content-Type':'application/json','x-auth-token':token||''}, body:JSON.stringify({title:title, desc:desc})});
+    var d = await r.json();
+    if(d.ok){
+      msg.style.color='#4caf50'; msg.textContent='Submitted!';
+      document.getElementById('sug-title').value='';
+      document.getElementById('sug-desc').value='';
+      loadSuggestions();
+      setTimeout(function(){ msg.textContent=''; }, 3000);
+    } else {
+      msg.style.color='#ff3c5a'; msg.textContent = d.error || 'Error';
+    }
+  } catch(e){ msg.style.color='#ff3c5a'; msg.textContent='Network error'; }
+}
+
+async function voteSug(id, dir){
+  var token = localStorage.getItem('vh_token');
+  try{
+    var r = await fetch('/api/suggestions/vote', {method:'POST', headers:{'Content-Type':'application/json','x-auth-token':token||''}, body:JSON.stringify({id:id, dir:dir})});
+    var d = await r.json();
+    if(d.ok) loadSuggestions();
+  } catch(e){}
+}
+
+async function deleteSug(id){
+  if(!confirm('Delete this suggestion?')) return;
+  var token = localStorage.getItem('vh_token');
+  try{
+    var r = await fetch('/api/admin/suggestions/delete', {method:'POST', headers:{'Content-Type':'application/json','x-auth-token':token||''}, body:JSON.stringify({id:id})});
+    var d = await r.json();
+    if(d.ok) loadSuggestions();
+    else alert('Error: '+(d.error||'failed'));
+  } catch(e){ alert('Network error'); }
 }
 
 async function submitSuggestion(){
@@ -1665,39 +1710,41 @@ async function deleteSug(id){
 var _udpUser = null;
 function openUserDetail(username){
   var u = _userMap[username];
-  if(!u){ console.error('no user for', username, 'map keys:', Object.keys(_userMap)); alert('Try clicking Refresh first'); return; }
-  document.getElementById('udp-name').textContent = u.username;
+  if(!u){ alert('User not found - click Refresh'); return; }
   var isOwner = (localStorage.getItem('vh_user')||'').toLowerCase()==='naxzyauxxy';
+  document.getElementById('udp-name').textContent = u.username;
   var rows = [
-    ['Status', u.online ? '<span style="color:#4caf50">&#9679; Online</span>' : '<span style="color:#666">&#9675; Offline</span>'],
-    ['Password', '<span style="color:#fff;font-family:monospace;letter-spacing:.05em">' + (u.pw||'—') + '</span>'],
-    ['Role', u.username==='naxzyauxxy'?'<span style="color:#ff3c5a">Owner</span>':u.isAdmin?'<span style="color:#ff9800">Admin</span>':'Member'],
-    ['IPs', (u.ipCount||0)+' unique IP'+(u.ipCount===1?'':'s')+(u.ipCount>1?' <span style="color:#ff3c5a">&#9888; possible sharing</span>':'')],
-    ['IP List', u.ips&&u.ips.length?'<span style="font-family:monospace;color:#888">'+u.ips.join('</span><br><span style="font-family:monospace;color:#888">')+'</span>':'<span style="color:#333">None</span>'],
-    ['Account', u.disabled?'<span style="color:#ff9800">DISABLED'+(u.banInfo?' — '+u.banInfo.reason:'')+'</span>':'<span style="color:#4caf50">Active</span>'],
+    ['Status',   u.online ? '<span style="color:#4caf50">&#9679; Online</span>' : '<span style="color:#666">&#9675; Offline</span>'],
+    ['Password', '<span style="color:#fff;font-family:monospace">' + (u.pw||'—') + '</span>'],
+    ['Role',     u.username==='naxzyauxxy' ? '<span style="color:#ff3c5a">Owner</span>' : u.isAdmin ? '<span style="color:#ff9800">Admin</span>' : 'Member'],
+    ['IPs',      (u.ipCount||0) + ' unique' + (u.ipCount>1 ? ' <span style="color:#ff3c5a">&#9888; sharing?</span>' : '')],
+    ['IP List',  (u.ips&&u.ips.length) ? u.ips.join(', ') : 'None'],
+    ['Account',  u.disabled ? '<span style="color:#ff9800">DISABLED' + (u.banInfo ? ' — '+u.banInfo.reason : '') + '</span>' : '<span style="color:#4caf50">Active</span>'],
   ];
   if(u.banInfo) rows.push(['Duration', u.banInfo.duration||'Permanent']);
   document.getElementById('udp-body').innerHTML = rows.map(function(r){
-    return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #111"><div style="color:#555;min-width:80px;flex-shrink:0">'+r[0]+'</div><div style="color:#aaa;word-break:break-all">'+r[1]+'</div></div>';
+    return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #111">'
+      + '<div style="color:#555;min-width:80px;flex-shrink:0">' + r[0] + '</div>'
+      + '<div style="color:#aaa;word-break:break-all">' + r[1] + '</div>'
+      + '</div>';
   }).join('');
   var btns = '';
-  if(u.username!=='naxzyauxxy'){
+  if(u.username !== 'naxzyauxxy'){
     var n = u.username;
-    var closePopup = "document.getElementById('user-detail-popup').style.display='none';";
-    if(isOwner&&!u.isAdmin)  btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff9800;border-color:#ff980044" onclick="adminPromote(\''+n+'\');'+closePopup+'">Make Admin</button>';
-    if(isOwner&&u.isAdmin)   btns += '<button class="kbtn" style="font-size:0.65rem;color:#aaa;border-color:#aaa4" onclick="adminDemote(\''+n+'\');'+closePopup+'">Remove Admin</button>';
-    btns += '<button class="kbtn" style="font-size:0.65rem" onclick="adminKick(\''+n+'\')">Kick</button>';
+    if(isOwner && !u.isAdmin) btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff9800;border-color:#ff980044" onclick="adminPromote(\'' + n + '\');document.getElementById(\'user-detail-popup\').style.display=\'none\'">Make Admin</button>';
+    if(isOwner && u.isAdmin)  btns += '<button class="kbtn" style="font-size:0.65rem;color:#aaa;border-color:#aaa4" onclick="adminDemote(\'' + n + '\');document.getElementById(\'user-detail-popup\').style.display=\'none\'">Remove Admin</button>';
+    btns += '<button class="kbtn" style="font-size:0.65rem" onclick="adminKick(\'' + n + '\')">Kick</button>';
     if(u.disabled){
-      btns += '<button class="kbtn" style="font-size:0.65rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle(\''+n+'\',false);'+closePopup+'">Enable</button>';
+      btns += '<button class="kbtn" style="font-size:0.65rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle(\'' + n + '\',false);document.getElementById(\'user-detail-popup\').style.display=\'none\'">Enable</button>';
     } else {
-      btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle(\''+n+'\',true);'+closePopup+'">Disable</button>';
+      btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle(\'' + n + '\',true);document.getElementById(\'user-detail-popup\').style.display=\'none\'">Disable</button>';
     }
-    btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="if(confirm(\'Delete '+n+'?\'))adminDelete(\''+n+'\')">Delete</button>';
+    btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="if(confirm(\'Delete ' + n + '?\'))adminDelete(\'' + n + '\')">Delete</button>';
   } else {
     btns = '<span style="font-size:0.65rem;color:#555">Owner — protected</span>';
   }
   document.getElementById('udp-actions').innerHTML = btns;
-  document.getElementById('user-detail-popup').style.display='flex';
+  document.getElementById('user-detail-popup').style.display = 'flex';
 }
 
 // Tab close warning — hooks onto first real user interaction
