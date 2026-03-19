@@ -439,7 +439,35 @@ app.get('/play', (req, res) => {
   if (!src) return res.status(400).send('missing src');
   res.setHeader('Cache-Control', 'no-cache');
   const ann = announcement ? JSON.stringify(announcement) : 'null';
-  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Game</title><style>*{margin:0;padding:0}html,body{width:100%;height:100%;background:#000;overflow:hidden}iframe{width:100%;height:100%;border:none}#ann{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px)}#ann-box{width:min(560px,90vw);padding:40px;border-radius:14px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px}#ann-text{font-family:system-ui,sans-serif;font-size:clamp(1.1rem,3vw,1.6rem);font-weight:900;line-height:1.3}#ann-btn{margin-top:8px;padding:10px 32px;border-radius:6px;border:none;font-family:system-ui,sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;background:#fff;color:#000}</style></head><body><iframe src="${src.replace(/"/g,'&quot;')}" allowfullscreen></iframe><div id="ann"><div id="ann-box"><div id="ann-icon" style="font-size:2.5rem"></div><div id="ann-text"></div><button id="ann-btn" onclick="document.getElementById('ann').style.display='none'">DISMISS</button></div></div><script>var A=${ann};if(A&&A.text){var icons={info:'📢',warn:'⚠️',error:'🚨',success:'✅'};var colors={info:{bg:'#0d1b2a',border:'#1565c0',text:'#64b5f6'},warn:{bg:'#1a1200',border:'#ff9800',text:'#ffb74d'},error:{bg:'#1a0000',border:'#ff3c5a',text:'#ff6b6b'},success:{bg:'#001a08',border:'#4caf50',text:'#81c784'}};var c=colors[A.type]||colors.info;var box=document.getElementById('ann-box');box.style.background=c.bg;box.style.border='1px solid '+c.border;document.getElementById('ann-icon').textContent=icons[A.type]||icons.info;var t=document.getElementById('ann-text');t.style.color=c.text;t.textContent=A.text;document.getElementById('ann').style.display='flex';}</script></body></html>`);
+  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Game</title><style>*{margin:0;padding:0}html,body{width:100%;height:100%;background:#000;overflow:hidden}iframe{width:100%;height:100%;border:none}#ann{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px)}#ann-box{width:min(560px,90vw);padding:40px;border-radius:14px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px}#ann-text{font-family:system-ui,sans-serif;font-size:clamp(1.1rem,3vw,1.6rem);font-weight:900;line-height:1.3}#ann-btn{margin-top:8px;padding:10px 32px;border-radius:6px;border:none;font-family:system-ui,sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;background:#fff;color:#000}</style></head><body><iframe src="${src.replace(/"/g,'&quot;')}" allowfullscreen></iframe><div id="ann"><div id="ann-box"><div id="ann-icon" style="font-size:2.5rem"></div><div id="ann-text"></div><button id="ann-btn" onclick="document.getElementById('ann').style.display='none'">DISMISS</button></div></div><script>
+// Auto-clicker for games
+var _acT=null,_acN=0,_acS=10;
+function toggleAC(on){
+  if(_acT){clearInterval(_acT);_acT=null;}
+  document.getElementById("ac-st").textContent=on?"On":"Off";
+  document.getElementById("ac-st").style.color=on?"#00e676":"#555";
+  if(on)_acT=setInterval(function(){
+    var el=document.elementFromPoint(window.innerWidth/2,window.innerHeight/2);
+    if(el)el.click();
+    _acN++;document.getElementById("ac-n").textContent=_acN.toLocaleString()+" clicks";
+  },Math.round(1000/_acS));
+}
+function setACS(v){_acS=parseInt(v);document.getElementById("ac-cps").textContent=v;var c=document.getElementById("ac-tog");if(c&&c.checked){toggleAC(false);toggleAC(true);}}
+</script>
+<div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:rgba(0,0,0,0.85);border:1px solid #222;border-radius:10px;padding:10px 14px;font-family:monospace;font-size:0.6rem;color:#aaa;display:flex;flex-direction:column;gap:6px;min-width:140px">
+  <div style="font-size:0.55rem;letter-spacing:0.15em;color:#444">AUTO CLICKER</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <input type="checkbox" id="ac-tog" onchange="toggleAC(this.checked)" style="cursor:pointer;accent-color:#00e676"/>
+    <span id="ac-st" style="color:#555">Off</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px">
+    <span style="color:#333">CPS:</span>
+    <input type="range" min="1" max="50" value="10" oninput="setACS(this.value)" style="flex:1;accent-color:#00e676"/>
+    <span id="ac-cps">10</span>
+  </div>
+  <div id="ac-n" style="color:#333">0 clicks</div>
+</div>
+<script>var A=${ann};if(A&&A.text){var icons={info:'📢',warn:'⚠️',error:'🚨',success:'✅'};var colors={info:{bg:'#0d1b2a',border:'#1565c0',text:'#64b5f6'},warn:{bg:'#1a1200',border:'#ff9800',text:'#ffb74d'},error:{bg:'#1a0000',border:'#ff3c5a',text:'#ff6b6b'},success:{bg:'#001a08',border:'#4caf50',text:'#81c784'}};var c=colors[A.type]||colors.info;var box=document.getElementById('ann-box');box.style.background=c.bg;box.style.border='1px solid '+c.border;document.getElementById('ann-icon').textContent=icons[A.type]||icons.info;var t=document.getElementById('ann-text');t.style.color=c.text;t.textContent=A.text;document.getElementById('ann').style.display='flex';}</script></body></html>`);
 });
 
 app.get('*', (req, res) => {
