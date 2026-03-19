@@ -150,8 +150,6 @@ function saveUsers() {
 }
 
 const data     = loadUsers();
-// Remove any leftover test/demo accounts on startup
-['admin','sss','test'].forEach(function(u){ if(data.users[u]) delete data.users[u]; });
 const USERS    = data.users;
 const ADMINS   = new Set(data.admins);
 const NO_LIMIT = new Set(data.noLimit);
