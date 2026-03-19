@@ -152,8 +152,29 @@ const ADMINS   = new Set(data.admins);
 const NO_LIMIT = new Set(data.noLimit);
 const DISABLED = new Set(data.disabled);
 
-const sessions    = new Map();
-const userSession = new Map();
+const SESSIONS_FILE = './sessions.json';
+
+// Load sessions from disk
+function loadSessions() {
+  try {
+    if (existsSync(SESSIONS_FILE)) {
+      const d = JSON.parse(readFileSync(SESSIONS_FILE, 'utf8'));
+      return { sessions: new Map(d.sessions||[]), userSession: new Map(d.userSession||[]) };
+    }
+  } catch(e) {}
+  return { sessions: new Map(), userSession: new Map() };
+}
+
+function saveSessions() {
+  try {
+    writeFileSync(SESSIONS_FILE, JSON.stringify({
+      sessions: [...sessions.entries()],
+      userSession: [...userSession.entries()]
+    }));
+  } catch(e) {}
+}
+
+const { sessions, userSession } = loadSessions();
 
 function makeToken() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -173,6 +194,7 @@ app.post('/api/auth/login', (req, res) => {
   const token = makeToken();
   sessions.set(token, u);
   userSession.set(u, token);
+  saveSessions();
   res.json({ ok: true, token, isAdmin: ADMINS.has(u) });
 });
 
@@ -189,6 +211,7 @@ app.post('/api/auth/logout', (req, res) => {
     const u = sessions.get(token);
     sessions.delete(token);
     if (userSession.get(u) === token) userSession.delete(u);
+    saveSessions();
   }
   res.json({ ok: true });
 });
