@@ -212,18 +212,6 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   <button onclick="document.getElementById('update-banner').style.display='none'" style="background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:0 2px">×</button>
 </div>
 
-<!-- Update Popup -->
-<div id="update-popup" style="display:none;position:fixed;inset:0;z-index:99980;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px)">
-  <div style="width:min(480px,90vw);background:#0a0a0a;border:1px solid #1a1a1a;border-radius:14px;padding:32px;display:flex;flex-direction:column;gap:16px">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div style="font-family:'Unbounded',sans-serif;font-size:0.6rem;letter-spacing:0.2em;color:#555">WHAT'S NEW</div>
-      <div id="update-version" style="font-size:0.55rem;color:#333;letter-spacing:0.1em"></div>
-    </div>
-    <div id="update-title" style="font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:900;line-height:1.3"></div>
-    <div id="update-body" style="font-size:0.72rem;color:#666;line-height:1.8"></div>
-    <button class="kbtn" onclick="dismissUpdate()" style="margin-top:4px;align-self:flex-start">Got it →</button>
-  </div>
-</div>
 <!-- User Detail Popup -->
 <div id="user-detail-popup" style="display:none;position:fixed;inset:0;z-index:99985;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px)">
   <div style="width:min(500px,92vw);background:#0a0a0a;border:1px solid #1a1a1a;border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:14px;max-height:85vh;overflow-y:auto">
@@ -1137,7 +1125,6 @@ function hideLogin(isAdmin){
   }
   // Trigger LUMI GAMES animation after login
   if(typeof triggerLoader === 'function') triggerLoader();
-  setTimeout(showUpdatePopup, 2000);
 }
 
 async function doLogin(){
@@ -1221,8 +1208,7 @@ async function checkSession(){
       if(t) t.style.display='';
     }
     if(typeof triggerLoader === 'function') triggerLoader();
-    setTimeout(showUpdatePopup, 2000);
-  } else {
+    } else {
     showLogin();
   }
 })();
@@ -1599,22 +1585,6 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
 
-// ── Updates popup ─────────────────────────────────────────
-var CURRENT_UPDATE = {version:'v1.3',title:'Suggestions are here!',body:'• New Suggestions tab — submit ideas for games or features\n• Vote up or down — highest voted rise to the top\n• Owner can remove any suggestion'};
-function showUpdatePopup(){
-  var seen = localStorage.getItem('lumi_update_seen');
-  if(seen === CURRENT_UPDATE.version) return;
-  var el = document.getElementById('update-popup');
-  document.getElementById('update-version').textContent = CURRENT_UPDATE.version;
-  document.getElementById('update-title').textContent = CURRENT_UPDATE.title;
-  document.getElementById('update-body').innerHTML = CURRENT_UPDATE.body.split('\n').map(function(l){return '<div>'+l+'</div>';}).join('');
-  if(el) el.style.display='flex';
-}
-function dismissUpdate(){
-  localStorage.setItem('lumi_update_seen', CURRENT_UPDATE.version);
-  document.getElementById('update-popup').style.display='none';
-}
-
 // ── Suggestions ───────────────────────────────────────────
 var BAD_WORDS = ["fuck", "shit", "bitch", "ass", "nigga", "nigger", "cunt", "dick", "pussy", "cock", "whore", "slut", "faggot", "retard", "bastard", "twat", "wank", "piss", "damn"];
 function hasBadWord(t){ var s=t.toLowerCase(); return BAD_WORDS.some(function(w){return s.includes(w);}); }
@@ -1623,32 +1593,36 @@ async function loadSuggestions(){
   var el=document.getElementById('sug-list');
   if(!el) return;
   var token=localStorage.getItem('vh_token');
-  if(!token){ el.innerHTML='<div style="color:#555;font-size:0.7rem">Loading...</div>'; setTimeout(loadSuggestions,600); return; }
+  if(!token){ setTimeout(loadSuggestions,800); return; }
+  el.innerHTML='<div style="color:#555;font-size:0.7rem">Loading...</div>';
   try{
     var r=await fetch('/api/suggestions');
     var d=await r.json();
-    if(!d.length){el.innerHTML='<div style="color:#555;font-size:0.7rem">No suggestions yet — be the first!</div>';return;}
-    var user=localStorage.getItem('vh_user')||'';
-    var isAdmin=localStorage.getItem('vh_admin')==='1';
-    var isOwner=(localStorage.getItem('vh_user')||'').toLowerCase()==='naxzyauxxy';
+    if(!Array.isArray(d)||!d.length){el.innerHTML='<div style="color:#555;font-size:0.7rem">No suggestions yet. Be the first!</div>';return;}
+    var user=(localStorage.getItem('vh_user')||'').toLowerCase();
+    var isOwner=user==='naxzyauxxy';
     el.innerHTML=d.map(function(s){
-      var voted=(s.voters||[]).includes(user);
-      var downvoted=(s.downvoters||[]).includes(user);
-      return '<div onclick="openUserDetail('+JSON.stringify(u)+')" style="cursor:pointer;padding:12px;background:var(--bg2);border:1px solid '+(u.ipCount>1?'#ff3c5a44':u.disabled?'#ff980033':'var(--border)')+';border-radius:8px;display:flex;gap:12px;align-items:flex-start">'
-        +'<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:32px">'
-        +'<button onclick="voteSug(''+s.id+'',1)" style="background:none;border:none;color:'+(voted?'var(--acc)':'#444')+';font-size:1.1rem;cursor:pointer;line-height:1;padding:0">▲</button>'
-        +'<span style="font-size:0.75rem;font-weight:700;color:'+(s.votes>0?'var(--acc)':s.votes<0?'#ff3c5a':'#555')+'">'+s.votes+'</span>'
-        +'<button onclick="voteSug(''+s.id+'',-1)" style="background:none;border:none;color:'+(downvoted?'#ff3c5a':'#444')+';font-size:1.1rem;cursor:pointer;line-height:1;padding:0">▼</button>'
-        +'</div>'
-        +'<div style="flex:1;min-width:0">'
-        +'<div style="font-size:0.8rem;font-weight:600;margin-bottom:3px">'+s.title+'</div>'
-        +(s.desc?'<div style="font-size:0.65rem;color:#555;margin-bottom:5px">'+s.desc+'</div>':'')
-        +'<div style="font-size:0.55rem;color:#333">'+s.user+' &nbsp;·&nbsp; '+new Date(s.at).toLocaleDateString()+'</div>'
-        +'</div>'
-        +(isAdmin?'<button class="kbtn" style="padding:3px 8px;font-size:0.55rem;color:#ff3c5a;border-color:#ff3c5a33;flex-shrink:0" onclick="deleteSug(''+s.id+'')">✕</button>':'')
-        +'</div>';
+      var voted=(s.voters||[]).map(function(x){return x.toLowerCase();}).includes(user);
+      var dvoted=(s.downvoters||[]).map(function(x){return x.toLowerCase();}).includes(user);
+      var vColor=voted?'var(--acc)':'#555';
+      var dColor=dvoted?'#ff3c5a':'#555';
+      var sColor=s.votes>0?'var(--acc)':s.votes<0?'#ff3c5a':'#555';
+      var html2='<div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;gap:12px;align-items:flex-start">';
+      html2+='<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:32px">';
+      html2+='<button onclick="voteSug(''+s.id+'',1)" style="background:none;border:none;color:'+vColor+';font-size:1.2rem;cursor:pointer;padding:2px">&#9650;</button>';
+      html2+='<span style="font-size:0.75rem;font-weight:700;color:'+sColor+'">'+s.votes+'</span>';
+      html2+='<button onclick="voteSug(''+s.id+'',-1)" style="background:none;border:none;color:'+dColor+';font-size:1.2rem;cursor:pointer;padding:2px">&#9660;</button>';
+      html2+='</div>';
+      html2+='<div style="flex:1;min-width:0">';
+      html2+='<div style="font-size:0.8rem;font-weight:600;margin-bottom:3px">'+s.title+'</div>';
+      if(s.desc) html2+='<div style="font-size:0.65rem;color:#555;margin-bottom:5px">'+s.desc+'</div>';
+      html2+='<div style="font-size:0.55rem;color:#333">by '+s.user+' &middot; '+new Date(s.at).toLocaleDateString()+'</div>';
+      html2+='</div>';
+      if(isOwner) html2+='<button onclick="deleteSug(''+s.id+'')" class="kbtn" style="padding:3px 8px;font-size:0.55rem;color:#ff3c5a;border-color:#ff3c5a33;flex-shrink:0;align-self:flex-start">&#10005;</button>';
+      html2+='</div>';
+      return html2;
     }).join('');
-  }catch(e){el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">Error loading</div>';}
+  }catch(e){el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">Error: '+e.message+'</div>';}
 }
 
 async function submitSuggestion(){
