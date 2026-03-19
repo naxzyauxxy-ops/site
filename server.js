@@ -9,9 +9,8 @@ import zlib from 'zlib';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const bareServer = createBareServer('/bare/');
+const bareServer = createBareServer('/ca/');
 const PORT = process.env.PORT || 3000;
-const uvDist = path.join(__dirname, 'node_modules', '@titaniumnetwork-dev', 'ultraviolet', 'dist');
 
 // ── Find bun ───────────────────────────────────────────────
 let BUN = (process.env.HOME || '/home/render') + '/.bun/bin/bun';
@@ -268,40 +267,15 @@ app.post('/api/admin/users/enable', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-// ── UV ─────────────────────────────────────────────────────
-// ── SW at root scope ───────────────────────────────────────
+// ── Static files (includes pre-built UV assets in public/) ──
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d', etag: true }));
+
+// SW needs special headers
 app.get('/sw.js', (req, res) => {
-  res.setHeader('Content-Type', 'application/javascript');
   res.setHeader('Service-Worker-Allowed', '/');
   res.setHeader('Cache-Control', 'no-cache');
-  res.send(`importScripts('/assets/mathematics/bundle.js');importScripts('/assets/mathematics/config.js');const sw=new UVServiceWorker();self.addEventListener('fetch',e=>e.respondWith(sw.fetch(e)));`);
+  res.sendFile(path.join(__dirname, 'public', 'sw.js'));
 });
-
-// ── UV config with /a/ prefix and /bare/ bare ──────────────
-app.get('/assets/mathematics/config.js', (req, res) => {
-  res.setHeader('Content-Type', 'application/javascript');
-  res.setHeader('Cache-Control', 'no-cache');
-  // UV 3.x uses xor encoding by default
-  res.send(`self.__uv$config={prefix:'/a/',bare:'/bare/',encodeUrl:Ultraviolet.codec.xor.encode,decodeUrl:Ultraviolet.codec.xor.decode,handler:'/assets/mathematics/handler.js',bundle:'/assets/mathematics/bundle.js',config:'/assets/mathematics/config.js',sw:'/sw.js'};`);
-});
-
-// ── UV static assets ───────────────────────────────────────
-app.get('/assets/mathematics/bundle.js', (req, res) => {
-  res.setHeader('Content-Type', 'application/javascript');
-  res.setHeader('Cache-Control', 'public, max-age=86400');
-  res.sendFile(path.join(uvDist, 'uv.bundle.js'));
-});
-app.get('/assets/mathematics/handler.js', (req, res) => {
-  res.setHeader('Content-Type', 'application/javascript');
-  res.setHeader('Cache-Control', 'public, max-age=86400');
-  res.sendFile(path.join(uvDist, 'uv.handler.js'));
-});
-
-// ── UV service worker route (/a/ prefix) ───────────────────
-app.use('/a/', (req, res, next) => {
-  res.setHeader('Cache-Control', 'no-cache');
-  next();
-}, express.static(path.join(uvDist)));
 // ── Game player - no login required, just serves the game ──
 app.get('/play', (req, res) => {
   const src = req.query.src || '';
@@ -310,7 +284,6 @@ app.get('/play', (req, res) => {
   res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Game</title><style>*{margin:0;padding:0}html,body,iframe{width:100%;height:100%;border:none;overflow:hidden;background:#000}</style></head><body><iframe src="${src.replace(/"/g,'&quot;')}" allowfullscreen></iframe></body></html>`);
 });
 
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '10m', etag: true }));
 app.get('*', (req, res) => { res.setHeader('Cache-Control', 'no-cache'); res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 
 // ── Server ─────────────────────────────────────────────────
