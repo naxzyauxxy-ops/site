@@ -458,16 +458,7 @@ async function launchProxy(){
 }
 
 function proxyGame(url){
-  if(!swReady){
-    // Try anyway
-    try{
-      var enc=__uv$config.encodeUrl(url);
-      window.open('/a/'+enc,'_blank');
-    }catch(e){alert('Proxy not ready yet — try again in a second.');}
-    return;
-  }
-  var enc=__uv$config.encodeUrl(url);
-  window.open('/a/'+enc,'_blank');
+  window.open(url,'_blank');
 }
 
 // Register service worker (Interstellar style)
