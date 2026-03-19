@@ -201,6 +201,10 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     </div>
     <div class="log" id="logBox"><span class="ll linf">// ready</span></div>
   </div>
+  <div class="scard" style="border-color:#ff3c5a44">
+    <h3 style="color:#ff3c5a">Caution</h3>
+    <p>The bot flooder may sometimes have problems not working. If it doesn't work, keep trying — wait a few seconds and start again.</p>
+  </div>
 </div>
 
 <!-- SETTINGS TAB -->
@@ -253,6 +257,17 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   </div>
 
   <div class="scard">
+    <h3>Game Proxy</h3>
+    <p>If games aren't loading, switch to a different proxy server.</p>
+    <select id="proxySelect" onchange="setGameProxy(this.value)" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.75rem">
+      <option value="0">Interstellar (sevecom)</option>
+      <option value="1">Selenite (edublue)</option>
+      <option value="2">Zatoga</option>
+      <option value="3">GoInterstellar</option>
+    </select>
+  </div>
+
+  <div class="scard">
     <h3>Background Image</h3>
     <p>Change the site's background image.</p>
     <div class="field"><input id="bgInput" placeholder="Enter image URL"/></div>
@@ -296,10 +311,6 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="kbtn" onclick="importData()">Import Save</button>
   </div>
 
-  <div class="scard" style="border-color:#ff3c5a44">
-    <h3 style="color:#ff3c5a">Caution</h3>
-    <p>The bot flooder may sometimes have problems not working. If it doesn't work, keep trying — wait a few seconds and start again.</p>
-  </div>
 </div>
 
 <script>
@@ -437,8 +448,29 @@ async function launchProxy(){
   }catch(e){s.textContent='Error: '+e.message;}
 }
 
+// Proxy sites to try in order - if one fails, next one is used
+var PROXIES = [
+  function(url){return 'https://interstellar.sevecom.com/service/'+btoa(url);},
+  function(url){return 'https://selenite.edublue.org/service/'+btoa(url);},
+  function(url){return 'https://zatoga.net/service/'+btoa(url);},
+  function(url){return 'https://gointerstellar.app/service/'+btoa(url);}
+];
+var proxyIndex = parseInt(localStorage.getItem('proxyIdx')||'0')%PROXIES.length;
+
 function proxyGame(url){
-  window.open(url,'_blank');
+  // Try UV first if ready, else use external proxy
+  if(swReady){
+    try{
+      var enc=__uv$config.encodeUrl(url);
+      window.open('/a/'+enc,'_blank');
+      return;
+    }catch(e){}
+  }
+  // Fall back to external interstellar-style proxy
+  var proxyUrl = PROXIES[proxyIndex](url);
+  var w = window.open(proxyUrl,'_blank');
+  // If popup blocked or fails, try direct
+  if(!w) window.open(url,'_blank');
 }
 
 // Register service worker (Interstellar style)
@@ -556,6 +588,12 @@ function resetCloak(){
   document.getElementById('cloakIcon').value='';
 }
 
+// Game proxy selector
+function setGameProxy(idx){
+  proxyIndex = parseInt(idx);
+  localStorage.setItem('proxyIdx', proxyIndex);
+}
+
 // Background
 function saveBg(){
   var url=document.getElementById('bgInput').value.trim();
@@ -625,6 +663,10 @@ function importData(){
   // Panic
   var pk=localStorage.getItem('eventKeyRaw');if(pk)document.getElementById('panicKeyInput').value=pk;
   var pl=localStorage.getItem('pLink');if(pl)document.getElementById('panicLinkInput').value=pl;
+
+  // Game proxy
+  var pi=localStorage.getItem('proxyIdx');
+  if(pi){proxyIndex=parseInt(pi);var sel=document.getElementById('proxySelect');if(sel)sel.value=pi;}
 
   // AB switch
   var ab=localStorage.getItem('ab');
