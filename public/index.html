@@ -1126,7 +1126,16 @@ async function adminAPI(path, body){
     headers:{'Content-Type':'application/json','x-auth-token':adminToken()},
     body: body ? JSON.stringify(body) : undefined
   });
-  return r.json();
+  const d = await r.json();
+  // If session expired (server restarted), force re-login
+  if(!d.ok && (d.error==='not authenticated' || d.error==='missing fields')){
+    localStorage.removeItem('vh_token');
+    localStorage.removeItem('vh_user');
+    localStorage.removeItem('vh_admin');
+    showLogin();
+    return d;
+  }
+  return d;
 }
 
 async function adminLoadUsers(){
