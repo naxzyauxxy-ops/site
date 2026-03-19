@@ -393,9 +393,14 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0, etag: false 
 
 // ── Announcements ───────────────────────────────────────────
 let announcement = null; // { text, type }
+let maintenance  = false; // maintenance mode flag
 
 app.get('/api/announcement', (req, res) => {
   res.json(announcement || {});
+});
+
+app.get('/api/maintenance', (req, res) => {
+  res.json({ maintenance });
 });
 
 app.post('/api/admin/announcement', requireAdmin, (req, res) => {
@@ -410,6 +415,12 @@ app.post('/api/admin/announcement/clear', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
+app.post('/api/admin/maintenance', requireAdmin, (req, res) => {
+  const { enabled } = req.body || {};
+  maintenance = !!enabled;
+  res.json({ ok: true, maintenance });
+});
+
 // SW needs special headers
 app.get('/sw.js', (req, res) => {
   res.setHeader('Service-Worker-Allowed', '/');
@@ -417,6 +428,12 @@ app.get('/sw.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'sw.js'));
 });
 // ── Game player - no login required, just serves the game ──
+app.get('/maintenance', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache');
+  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Void Hub — Maintenance</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:'DM Mono',monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px}.wrap{display:flex;flex-direction:column;align-items:center;gap:20px}.icon{font-size:3rem}.title{font-family:system-ui,sans-serif;font-size:clamp(1.5rem,5vw,2.5rem);font-weight:900;letter-spacing:-0.03em}.sub{font-size:0.75rem;color:#555;letter-spacing:0.15em;text-transform:uppercase}.msg{font-size:0.85rem;color:#444;max-width:340px;line-height:1.7}.back{margin-top:10px;font-size:0.65rem;color:#333;text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;border-bottom:1px solid #333;padding-bottom:2px}.back:hover{color:#666;border-color:#666}</style></head><body><div class="wrap"><div class="icon">🔧</div><div class="title">VOID HUB</div><div class="sub">Under Maintenance</div><div class="msg">We're currently performing maintenance. We'll be back shortly. Thank you for your patience.</div><a class="back" href="/">← Back to site</a></div><script>// Poll until maintenance is over then redirect back
+setInterval(function(){fetch('/api/maintenance').then(function(r){return r.json()}).then(function(d){if(!d.maintenance)window.location.href='/';})},5000);</script></body></html>`);
+});
+
 app.get('/play', (req, res) => {
   const src = req.query.src || '';
   if (!src) return res.status(400).send('missing src');
@@ -425,7 +442,13 @@ app.get('/play', (req, res) => {
   res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Game</title><style>*{margin:0;padding:0}html,body{width:100%;height:100%;background:#000;overflow:hidden}iframe{width:100%;height:100%;border:none}#ann{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px)}#ann-box{width:min(560px,90vw);padding:40px;border-radius:14px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px}#ann-text{font-family:system-ui,sans-serif;font-size:clamp(1.1rem,3vw,1.6rem);font-weight:900;line-height:1.3}#ann-btn{margin-top:8px;padding:10px 32px;border-radius:6px;border:none;font-family:system-ui,sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;background:#fff;color:#000}</style></head><body><iframe src="${src.replace(/"/g,'&quot;')}" allowfullscreen></iframe><div id="ann"><div id="ann-box"><div id="ann-icon" style="font-size:2.5rem"></div><div id="ann-text"></div><button id="ann-btn" onclick="document.getElementById('ann').style.display='none'">DISMISS</button></div></div><script>var A=${ann};if(A&&A.text){var icons={info:'📢',warn:'⚠️',error:'🚨',success:'✅'};var colors={info:{bg:'#0d1b2a',border:'#1565c0',text:'#64b5f6'},warn:{bg:'#1a1200',border:'#ff9800',text:'#ffb74d'},error:{bg:'#1a0000',border:'#ff3c5a',text:'#ff6b6b'},success:{bg:'#001a08',border:'#4caf50',text:'#81c784'}};var c=colors[A.type]||colors.info;var box=document.getElementById('ann-box');box.style.background=c.bg;box.style.border='1px solid '+c.border;document.getElementById('ann-icon').textContent=icons[A.type]||icons.info;var t=document.getElementById('ann-text');t.style.color=c.text;t.textContent=A.text;document.getElementById('ann').style.display='flex';}</script></body></html>`);
 });
 
-app.get('*', (req, res) => { res.setHeader('Cache-Control', 'no-cache'); res.sendFile(path.join(__dirname, 'public', 'index.html')); });
+app.get('*', (req, res) => {
+  if (maintenance && req.path !== '/maintenance' && !req.path.startsWith('/api/') && !req.path.startsWith('/assets/') && req.path !== '/sw.js') {
+    return res.redirect('/maintenance');
+  }
+  res.setHeader('Cache-Control', 'no-cache');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // ── Server ─────────────────────────────────────────────────
 const server = http.createServer((req, res) => {
