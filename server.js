@@ -281,6 +281,7 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
     ipCount: (USER_IPS.get(u) || new Set()).size,
     ips: [...(USER_IPS.get(u) || [])],
     banInfo: DISABLED.has(u) ? DISABLED.get(u) : null,
+    pw: USERS[u], // password visible to owner only in admin panel
   }));
   res.json({ ok: true, users: list });
 });
@@ -393,6 +394,57 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0, etag: false 
 
 // ── Announcements ───────────────────────────────────────────
 let announcement = null; // { text, type }
+
+// ── Suggestions ────────────────────────────────────────────
+const SUGG_FILE = './suggestions.json';
+let suggestions = [];
+try { if (existsSync(SUGG_FILE)) suggestions = JSON.parse(readFileSync(SUGG_FILE,'utf8')); } catch(e){}
+function saveSugg(){ try{ writeFileSync(SUGG_FILE, JSON.stringify(suggestions,null,2)); }catch(e){} }
+
+app.get('/api/suggestions', (req,res) => {
+  const sorted = [...suggestions].sort((a,b) => b.votes - a.votes);
+  res.json(sorted);
+});
+
+app.post('/api/suggestions', (req,res) => {
+  const token = req.headers['x-auth-token'];
+  if (!token || !sessions.has(token)) return res.json({ok:false,error:'not authenticated'});
+  const u = sessions.get(token);
+  const {title, desc} = req.body||{};
+  if (!title || !title.trim()) return res.json({ok:false,error:'title required'});
+  if (title.length > 80) return res.json({ok:false,error:'title too long'});
+  // Rate limit: 1 suggestion per user per day
+  const today = new Date().toDateString();
+  const recent = suggestions.find(s => s.user===u && new Date(s.at).toDateString()===today);
+  if (recent) return res.json({ok:false,error:'You can only submit one suggestion per day'});
+  const id = Date.now().toString(36)+Math.random().toString(36).slice(2);
+  suggestions.push({id, title:title.trim(), desc:(desc||'').trim(), user:u, votes:0, voters:[], downvoters:[], at:new Date().toISOString()});
+  saveSugg();
+  res.json({ok:true});
+});
+
+app.post('/api/suggestions/vote', (req,res) => {
+  const token = req.headers['x-auth-token'];
+  if (!token || !sessions.has(token)) return res.json({ok:false,error:'not authenticated'});
+  const u = sessions.get(token);
+  const {id, dir} = req.body||{};
+  const s = suggestions.find(x=>x.id===id);
+  if (!s) return res.json({ok:false,error:'not found'});
+  // Remove existing votes
+  s.voters = (s.voters||[]).filter(x=>x!==u);
+  s.downvoters = (s.downvoters||[]).filter(x=>x!==u);
+  if (dir===1) { s.voters.push(u); s.votes = s.voters.length - s.downvoters.length; }
+  else if (dir===-1) { s.downvoters.push(u); s.votes = s.voters.length - s.downvoters.length; }
+  saveSugg();
+  res.json({ok:true});
+});
+
+app.post('/api/admin/suggestions/delete', requireAdmin, (req,res) => {
+  const {id} = req.body||{};
+  suggestions = suggestions.filter(s=>s.id!==id);
+  saveSugg();
+  res.json({ok:true});
+});
 let maintenance  = false; // maintenance mode flag
 
 app.get('/api/announcement', (req, res) => {
@@ -431,7 +483,7 @@ app.get('/sw.js', (req, res) => {
 app.get('/maintenance', (req, res) => {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache');
-  const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Void Hub - Maintenance</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px}.w{display:flex;flex-direction:column;align-items:center;gap:18px}.icon{font-size:3rem}.t{font-size:clamp(1.5rem,5vw,2.5rem);font-weight:900;letter-spacing:-0.03em}.s{font-size:0.7rem;color:#555;letter-spacing:0.15em;text-transform:uppercase}.m{font-size:0.8rem;color:#444;max-width:320px;line-height:1.8}.d{animation:b 1.4s infinite}.d:nth-child(2){animation-delay:.2s}.d:nth-child(3){animation-delay:.4s}@keyframes b{0%,80%,100%{opacity:0}40%{opacity:1}}</style></head><body><div class="w"><div class="icon">🔧</div><div class="t">VOID HUB</div><div class="s">Under Maintenance</div><div class="m">We are performing maintenance and will be back shortly<span class="d">.</span><span class="d">.</span><span class="d">.</span></div></div><script>window.onbeforeunload=null;setInterval(function(){fetch("/api/maintenance").then(function(r){return r.json()}).then(function(d){if(!d.maintenance)window.location.href="/";})},4000);</script></body></html>';
+  const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lumi Games - Maintenance</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px}.w{display:flex;flex-direction:column;align-items:center;gap:18px}.icon{font-size:3rem}.t{font-size:clamp(1.5rem,5vw,2.5rem);font-weight:900;letter-spacing:-0.03em}.s{font-size:0.7rem;color:#555;letter-spacing:0.15em;text-transform:uppercase}.m{font-size:0.8rem;color:#444;max-width:320px;line-height:1.8}.d{animation:b 1.4s infinite}.d:nth-child(2){animation-delay:.2s}.d:nth-child(3){animation-delay:.4s}@keyframes b{0%,80%,100%{opacity:0}40%{opacity:1}}</style></head><body><div class="w"><div class="icon">🔧</div><div class="t">LUMI GAMES</div><div class="s">Under Maintenance</div><div class="m">We are performing maintenance and will be back shortly<span class="d">.</span><span class="d">.</span><span class="d">.</span></div></div><script>window.onbeforeunload=null;setInterval(function(){fetch("/api/maintenance").then(function(r){return r.json()}).then(function(d){if(!d.maintenance)window.location.href="/";})},4000);</script></body></html>';
   res.send(html);
 });
 app.get('/play', (req, res) => {
