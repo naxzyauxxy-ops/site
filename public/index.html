@@ -270,8 +270,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="kbtn" onclick="adminResetPass()">Reset Password</button>
     <div id="a-rp-msg" style="font-size:0.65rem;margin-top:8px;color:#4caf50"></div>
   </div>
-</div></div>
-  </div>
+</div>
 
   <div class="scard">
     <h3>Panic Key</h3>
@@ -937,24 +936,37 @@ async function adminAPI(path, body){
 
 async function adminLoadUsers(){
   var el = document.getElementById('a-user-list');
-  el.innerHTML='<div style="color:#333;font-size:0.7rem">Loading...</div>';
-  var d = await adminAPI('/api/admin/users');
-  if(!d.ok){ el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">'+d.error+'</div>'; return; }
-  if(!d.users.length){ el.innerHTML='<div style="color:#333;font-size:0.7rem">No users</div>'; return; }
-  el.innerHTML = d.users.map(u => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:6px">
-      <div>
-        <span style="font-size:0.75rem;font-weight:600">${u.username}</span>
-        ${u.isAdmin?'<span style="font-size:0.55rem;background:#ff3c5a22;color:#ff3c5a;padding:2px 6px;border-radius:4px;margin-left:6px">ADMIN</span>':''}
-        ${u.noLimit?'<span style="font-size:0.55rem;background:#4caf5022;color:#4caf50;padding:2px 6px;border-radius:4px;margin-left:4px">∞</span>':''}
-        <span style="font-size:0.55rem;margin-left:6px;color:${u.online?'#4caf50':'#555'}">${u.online?'● online':'○ offline'}</span>
+  if(!el) return;
+  el.innerHTML='<div style="color:#555;font-size:0.7rem">Loading...</div>';
+  try {
+    var d = await adminAPI('/api/admin/users');
+    if(!d.ok){ el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">'+d.error+'</div>'; return; }
+    if(!d.users.length){ el.innerHTML='<div style="color:#555;font-size:0.7rem">No accounts yet</div>'; return; }
+    el.innerHTML = d.users.map(u => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;gap:8px">
+        <div style="min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:0.8rem;font-weight:600;${u.disabled?'color:#555;text-decoration:line-through':''}">${u.username}</span>
+            ${u.isAdmin?'<span style="font-size:0.55rem;background:#ff3c5a22;color:#ff3c5a;padding:2px 7px;border-radius:4px">ADMIN</span>':''}
+            ${u.noLimit?'<span style="font-size:0.55rem;background:#4caf5022;color:#4caf50;padding:2px 7px;border-radius:4px">∞ no limit</span>':''}
+            ${u.disabled?'<span style="font-size:0.55rem;background:#ff980022;color:#ff9800;padding:2px 7px;border-radius:4px">DISABLED</span>':''}
+          </div>
+          <div style="font-size:0.6rem;margin-top:3px;color:${u.online?'#4caf50':'#444'}">${u.online?'● online now':'○ offline'}</div>
+        </div>
+        ${u.isAdmin?'<span style="font-size:0.6rem;color:#333">owner</span>':`
+        <div style="display:flex;gap:5px;flex-shrink:0">
+          <button class="kbtn" style="padding:4px 8px;font-size:0.6rem" onclick="adminKick('${u.username}')">Kick</button>
+          ${u.disabled
+            ? `<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle('${u.username}',false)">Enable</button>`
+            : `<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle('${u.username}',true)">Disable</button>`
+          }
+          <button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="adminDelete('${u.username}')">Delete</button>
+        </div>`}
       </div>
-      ${u.isAdmin?'':`<div style="display:flex;gap:6px">
-        <button class="kbtn" style="padding:4px 8px;font-size:0.6rem" onclick="adminKick('${u.username}')">Kick</button>
-        <button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="adminDelete('${u.username}')">Delete</button>
-      </div>`}
-    </div>
-  `).join('');
+    `).join('');
+  } catch(e) {
+    el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">Error loading users</div>';
+  }
 }
 
 async function adminCreate(){
@@ -978,6 +990,12 @@ async function adminCreate(){
 async function adminDelete(username){
   if(!confirm('Delete '+username+'? This cannot be undone.')) return;
   var d=await adminAPI('/api/admin/users/delete',{username});
+  if(d.ok) adminLoadUsers();
+  else alert('Error: '+d.error);
+}
+
+async function adminToggle(username, disable){
+  var d=await adminAPI('/api/admin/users/'+(disable?'disable':'enable'),{username});
   if(d.ok) adminLoadUsers();
   else alert('Error: '+d.error);
 }
@@ -1006,7 +1024,7 @@ async function adminResetPass(){
 // Auto-load users when admin tab is clicked
 document.addEventListener('DOMContentLoaded',function(){
   var adminTabBtn=document.getElementById('admin-tab');
-  if(adminTabBtn) adminTabBtn.addEventListener('click',function(){ adminLoadUsers(); });
+  if(adminTabBtn) adminTabBtn.addEventListener('click',function(){ setTimeout(adminLoadUsers,100); });
 });
 </script>
 </body>
