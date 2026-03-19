@@ -655,9 +655,15 @@ async function launchProxy(){
 
 // Proxy sites to try in order - if one fails, next one is used
 function proxyGame(url){
-  // Route through interstellar.sevecom.com/a proxy
-  var enc = btoa(url);
-  window.open('https://interstellar.sevecom.com/a/?ext&_='+enc,'_blank');
+  if(swReady){
+    try{
+      var enc=__uv$config.encodeUrl(url);
+      window.open('/a/'+enc,'_blank');
+      return;
+    }catch(e){}
+  }
+  // SW not ready yet — open directly as fallback
+  window.open(url,'_blank');
 }
 
 // Register service worker (Interstellar style)
