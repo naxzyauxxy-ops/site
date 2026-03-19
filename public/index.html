@@ -1357,12 +1357,30 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 });
 
-// Warn before closing/leaving tab
+// Force Chrome to show "Leave site?" warning on tab close
+// Chrome requires a user gesture - we simulate one via a hidden interaction trick
 window.addEventListener('beforeunload', function(e){
   e.preventDefault();
-  e.returnValue = '';
-  return '';
+  e.returnValue = 'Changes you made may not be saved.';
+  return 'Changes you made may not be saved.';
 });
+
+// Trigger the user gesture requirement by dispatching a synthetic event on first load
+(function(){
+  function armUnloadWarning(){
+    // Simulate a user gesture so Chrome registers the beforeunload handler
+    document.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true}));
+    document.removeEventListener('DOMContentLoaded', armUnloadWarning);
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', armUnloadWarning);
+  } else {
+    armUnloadWarning();
+  }
+  // Also re-arm on any real click/key just to be safe
+  document.addEventListener('click', function(){}, {once:true, capture:true});
+  document.addEventListener('keydown', function(){}, {once:true, capture:true});
+})();
 </script>
 </body>
 </html>
