@@ -435,6 +435,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
   <div class="scard">
     <h3 style="margin-bottom:12px">All Accounts</h3>
+    <input id="a-search" placeholder="&#128269; Search username..." autocomplete="off" oninput="filterUserList(this.value)" style="width:100%;box-sizing:border-box;margin-bottom:12px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.72rem;outline:none"/>
     <div id="a-user-list" style="display:flex;flex-direction:column;gap:8px">
       <div style="color:#555;font-size:0.7rem">Loading...</div>
     </div>
@@ -1169,6 +1170,49 @@ async function adminAPI(path, body){
   return d;
 }
 
+var _allUsers = [];
+
+function renderUserList(users){
+  var el = document.getElementById('a-user-list');
+  if(!el) return;
+  var isOwner = (localStorage.getItem('vh_user')||'').toLowerCase() === 'naxzyauxxy';
+  if(!users.length){ el.innerHTML='<div style="color:#555;font-size:0.7rem">No accounts found</div>'; return; }
+  el.innerHTML = users.map(function(u){
+    var badges = '';
+    if(u.username==='naxzyauxxy') badges += '<span style="font-size:0.55rem;background:#ff3c5a33;color:#ff3c5a;padding:2px 7px;border-radius:4px">OWNER</span>';
+    if(u.isAdmin&&u.username!=='naxzyauxxy') badges += '<span style="font-size:0.55rem;background:#ff980033;color:#ff9800;padding:2px 7px;border-radius:4px">ADMIN</span>';
+    if(u.disabled) badges += '<span style="font-size:0.55rem;background:#ff980022;color:#ff9800;padding:2px 7px;border-radius:4px">DISABLED</span>';
+    if(u.ipCount>1) badges += '<span style="font-size:0.55rem;background:#ff3c5a44;color:#ff3c5a;padding:2px 7px;border-radius:4px">⚠ '+u.ipCount+' IPs</span>';
+    var ipLine = u.online ? '● online' : '○ offline';
+    if(u.ips&&u.ips.length) ipLine += ' &nbsp;|&nbsp; IPs: '+u.ips.join(', ');
+    var nameStyle = u.disabled ? 'color:#555;text-decoration:line-through' : '';
+    var btns = '';
+    if(u.username!=='naxzyauxxy'){
+      if(isOwner&&!u.isAdmin) btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminPromote(\''+u.username+'\')">Make Admin</button>';
+      if(isOwner&&u.isAdmin) btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#aaa;border-color:#aaa4" onclick="adminDemote(\''+u.username+'\')">Remove Admin</button>';
+      btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem" onclick="adminKick(\''+u.username+'\')">Kick</button>';
+      if(u.disabled) btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle(\''+u.username+'\',false)">Enable</button>';
+      else btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle(\''+u.username+'\',true)">Disable</button>';
+      btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="adminDelete(\''+u.username+'\')">Delete</button>';
+    }
+    return '<div style="padding:10px 12px;background:var(--bg2);border:1px solid '+(u.ipCount>1?'#ff3c5a44':u.disabled?'#ff980033':'var(--border)')+';border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">'
+      +'<div style="min-width:0">'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">'
+      +'<span style="font-size:0.8rem;font-weight:600;'+nameStyle+'">'+u.username+'</span>'+badges
+      +'</div>'
+      +'<div style="font-size:0.6rem;color:'+(u.online?'#4caf50':'#444')+'">'+ipLine+'</div>'
+      +'</div>'
+      +(u.username==='naxzyauxxy'?'<span style="font-size:0.6rem;color:#555">owner</span>':'<div style="display:flex;gap:5px;flex-wrap:wrap">'+btns+'</div>')
+      +'</div>';
+  }).join('');
+}
+
+function filterUserList(q){
+  if(!q.trim()){ renderUserList(_allUsers); return; }
+  var f = q.toLowerCase();
+  renderUserList(_allUsers.filter(function(u){ return u.username.toLowerCase().includes(f); }));
+}
+
 async function adminLoadUsers(){
   var el = document.getElementById('a-user-list');
   if(!el) return;
@@ -1178,34 +1222,9 @@ async function adminLoadUsers(){
   try {
     var d = await adminAPI('/api/admin/users');
     if(!d.ok){ el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">'+d.error+'</div>'; return; }
-    if(!d.users.length){ el.innerHTML='<div style="color:#555;font-size:0.7rem">No accounts yet</div>'; return; }
-    var isOwner = localStorage.getItem('vh_user') === 'naxzyauxxy';
-    el.innerHTML = d.users.map(u => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;gap:8px;flex-wrap:wrap">
-        <div style="min-width:0">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            <span style="font-size:0.8rem;font-weight:600;${u.disabled?'color:#555;text-decoration:line-through':''}">${u.username}</span>
-            ${u.username==='naxzyauxxy'?'<span style="font-size:0.55rem;background:#ff3c5a33;color:#ff3c5a;padding:2px 7px;border-radius:4px">OWNER</span>':''}
-            ${u.isAdmin&&u.username!=='naxzyauxxy'?'<span style="font-size:0.55rem;background:#ff980033;color:#ff9800;padding:2px 7px;border-radius:4px">ADMIN</span>':''}
-            ${u.noLimit&&!u.isAdmin?'<span style="font-size:0.55rem;background:#4caf5022;color:#4caf50;padding:2px 7px;border-radius:4px">∞</span>':''}
-            ${u.disabled?'<span style="font-size:0.55rem;background:#ff980022;color:#ff9800;padding:2px 7px;border-radius:4px">DISABLED</span>':''}
-            ${u.ipCount>1?'<span style="font-size:0.55rem;background:#ff3c5a33;color:#ff3c5a;padding:2px 7px;border-radius:4px">⚠ '+u.ipCount+' IPs</span>':''}
-          </div>
-          <div style="font-size:0.6rem;margin-top:3px;color:${u.online?'#4caf50':'#444'}">${u.online?'● online now':'○ offline'}${u.ipCount?'  •  '+u.ipCount+' unique IP'+(u.ipCount===1?'':'s')+(u.ips&&u.ips.length?' ('+u.ips.join(', ')+')'):'':''}</div>
-        </div>
-        ${u.username==='naxzyauxxy'?'<span style="font-size:0.6rem;color:#555">owner</span>':`
-        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
-          ${isOwner&&!u.isAdmin?`<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminPromote('${u.username}')">Make Admin</button>`:''}
-          ${isOwner&&u.isAdmin?`<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#aaa;border-color:#aaa4" onclick="adminDemote('${u.username}')">Remove Admin</button>`:''}
-          <button class="kbtn" style="padding:4px 8px;font-size:0.6rem" onclick="adminKick('${u.username}')">Kick</button>
-          ${u.disabled
-            ?`<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle('${u.username}',false)">Enable</button>`
-            :`<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle('${u.username}',true)">Disable</button>`
-          }
-          <button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="adminDelete('${u.username}')">Delete</button>
-        </div>`}
-      </div>
-    `).join('');
+    _allUsers = d.users;
+    var q = (document.getElementById('a-search')||{}).value||'';
+    filterUserList(q);
   } catch(e) {
     el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">Error: '+e.message+'</div>';
   }
