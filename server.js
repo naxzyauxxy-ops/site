@@ -117,11 +117,14 @@ app.get('/api/health', (req, res) => res.json({ ok: true, floods: activeFloods, 
 
 // ── Auth / session API ─────────────────────────────────────
 // One active session per user. New login kicks old session.
+// Accounts in NO_LIMIT get unlimited concurrent sessions.
 const USERS = {
+  'naxzyauxxy': 'Gmoder23',
   'admin':  'voidhub2024',
   'user1':  'pass1',
   'user2':  'pass2'
 };
+const NO_LIMIT = new Set(['naxzyauxxy']); // these accounts skip the one-session rule
 const sessions = new Map(); // token -> username
 const userSession = new Map(); // username -> token
 
@@ -134,9 +137,11 @@ app.post('/api/auth/login', (req, res) => {
   if (!username || !password) return res.json({ ok: false, error: 'missing fields' });
   const u = username.trim().toLowerCase();
   if (!USERS[u] || USERS[u] !== password) return res.json({ ok: false, error: 'invalid credentials' });
-  // Invalidate old session for this user
-  const oldToken = userSession.get(u);
-  if (oldToken) sessions.delete(oldToken);
+  // Only enforce one-session limit for non-admin accounts
+  if (!NO_LIMIT.has(u)) {
+    const oldToken = userSession.get(u);
+    if (oldToken) sessions.delete(oldToken);
+  }
   // Create new session
   const token = makeToken();
   sessions.set(token, u);
