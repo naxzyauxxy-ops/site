@@ -205,6 +205,13 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   </div>
 </div>
 
+<!-- Update notification banner -->
+<div id="update-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99995;background:#111;border:1px solid #333;border-radius:10px;padding:12px 20px;display:none;align-items:center;gap:14px;font-family:'DM Mono',monospace;font-size:0.7rem;color:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.6);white-space:nowrap">
+  <span>🔄 <b>Update available</b> — refresh for the latest version</span>
+  <button onclick="location.reload()" style="background:#fff;color:#000;border:none;border-radius:6px;padding:6px 14px;font-family:'DM Mono',monospace;font-size:0.65rem;font-weight:700;cursor:pointer;letter-spacing:0.05em">REFRESH</button>
+  <button onclick="document.getElementById('update-banner').style.display='none'" style="background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:0 2px">×</button>
+</div>
+
 <!-- Announcement Banner -->
 <div id="ann-banner" style="display:none;position:fixed;inset:0;z-index:99990;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px)">
   <div id="ann-box" style="width:min(560px,90vw);padding:40px;border-radius:14px;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;gap:20px">
@@ -1337,6 +1344,26 @@ async function loadAnnouncement(){
 }
 
 // Auto-load users when admin tab is clicked
+// ── Update detection — polls server build ID every 60s ──────
+(function(){
+  var knownBuild = null;
+  async function checkBuild(){
+    try{
+      var r = await fetch('/api/health');
+      var d = await r.json();
+      if(!d.build) return;
+      if(knownBuild === null){ knownBuild = d.build; return; }
+      if(d.build !== knownBuild){
+        // New deploy detected — show refresh banner
+        var b = document.getElementById('update-banner');
+        if(b) b.style.display = 'flex';
+      }
+    } catch(e){}
+  }
+  checkBuild();
+  setInterval(checkBuild, 60000);
+})();
+
 // Receive session token from about:blank parent wrapper
 window.addEventListener('message', function(e){
   if(!e.data || e.data.type !== 'vh_session') return;
