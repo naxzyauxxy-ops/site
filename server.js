@@ -122,6 +122,7 @@ const USERS = {
 };
 const ADMINS   = new Set(['naxzyauxxy']);
 const NO_LIMIT = new Set(['naxzyauxxy']);
+const DISABLED = new Set(); // accounts blocked from logging in
 const sessions    = new Map();
 const userSession = new Map();
 
@@ -134,6 +135,7 @@ app.post('/api/auth/login', (req, res) => {
   if (!username || !password) return res.json({ ok: false, error: 'missing fields' });
   const u = username.trim().toLowerCase();
   if (!USERS[u] || USERS[u] !== password) return res.json({ ok: false, error: 'invalid credentials' });
+  if (DISABLED.has(u)) return res.json({ ok: false, error: 'account disabled' });
   if (!NO_LIMIT.has(u)) {
     const oldToken = userSession.get(u);
     if (oldToken) sessions.delete(oldToken);
@@ -177,6 +179,7 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
     isAdmin: ADMINS.has(u),
     noLimit: NO_LIMIT.has(u),
     online: userSession.has(u),
+    disabled: DISABLED.has(u),
   }));
   res.json({ ok: true, users: list });
 });
@@ -221,6 +224,25 @@ app.post('/api/admin/users/kick', requireAdmin, (req, res) => {
   const u = (username || '').trim().toLowerCase();
   const tok = userSession.get(u);
   if (tok) { sessions.delete(tok); userSession.delete(u); }
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/users/disable', requireAdmin, (req, res) => {
+  const { username } = req.body || {};
+  const u = (username || '').trim().toLowerCase();
+  if (ADMINS.has(u)) return res.json({ ok: false, error: 'cannot disable admin accounts' });
+  if (!USERS[u]) return res.json({ ok: false, error: 'user not found' });
+  DISABLED.add(u);
+  // Kick their session immediately
+  const tok = userSession.get(u);
+  if (tok) { sessions.delete(tok); userSession.delete(u); }
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/users/enable', requireAdmin, (req, res) => {
+  const { username } = req.body || {};
+  const u = (username || '').trim().toLowerCase();
+  DISABLED.delete(u);
   res.json({ ok: true });
 });
 
