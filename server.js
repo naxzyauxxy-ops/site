@@ -168,20 +168,38 @@ app.post('/api/auth/logout', (req, res) => {
 
 
 // ── UV ─────────────────────────────────────────────────────
-app.get('/uv/sw.js', (req, res) => {
+// ── SW at root scope ───────────────────────────────────────
+app.get('/sw.js', (req, res) => {
   res.setHeader('Content-Type', 'application/javascript');
   res.setHeader('Service-Worker-Allowed', '/');
   res.setHeader('Cache-Control', 'no-cache');
-  res.send(`importScripts('/uv/uv.bundle.js');importScripts('/uv/uv.config.js');importScripts('/uv/uv.sw.js');const sw=new UVServiceWorker();self.addEventListener('fetch',e=>e.respondWith(sw.fetch(e)));`);
+  res.send(`importScripts('/assets/mathematics/bundle.js');importScripts('/assets/mathematics/config.js');const sw=new UVServiceWorker();self.addEventListener('fetch',e=>e.respondWith(sw.fetch(e)));`);
 });
 
-app.get('/uv/uv.config.js', (req, res) => {
+// ── UV config with /a/ prefix and /bare/ bare ──────────────
+app.get('/assets/mathematics/config.js', (req, res) => {
   res.setHeader('Content-Type', 'application/javascript');
   res.setHeader('Cache-Control', 'no-cache');
-  res.send(`(function(){const e=typeof Ultraviolet!=='undefined'?Ultraviolet.codec.xor.encode:s=>encodeURIComponent(s);const d=typeof Ultraviolet!=='undefined'?Ultraviolet.codec.xor.decode:s=>decodeURIComponent(s);const c={prefix:'/uv/service/',bare:'/bare/',encodeUrl:e,decodeUrl:d,handler:'/uv/uv.handler.js',client:'/uv/uv.client.js',bundle:'/uv/uv.bundle.js',config:'/uv/uv.config.js',sw:'/uv/uv.sw.js'};if(typeof self!=='undefined')self.__uv$config=c;if(typeof window!=='undefined')window.__uv$config=c;})();`);
+  res.send(`(function(){const xor=(s)=>{let o='';for(let i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^2);return o};const enc=(s)=>encodeURIComponent(xor(s));const dec=(s)=>xor(decodeURIComponent(s));const c={prefix:'/a/',bare:'/bare/',encodeUrl:enc,decodeUrl:dec,handler:'/assets/mathematics/handler.js',client:'/assets/mathematics/bundle.js',bundle:'/assets/mathematics/bundle.js',config:'/assets/mathematics/config.js',sw:'/sw.js'};if(typeof self!=='undefined')self.__uv$config=c;if(typeof window!=='undefined')window.__uv$config=c;})();`);
 });
 
-app.use('/uv', (req, res, next) => { res.setHeader('Cache-Control', 'public, max-age=86400'); next(); }, express.static(uvDist));
+// ── UV static assets ───────────────────────────────────────
+app.get('/assets/mathematics/bundle.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.sendFile(path.join(uvDist, 'uv.bundle.js'));
+});
+app.get('/assets/mathematics/handler.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.sendFile(path.join(uvDist, 'uv.handler.js'));
+});
+
+// ── UV service worker route (/a/ prefix) ───────────────────
+app.use('/a/', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache');
+  next();
+}, express.static(path.join(uvDist)));
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '10m', etag: true }));
 app.get('*', (req, res) => { res.setHeader('Cache-Control', 'no-cache'); res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 
