@@ -212,23 +212,6 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   <button onclick="document.getElementById('update-banner').style.display='none'" style="background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:0 2px">×</button>
 </div>
 
-<!-- Auto-Clicker Widget -->
-<div id="autoclicker-widget" style="display:none;position:fixed;bottom:20px;right:20px;z-index:88888;font-family:'DM Mono',monospace">
-  <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:8px;min-width:160px">
-    <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#555">Auto Clicker</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <label class="toggle"><input type="checkbox" id="ac-toggle" onchange="toggleAutoClicker(this.checked)"><span class="slider"></span></label>
-      <span id="ac-status" style="font-size:0.65rem;color:#555">Off</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:6px">
-      <span style="font-size:0.6rem;color:#444">CPS:</span>
-      <input type="range" id="ac-speed" min="1" max="50" value="10" oninput="updateACSpeed(this.value)" style="flex:1;accent-color:var(--acc)"/>
-      <span id="ac-cps" style="font-size:0.6rem;color:#aaa;min-width:28px">10</span>
-    </div>
-    <div id="ac-count" style="font-size:0.55rem;color:#333">0 clicks</div>
-  </div>
-</div>
-
 <!-- Announcement Banner -->
 <div id="ann-banner" style="display:none;position:fixed;inset:0;z-index:99990;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px)">
   <div id="ann-box" style="width:min(560px,90vw);padding:40px;border-radius:14px;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;gap:20px">
@@ -701,6 +684,7 @@ function show(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
+
   if(id==='admin'){
     adminLoadUsers();
     // Sync maintenance toggle state
@@ -1102,8 +1086,6 @@ function hideLogin(isAdmin){
   }
   // Trigger VOID HUB animation after login
   if(typeof triggerLoader === 'function') triggerLoader();
-  // Show auto-clicker widget
-  showAutoClicker();
 }
 
 async function doLogin(){
@@ -1561,48 +1543,6 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 
-// ── Auto-Clicker ──────────────────────────────────────────
-var _acTimer = null;
-var _acCount = 0;
-var _acCPS   = 10;
-
-function toggleAutoClicker(on){
-  var status = document.getElementById('ac-status');
-  if(_acTimer){ clearInterval(_acTimer); _acTimer=null; }
-  if(on){
-    status.textContent='On';
-    status.style.color='var(--acc)';
-    _acTimer = setInterval(function(){
-      // Click at center of screen
-      var el = document.elementFromPoint(window.innerWidth/2, window.innerHeight/2);
-      if(el){ el.click(); }
-      // Also dispatch mouse events for games that need them
-      var ev = new MouseEvent('click',{bubbles:true,cancelable:true,view:window});
-      if(el) el.dispatchEvent(ev);
-      _acCount++;
-      var c = document.getElementById('ac-count');
-      if(c) c.textContent = _acCount.toLocaleString() + ' clicks';
-    }, Math.round(1000/_acCPS));
-  } else {
-    status.textContent='Off';
-    status.style.color='#555';
-  }
-}
-
-function updateACSpeed(v){
-  _acCPS = parseInt(v);
-  var el = document.getElementById('ac-cps');
-  if(el) el.textContent = v;
-  // Restart if running
-  var tog = document.getElementById('ac-toggle');
-  if(tog && tog.checked){ toggleAutoClicker(false); toggleAutoClicker(true); }
-}
-
-// Show auto-clicker widget after login
-function showAutoClicker(){
-  var w = document.getElementById('autoclicker-widget');
-  if(w) w.style.display='block';
-}
 
 // Tab close warning — hooks onto first real user interaction
 (function(){
