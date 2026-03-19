@@ -158,3 +158,8 @@ server.on('upgrade', (req, socket, head) => {
 server.keepAliveTimeout = 65000;
 server.maxConnections = 2000;
 server.listen(PORT, () => console.log('Void Hub listening on ' + PORT));
+const USERS = {
+  'admin':  'voidhub2024',
+  'user1':  'pass1',      // paying user
+  'yourneweuser': 'theirpassword',
+};
