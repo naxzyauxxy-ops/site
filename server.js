@@ -228,7 +228,7 @@ app.post('/api/auth/login', (req, res) => {
       const tok = userSession.get(u);
       if (tok) { sessions.delete(tok); userSession.delete(u); saveSessions(); }
       saveUsers();
-      console.log(\`[AUTO-BAN] \${u} disabled — \${ips.size} IPs detected: \${[...ips].join(', ')}\`);
+      console.log('[AUTO-BAN] ' + u + ' disabled — ' + ips.size + ' IPs: ' + [...ips].join(', '));
       return res.json({ ok: false, error: 'Your account has been disabled for violating the Terms of Service (account sharing). To regain access, pay the $30 reactivation fee via CashApp $skylerondat.' });
     }
   }
