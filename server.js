@@ -2,7 +2,7 @@ import express from 'express';
 import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createBareServer } from '@tomphttp/bare-server-node';
+import { createBareServer } from '@nebula-services/bare-server-node';
 import { spawn, execSync } from 'child_process';
 import { existsSync } from 'fs';
 import zlib from 'zlib';
@@ -120,6 +120,7 @@ const USERS = {
   'naxzyauxxy': 'Gmoder23',
   'admin':  'voidhub2024',
 };
+const OWNER    = 'naxzyauxxy'; // protected — cannot be modified by other admins
 const ADMINS   = new Set(['naxzyauxxy']);
 const NO_LIMIT = new Set(['naxzyauxxy']);
 const DISABLED = new Set(); // accounts blocked from logging in
@@ -198,7 +199,8 @@ app.post('/api/admin/users/create', requireAdmin, (req, res) => {
 app.post('/api/admin/users/delete', requireAdmin, (req, res) => {
   const { username } = req.body || {};
   const u = (username || '').trim().toLowerCase();
-  if (ADMINS.has(u)) return res.json({ ok: false, error: 'cannot delete admin accounts' });
+  if (u === OWNER) return res.json({ ok: false, error: 'cannot modify the owner account' });
+  if (ADMINS.has(u) && req.adminUser !== OWNER) return res.json({ ok: false, error: 'only the owner can modify admin accounts' });
   if (!USERS[u]) return res.json({ ok: false, error: 'user not found' });
   const tok = userSession.get(u);
   if (tok) sessions.delete(tok);
@@ -227,10 +229,30 @@ app.post('/api/admin/users/kick', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
+// Promote to admin
+app.post('/api/admin/users/promote', requireAdmin, (req, res) => {
+  const { username } = req.body || {};
+  const u = (username || '').trim().toLowerCase();
+  if (!USERS[u]) return res.json({ ok: false, error: 'user not found' });
+  ADMINS.add(u);
+  NO_LIMIT.add(u); // admins always get no limit
+  res.json({ ok: true });
+});
+
+// Demote from admin (cannot touch OWNER)
+app.post('/api/admin/users/demote', requireAdmin, (req, res) => {
+  const { username } = req.body || {};
+  const u = (username || '').trim().toLowerCase();
+  if (u === OWNER) return res.json({ ok: false, error: 'cannot demote the owner' });
+  ADMINS.delete(u);
+  res.json({ ok: true });
+});
+
 app.post('/api/admin/users/disable', requireAdmin, (req, res) => {
   const { username } = req.body || {};
   const u = (username || '').trim().toLowerCase();
-  if (ADMINS.has(u)) return res.json({ ok: false, error: 'cannot disable admin accounts' });
+  if (u === OWNER) return res.json({ ok: false, error: 'cannot modify the owner account' });
+  if (ADMINS.has(u) && req.adminUser !== OWNER) return res.json({ ok: false, error: 'only the owner can modify admin accounts' });
   if (!USERS[u]) return res.json({ ok: false, error: 'user not found' });
   DISABLED.add(u);
   // Kick their session immediately
@@ -259,7 +281,8 @@ app.get('/sw.js', (req, res) => {
 app.get('/assets/mathematics/config.js', (req, res) => {
   res.setHeader('Content-Type', 'application/javascript');
   res.setHeader('Cache-Control', 'no-cache');
-  res.send(`(function(){const xor=(s)=>{let o='';for(let i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^2);return o};const enc=(s)=>encodeURIComponent(xor(s));const dec=(s)=>xor(decodeURIComponent(s));const c={prefix:'/a/',bare:'/bare/',encodeUrl:enc,decodeUrl:dec,handler:'/assets/mathematics/handler.js',client:'/assets/mathematics/bundle.js',bundle:'/assets/mathematics/bundle.js',config:'/assets/mathematics/config.js',sw:'/sw.js'};if(typeof self!=='undefined')self.__uv$config=c;if(typeof window!=='undefined')window.__uv$config=c;})();`);
+  // UV 3.x uses xor encoding by default
+  res.send(`self.__uv$config={prefix:'/a/',bare:'/bare/',encodeUrl:Ultraviolet.codec.xor.encode,decodeUrl:Ultraviolet.codec.xor.decode,handler:'/assets/mathematics/handler.js',bundle:'/assets/mathematics/bundle.js',config:'/assets/mathematics/config.js',sw:'/sw.js'};`);
 });
 
 // ── UV static assets ───────────────────────────────────────
@@ -279,6 +302,14 @@ app.use('/a/', (req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache');
   next();
 }, express.static(path.join(uvDist)));
+// ── Game player - no login required, just serves the game ──
+app.get('/play', (req, res) => {
+  const src = req.query.src || '';
+  if (!src) return res.status(400).send('missing src');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Game</title><style>*{margin:0;padding:0}html,body,iframe{width:100%;height:100%;border:none;overflow:hidden;background:#000}</style></head><body><iframe src="${src.replace(/"/g,'&quot;')}" allowfullscreen></iframe></body></html>`);
+});
+
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '10m', etag: true }));
 app.get('*', (req, res) => { res.setHeader('Cache-Control', 'no-cache'); res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 
