@@ -436,7 +436,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   <div class="scard">
     <h3 style="margin-bottom:12px">All Accounts</h3>
     <div id="a-user-list" style="display:flex;flex-direction:column;gap:8px">
-      <div style="color:#555;font-size:0.7rem">Click refresh to load accounts</div>
+      <div style="color:#555;font-size:0.7rem">Loading...</div>
     </div>
     <button class="kbtn" style="margin-top:12px" onclick="adminLoadUsers()">&#8635; Refresh</button>
   </div>
@@ -662,7 +662,7 @@ function show(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
-  if(id==='admin') setTimeout(adminLoadUsers, 50);
+  if(id==='admin'){ adminLoadUsers(); }
   if(id==='flood'){
     var isAdmin = localStorage.getItem('vh_admin')==='1';
     var maintenance = document.getElementById('flood-maintenance');
@@ -1382,8 +1382,6 @@ window.addEventListener('message', function(e){
 });
 
 document.addEventListener('DOMContentLoaded',function(){
-  var adminTabBtn=document.getElementById('admin-tab');
-  if(adminTabBtn) adminTabBtn.addEventListener('click',function(){ setTimeout(adminLoadUsers,100); });
   loadAnnouncement();
   // Auto-show purchase screen if URL is /purchase
   if(window.location.pathname==='/purchase'){
