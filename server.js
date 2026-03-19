@@ -152,6 +152,33 @@ const ADMINS   = new Set(data.admins);
 const NO_LIMIT = new Set(data.noLimit);
 const DISABLED = new Set(data.disabled);
 
+// ── IP tracking & auto-ban ─────────────────────────────────
+const IP_FILE = './ips.json';
+const USER_IPS = new Map(); // username -> Set of IPs seen
+
+function loadIPs() {
+  try {
+    if (existsSync(IP_FILE)) {
+      const d = JSON.parse(readFileSync(IP_FILE, 'utf8'));
+      for (const [u, ips] of Object.entries(d)) USER_IPS.set(u, new Set(ips));
+    }
+  } catch(e) {}
+}
+
+function saveIPs() {
+  try {
+    const out = {};
+    for (const [u, ips] of USER_IPS.entries()) out[u] = [...ips];
+    writeFileSync(IP_FILE, JSON.stringify(out, null, 2));
+  } catch(e) {}
+}
+
+function getIP(req) {
+  return (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+}
+
+loadIPs();
+
 const SESSIONS_FILE = './sessions.json';
 
 // Load sessions from disk
@@ -186,7 +213,24 @@ app.post('/api/auth/login', (req, res) => {
   if (!username || !password) return res.json({ ok: false, error: 'missing fields' });
   const u = username.trim().toLowerCase();
   if (!USERS[u] || USERS[u] !== password) return res.json({ ok: false, error: 'invalid credentials' });
-  if (DISABLED.has(u)) return res.json({ ok: false, error: 'account disabled' });
+  if (DISABLED.has(u)) return res.json({ ok: false, error: 'Your account has been disabled for violating the Terms of Service (account sharing). To regain access, pay the $30 reactivation fee via CashApp $skylerondat.' });
+  // Track IP and auto-disable on multiple IPs (skip for owner/no-limit accounts)
+  if (u !== OWNER && !NO_LIMIT.has(u)) {
+    const ip = getIP(req);
+    if (!USER_IPS.has(u)) USER_IPS.set(u, new Set());
+    const ips = USER_IPS.get(u);
+    ips.add(ip);
+    saveIPs();
+    // More than 1 unique IP = sharing detected → auto-disable
+    if (ips.size > 1) {
+      DISABLED.add(u);
+      const tok = userSession.get(u);
+      if (tok) { sessions.delete(tok); userSession.delete(u); saveSessions(); }
+      saveUsers();
+      console.log(\`[AUTO-BAN] \${u} disabled — \${ips.size} IPs detected: \${[...ips].join(', ')}\`);
+      return res.json({ ok: false, error: 'Your account has been disabled for violating the Terms of Service (account sharing). To regain access, pay the $30 reactivation fee via CashApp $skylerondat.' });
+    }
+  }
   if (!NO_LIMIT.has(u)) {
     const oldToken = userSession.get(u);
     if (oldToken) sessions.delete(oldToken);
@@ -233,6 +277,8 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
     noLimit: NO_LIMIT.has(u),
     online: userSession.has(u),
     disabled: DISABLED.has(u),
+    ipCount: (USER_IPS.get(u) || new Set()).size,
+    ips: [...(USER_IPS.get(u) || [])],
   }));
   res.json({ ok: true, users: list });
 });
@@ -303,6 +349,9 @@ app.post('/api/admin/users/demote', requireAdmin, (req, res) => {
   const u = (username || '').trim().toLowerCase();
   if (u === OWNER) return res.json({ ok: false, error: 'cannot demote the owner' });
   ADMINS.delete(u);
+  // Kick their session so their next checkSession returns isAdmin: false
+  const tok = userSession.get(u);
+  if (tok) { sessions.delete(tok); userSession.delete(u); saveSessions(); }
   saveUsers();
   res.json({ ok: true });
 });
@@ -325,7 +374,10 @@ app.post('/api/admin/users/enable', requireAdmin, (req, res) => {
   const { username } = req.body || {};
   const u = (username || '').trim().toLowerCase();
   DISABLED.delete(u);
+  // Clear IP history so they get a fresh start
+  USER_IPS.delete(u);
   saveUsers();
+  saveIPs();
   res.json({ ok: true });
 });
 
