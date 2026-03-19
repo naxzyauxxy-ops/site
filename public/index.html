@@ -200,6 +200,20 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <div id="udp-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px"></div>
   </div>
 </div>
+<!-- Sharing Alert Popup -->
+<div id="sharing-alert" style="display:none;position:fixed;bottom:24px;right:24px;z-index:99999;width:min(340px,90vw);background:#0a0a0a;border:1px solid #ff3c5a44;border-radius:12px;padding:20px;font-family:'DM Mono',monospace;box-shadow:0 8px 32px rgba(0,0,0,0.6)">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <span style="font-size:1.2rem">🚨</span>
+    <span style="font-size:0.7rem;font-weight:700;color:#ff3c5a;letter-spacing:0.1em">SHARING DETECTED</span>
+  </div>
+  <div id="sharing-alert-msg" style="font-size:0.68rem;color:#aaa;margin-bottom:14px;line-height:1.5"></div>
+  <div style="display:flex;gap:8px">
+    <button class="kbtn" id="sharing-disable-btn" style="font-size:0.65rem;color:#ff3c5a;border-color:#ff3c5a44;flex:1">Disable Account</button>
+    <button class="kbtn" onclick="document.getElementById('sharing-alert').style.display='none'" style="font-size:0.65rem;color:#555;flex:1">Dismiss</button>
+  </div>
+</div>
+
+
 <!-- Announcement Banner -->
 <div id="ann-banner" style="display:none;position:fixed;inset:0;z-index:99990;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px)">
   <div id="ann-box" style="width:min(560px,90vw);padding:40px;border-radius:14px;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;gap:20px">
@@ -1911,6 +1925,66 @@ async function addComment(type, id){
       if(type==='bug') loadBugs(); else loadSuggestions();
     } else { alert(d.error||'Error'); }
   } catch(e){ alert('Network error'); }
+}
+
+
+// ── Tab sharing WebSocket ───────────────────────────────────
+var _lsWs = null;
+var _lsSharingUser = null;
+
+function connectSharingWS() {
+  var token = localStorage.getItem('vh_token');
+  if (!token) { setTimeout(connectSharingWS, 1000); return; }
+  try {
+    var proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    var ws = new WebSocket(proto + '//' + location.host + '/ws');
+    _lsWs = ws;
+    ws.onopen = function() {
+      ws.send(JSON.stringify({ type: 'auth', token: token }));
+    };
+    ws.onmessage = function(e) {
+      try {
+        var msg = JSON.parse(e.data);
+        if (msg.type === 'force_refresh') {
+          // Account was disabled - clear session and reload
+          localStorage.removeItem('vh_token');
+          localStorage.removeItem('vh_user');
+          localStorage.removeItem('vh_admin');
+          window.onbeforeunload = null;
+          location.reload();
+        }
+        if (msg.type === 'sharing_alert') {
+          // Only shown to owner
+          _lsSharingUser = msg.username;
+          var el = document.getElementById('sharing-alert');
+          var msgEl = document.getElementById('sharing-alert-msg');
+          if (msgEl) msgEl.innerHTML = '<b style="color:#fff">' + msg.username + '</b> is logged in from <b style="color:#ff3c5a">' + msg.tabs + ' tabs</b>' + (msg.ips && msg.ips.length ? '<br>IPs: <span style="color:#666;font-family:monospace">' + msg.ips.join(', ') + '</span>' : '');
+          var btn = document.getElementById('sharing-disable-btn');
+          if (btn) btn.onclick = function() {
+            if (_lsWs && _lsWs.readyState === 1) {
+              _lsWs.send(JSON.stringify({ type: 'disable_user', username: _lsSharingUser, token: localStorage.getItem('vh_token') }));
+              document.getElementById('sharing-alert').style.display = 'none';
+            }
+          };
+          if (el) el.style.display = 'block';
+        }
+      } catch(e) {}
+    };
+    ws.onclose = function() {
+      _lsWs = null;
+      // Reconnect after 3s
+      setTimeout(connectSharingWS, 3000);
+    };
+    ws.onerror = function() { ws.close(); };
+  } catch(e) {}
+}
+
+// Start WS after login
+var _wsStarted = false;
+function startSharingWS() {
+  if (_wsStarted) return;
+  _wsStarted = true;
+  connectSharingWS();
 }
 
 // Tab close warning — hooks onto first real user interaction
