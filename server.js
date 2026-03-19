@@ -215,22 +215,12 @@ app.post('/api/auth/login', (req, res) => {
   const u = username.trim().toLowerCase();
   if (!USERS[u] || USERS[u] !== password) return res.json({ ok: false, error: 'invalid credentials' });
   if (DISABLED.has(u)) return res.json({ ok: false, error: 'Your account has been disabled for violating the Terms of Service (account sharing). To regain access, pay the $30 reactivation fee via CashApp $skylerondat.' });
-  // Track IP and auto-disable on multiple IPs (skip for owner/no-limit accounts)
+  // Track IPs silently — admin can review and ban manually
   if (u !== OWNER && !NO_LIMIT.has(u)) {
     const ip = getIP(req);
     if (!USER_IPS.has(u)) USER_IPS.set(u, new Set());
-    const ips = USER_IPS.get(u);
-    ips.add(ip);
+    USER_IPS.get(u).add(ip);
     saveIPs();
-    // More than 1 unique IP = sharing detected → auto-disable
-    if (ips.size > 1) {
-      DISABLED.add(u);
-      const tok = userSession.get(u);
-      if (tok) { sessions.delete(tok); userSession.delete(u); saveSessions(); }
-      saveUsers();
-      console.log('[AUTO-BAN] ' + u + ' disabled — ' + ips.size + ' IPs: ' + [...ips].join(', '));
-      return res.json({ ok: false, error: 'Your account has been disabled for violating the Terms of Service (account sharing). To regain access, pay the $30 reactivation fee via CashApp $skylerondat.' });
-    }
   }
   if (!NO_LIMIT.has(u)) {
     const oldToken = userSession.get(u);
