@@ -265,6 +265,16 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 <!-- FLOOD TAB -->
 <div class="panel" id="panel-flood">
   <h1>BLOOKET<br><span>BOT FLOODER</span></h1>
+
+  <!-- Maintenance overlay — shown to non-admins -->
+  <div id="flood-maintenance" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px">
+    <div style="font-size:2rem">🔧</div>
+    <div style="font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:900;letter-spacing:0.05em">UNDER MAINTENANCE</div>
+    <div style="font-size:0.7rem;color:#555;max-width:280px;line-height:1.6">The bot flooder is temporarily unavailable. Check back later.</div>
+  </div>
+
+  <!-- Actual flooder — shown to admins only -->
+  <div id="flood-content">
   <div class="card">
     <div class="mrow">
       <div class="mb active" onclick="setMode('beta',this)">New Modes</div>
@@ -294,6 +304,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <h3 style="color:#ff3c5a">Caution</h3>
     <p>The bot flooder may sometimes have problems not working. If it doesn't work, keep trying — wait a few seconds and start again.</p>
   </div>
+  </div><!-- end flood-content -->
 </div>
 
 <!-- SETTINGS TAB -->
@@ -640,6 +651,13 @@ function show(id,el){
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
   if(id==='admin') setTimeout(adminLoadUsers, 50);
+  if(id==='flood'){
+    var isAdmin = localStorage.getItem('vh_admin')==='1';
+    var maintenance = document.getElementById('flood-maintenance');
+    var content = document.getElementById('flood-content');
+    if(maintenance) maintenance.style.display = isAdmin ? 'none' : 'flex';
+    if(content) content.style.display = isAdmin ? '' : 'none';
+  }
 }
 
 // ── Proxy ─────────────────────────────────────────────────────────────────
