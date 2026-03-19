@@ -1241,40 +1241,33 @@ async function adminAPI(path, body){
 }
 
 var _allUsers = [];
+var _userMap = {}; // username -> user object for safe onclick
 
 function renderUserList(users){
   var el = document.getElementById('a-user-list');
   if(!el) return;
   var isOwner = (localStorage.getItem('vh_user')||'').toLowerCase() === 'naxzyauxxy';
   if(!users.length){ el.innerHTML='<div style="color:#555;font-size:0.7rem">No accounts found</div>'; return; }
+  users.forEach(function(u){ _userMap[u.username] = u; });
   el.innerHTML = users.map(function(u){
     var badges = '';
     if(u.username==='naxzyauxxy') badges += '<span style="font-size:0.55rem;background:#ff3c5a33;color:#ff3c5a;padding:2px 7px;border-radius:4px">OWNER</span>';
     if(u.isAdmin&&u.username!=='naxzyauxxy') badges += '<span style="font-size:0.55rem;background:#ff980033;color:#ff9800;padding:2px 7px;border-radius:4px">ADMIN</span>';
     if(u.disabled) badges += '<span style="font-size:0.55rem;background:#ff980022;color:#ff9800;padding:2px 7px;border-radius:4px">DISABLED</span>';
-    if(u.ipCount>1) badges += '<span style="font-size:0.55rem;background:#ff3c5a44;color:#ff3c5a;padding:2px 7px;border-radius:4px">⚠ '+u.ipCount+' IPs</span>';
-    var ipLine = u.online ? '● online' : '○ offline';
-    if(u.ips&&u.ips.length) ipLine += ' &nbsp;|&nbsp; IPs: '+u.ips.join(', ');
-    var pwLine = u.pw ? '<span style="color:#333;font-size:0.55rem"> &nbsp;|&nbsp; pw: <span style="color:#666;letter-spacing:0.05em">'+u.pw+'</span></span>' : '';
-    if(u.banInfo) ipLine += '<br><span style="color:#ff9800">⛔ Reason: '+u.banInfo.reason+' &nbsp;|&nbsp; Duration: '+u.banInfo.duration+'</span>';
+    if(u.ipCount>1) badges += '<span style="font-size:0.55rem;background:#ff3c5a44;color:#ff3c5a;padding:2px 7px;border-radius:4px">&#9888; '+u.ipCount+' IPs</span>';
     var nameStyle = u.disabled ? 'color:#555;text-decoration:line-through' : '';
-    var btns = '';
-    if(u.username!=='naxzyauxxy'){
-      if(isOwner&&!u.isAdmin) btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminPromote(\''+u.username+'\')">Make Admin</button>';
-      if(isOwner&&u.isAdmin) btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#aaa;border-color:#aaa4" onclick="adminDemote(\''+u.username+'\')">Remove Admin</button>';
-      btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem" onclick="adminKick(\''+u.username+'\')">Kick</button>';
-      if(u.disabled) btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle(\''+u.username+'\',false)">Enable</button>';
-      else btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle(\''+u.username+'\',true)">Disable</button>';
-      btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="adminDelete(\''+u.username+'\')">Delete</button>';
-    }
-    return '<div onclick="openUserDetail('+JSON.stringify(u)+')" style="padding:10px 12px;background:var(--bg2);border:1px solid '+(u.ipCount>1?'#ff3c5a44':u.disabled?'#ff980033':'var(--border)')+';border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;cursor:pointer" onmouseover="this.style.borderColor='#333'" onmouseout="this.style.borderColor=''+(u.ipCount>1?'#ff3c5a44':u.disabled?'#ff980033':'var(--border)')+''">
+    var borderColor = u.ipCount>1 ? '#ff3c5a44' : u.disabled ? '#ff980033' : 'var(--border)';
+    var onlineColor = u.online ? '#4caf50' : '#444';
+    var onlineText = u.online ? '&#9679; online' : '&#9675; offline';
+    // Use data-username instead of JSON.stringify to avoid quote issues
+    return '<div data-uname="'+u.username+'" onclick="openUserDetail(this.dataset.uname)" style="cursor:pointer;padding:10px 12px;background:var(--bg2);border:1px solid '+borderColor+';border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">'
       +'<div style="min-width:0">'
       +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">'
       +'<span style="font-size:0.8rem;font-weight:600;'+nameStyle+'">'+u.username+'</span>'+badges
       +'</div>'
-      +'<div style="font-size:0.6rem;color:'+(u.online?'#4caf50':'#444')+'">'+ipLine+'</div>'
+      +'<div style="font-size:0.6rem;color:'+onlineColor+'">'+onlineText+(u.ips&&u.ips.length?' &nbsp;|&nbsp; IPs: '+u.ips.join(', '):'')+'</div>'
       +'</div>'
-      +(u.username==='naxzyauxxy'?'<span style="font-size:0.6rem;color:#555">owner</span>':'<div style="display:flex;gap:5px;flex-wrap:wrap">'+btns+'</div>')
+      +'<span style="font-size:0.6rem;color:#333">View &#8250;</span>'
       +'</div>';
   }).join('');
 }
@@ -1662,7 +1655,8 @@ async function deleteSug(id){
 
 // ── User detail popup ─────────────────────────────────────
 var _udpUser = null;
-function openUserDetail(u){
+function openUserDetail(username){
+  var u = _userMap[username] || {};
   _udpUser = u;
   var popup = document.getElementById('user-detail-popup');
   var isOwner = (localStorage.getItem('vh_user')||'').toLowerCase()==='naxzyauxxy';
