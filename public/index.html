@@ -148,6 +148,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="tab active" onclick="show('games',this)">Games</button>
     <button class="tab" onclick="show('flood',this)">Flood</button>
     <button class="tab" onclick="show('settings',this)">Settings</button>
+    <button class="tab" id="admin-tab" style="display:none;color:#ff3c5a" onclick="show('admin',this)">Admin</button>
   </div>
 </nav>
 
@@ -228,7 +229,48 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <div class="srow">
       <label class="toggle"><input type="checkbox" id="ab-switch" onchange="toggleAB()"><span class="slider"></span></label>
       <button class="kbtn" onclick="openAB()">Open Popup</button>
+    
+
+<!-- ADMIN PANEL -->
+<div class="panel" id="panel-admin">
+  <h1>ADMIN<br><span>PANEL</span></h1>
+
+  <!-- Create User -->
+  <div class="scard">
+    <h3>Create Account</h3>
+    <p>Create a new account for a paying user.</p>
+    <div class="g2" style="margin-top:10px">
+      <div class="field"><label>Username</label><input id="a-new-user" placeholder="username" autocomplete="off"/></div>
+      <div class="field"><label>Password</label><input id="a-new-pass" placeholder="password" autocomplete="off"/></div>
     </div>
+    <div style="display:flex;align-items:center;gap:10px;margin:10px 0">
+      <input type="checkbox" id="a-no-limit" style="width:16px;height:16px;cursor:pointer"/>
+      <label for="a-no-limit" style="font-size:0.7rem;cursor:pointer">No session limit (for trusted users)</label>
+    </div>
+    <button class="kbtn" onclick="adminCreate()">Create Account</button>
+    <div id="a-create-msg" style="font-size:0.65rem;margin-top:8px;color:#4caf50"></div>
+  </div>
+
+  <!-- User List -->
+  <div class="scard">
+    <h3 style="margin-bottom:12px">All Accounts</h3>
+    <div id="a-user-list" style="display:flex;flex-direction:column;gap:8px">
+      <div style="color:#333;font-size:0.7rem">Loading...</div>
+    </div>
+    <button class="kbtn" style="margin-top:12px" onclick="adminLoadUsers()">↻ Refresh</button>
+  </div>
+
+  <!-- Reset Password -->
+  <div class="scard">
+    <h3>Reset Password</h3>
+    <div class="g2" style="margin-top:10px">
+      <div class="field"><label>Username</label><input id="a-rp-user" placeholder="username"/></div>
+      <div class="field"><label>New Password</label><input id="a-rp-pass" placeholder="new password"/></div>
+    </div>
+    <button class="kbtn" onclick="adminResetPass()">Reset Password</button>
+    <div id="a-rp-msg" style="font-size:0.65rem;margin-top:8px;color:#4caf50"></div>
+  </div>
+</div></div>
   </div>
 
   <div class="scard">
@@ -1000,8 +1042,12 @@ function importData(){
 <script>
 // ── Login system (server-enforced, one session per user) ──────────────────
 function showLogin(){ document.getElementById('login-screen').classList.remove('gone'); }
-function hideLogin(){
+function hideLogin(isAdmin){
   document.getElementById('login-screen').classList.add('gone');
+  if(isAdmin){
+    var t=document.getElementById('admin-tab');
+    if(t) t.style.display='';
+  }
   // Trigger VOID HUB animation after login
   if(typeof triggerLoader === 'function') triggerLoader();
 }
@@ -1023,7 +1069,9 @@ async function doLogin(){
     if(d.ok){
       localStorage.setItem('vh_token', d.token);
       localStorage.setItem('vh_user', u);
-      hideLogin();
+      if(d.isAdmin) localStorage.setItem('vh_admin','1');
+      else localStorage.removeItem('vh_admin');
+      hideLogin(d.isAdmin);
     } else {
       err.textContent = d.error || 'incorrect username or password';
       document.getElementById('login-pass').value='';
@@ -1051,6 +1099,11 @@ async function checkSession(){
       showLogin();
       return false;
     }
+    if(d.isAdmin){
+      localStorage.setItem('vh_admin','1');
+      var t=document.getElementById('admin-tab');
+      if(t) t.style.display='';
+    }
     return true;
   } catch(e){ return true; }
 }
@@ -1060,6 +1113,10 @@ async function checkSession(){
   var valid = await checkSession();
   if(valid){
     document.getElementById('login-screen').classList.add('gone');
+    if(localStorage.getItem('vh_admin')==='1'){
+      var t=document.getElementById('admin-tab');
+      if(t) t.style.display='';
+    }
     if(typeof triggerLoader === 'function') triggerLoader();
   } else {
     showLogin();
@@ -1070,5 +1127,93 @@ async function checkSession(){
 setInterval(checkSession, 60000);
 </script>
 
+
+<script>
+// ── Admin Panel Functions ─────────────────────────────────
+function adminToken(){ return localStorage.getItem('vh_token')||''; }
+
+async function adminAPI(path, body){
+  const r = await fetch(path,{
+    method: body ? 'POST' : 'GET',
+    headers:{'Content-Type':'application/json','x-auth-token':adminToken()},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  return r.json();
+}
+
+async function adminLoadUsers(){
+  var el = document.getElementById('a-user-list');
+  el.innerHTML='<div style="color:#333;font-size:0.7rem">Loading...</div>';
+  var d = await adminAPI('/api/admin/users');
+  if(!d.ok){ el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">'+d.error+'</div>'; return; }
+  if(!d.users.length){ el.innerHTML='<div style="color:#333;font-size:0.7rem">No users</div>'; return; }
+  el.innerHTML = d.users.map(u => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:6px">
+      <div>
+        <span style="font-size:0.75rem;font-weight:600">${u.username}</span>
+        ${u.isAdmin?'<span style="font-size:0.55rem;background:#ff3c5a22;color:#ff3c5a;padding:2px 6px;border-radius:4px;margin-left:6px">ADMIN</span>':''}
+        ${u.noLimit?'<span style="font-size:0.55rem;background:#4caf5022;color:#4caf50;padding:2px 6px;border-radius:4px;margin-left:4px">∞</span>':''}
+        <span style="font-size:0.55rem;margin-left:6px;color:${u.online?'#4caf50':'#555'}">${u.online?'● online':'○ offline'}</span>
+      </div>
+      ${u.isAdmin?'':`<div style="display:flex;gap:6px">
+        <button class="kbtn" style="padding:4px 8px;font-size:0.6rem" onclick="adminKick('${u.username}')">Kick</button>
+        <button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="adminDelete('${u.username}')">Delete</button>
+      </div>`}
+    </div>
+  `).join('');
+}
+
+async function adminCreate(){
+  var u=document.getElementById('a-new-user').value.trim();
+  var p=document.getElementById('a-new-pass').value.trim();
+  var nl=document.getElementById('a-no-limit').checked;
+  var msg=document.getElementById('a-create-msg');
+  if(!u||!p){msg.style.color='#ff3c5a';msg.textContent='fill in both fields';return;}
+  var d=await adminAPI('/api/admin/users/create',{username:u,password:p,noLimit:nl});
+  if(d.ok){
+    msg.style.color='#4caf50';msg.textContent='✓ Account created: '+u;
+    document.getElementById('a-new-user').value='';
+    document.getElementById('a-new-pass').value='';
+    document.getElementById('a-no-limit').checked=false;
+    adminLoadUsers();
+  } else {
+    msg.style.color='#ff3c5a';msg.textContent='✗ '+d.error;
+  }
+}
+
+async function adminDelete(username){
+  if(!confirm('Delete '+username+'? This cannot be undone.')) return;
+  var d=await adminAPI('/api/admin/users/delete',{username});
+  if(d.ok) adminLoadUsers();
+  else alert('Error: '+d.error);
+}
+
+async function adminKick(username){
+  var d=await adminAPI('/api/admin/users/kick',{username});
+  if(d.ok){ alert(username+' has been kicked.'); adminLoadUsers(); }
+  else alert('Error: '+d.error);
+}
+
+async function adminResetPass(){
+  var u=document.getElementById('a-rp-user').value.trim();
+  var p=document.getElementById('a-rp-pass').value.trim();
+  var msg=document.getElementById('a-rp-msg');
+  if(!u||!p){msg.style.color='#ff3c5a';msg.textContent='fill in both fields';return;}
+  var d=await adminAPI('/api/admin/users/password',{username:u,password:p});
+  if(d.ok){
+    msg.style.color='#4caf50';msg.textContent='✓ Password updated for '+u;
+    document.getElementById('a-rp-user').value='';
+    document.getElementById('a-rp-pass').value='';
+  } else {
+    msg.style.color='#ff3c5a';msg.textContent='✗ '+d.error;
+  }
+}
+
+// Auto-load users when admin tab is clicked
+document.addEventListener('DOMContentLoaded',function(){
+  var adminTabBtn=document.getElementById('admin-tab');
+  if(adminTabBtn) adminTabBtn.addEventListener('click',function(){ adminLoadUsers(); });
+});
+</script>
 </body>
 </html>
