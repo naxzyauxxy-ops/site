@@ -100,10 +100,37 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 .loader-pixels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .px{position:absolute;width:4px;height:4px;background:#fff;opacity:0;animation:pxfall 1s ease forwards}
 @keyframes pxfall{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(40px)}}
+
+/* ── Login Screen ──────────────────────────────────────────────────────── */
+#login-screen{position:fixed;inset:0;background:#000;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'DM Mono',monospace}
+#login-screen.gone{display:none}
+.login-box{width:min(340px,88vw);display:flex;flex-direction:column;gap:14px}
+.login-logo{font-family:'Unbounded',sans-serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:900;letter-spacing:-0.04em;color:#fff;text-align:center;margin-bottom:8px}
+.login-sub{font-size:0.55rem;letter-spacing:0.22em;text-transform:uppercase;color:#333;text-align:center;margin-top:-10px;margin-bottom:6px}
+.login-input{background:#0a0a0a;border:1px solid #222;border-radius:6px;padding:11px 14px;color:#fff;font-family:'DM Mono',monospace;font-size:0.8rem;outline:none;transition:border .2s}
+.login-input:focus{border-color:#555}
+.login-input::placeholder{color:#333}
+.login-btn{background:#fff;color:#000;border:none;border-radius:6px;padding:11px;font-family:'Unbounded',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;cursor:pointer;transition:opacity .15s}
+.login-btn:hover{opacity:0.85}
+.login-err{font-size:0.6rem;color:#ff3c5a;text-align:center;min-height:14px;letter-spacing:0.05em}
+.login-footer{font-size:0.5rem;color:#222;text-align:center;margin-top:4px}
+.login-footer a{color:#333;text-decoration:none}
 </style>
 </head>
 <body>
 
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">VOID HUB</div>
+    <div class="login-sub">members only</div>
+    <input class="login-input" id="login-user" placeholder="Username" autocomplete="off" spellcheck="false"/>
+    <input class="login-input" id="login-pass" placeholder="Password" type="password" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div class="login-err" id="login-err"></div>
+    <button class="login-btn" onclick="doLogin()">ENTER</button>
+    <div class="login-footer">need access? contact <a href="https://discord.com">the owner</a></div>
+  </div>
+</div>
 
 <div id="loader">
   <div class="loader-pixels" id="loaderPx"></div>
@@ -964,6 +991,72 @@ function importData(){
   document.addEventListener('click',onGesture,{once:true});
   document.addEventListener('keydown',onGesture,{once:true});
 })();
+</script>
+
+
+<script>
+// ── Login system (server-enforced, one session per user) ──────────────────
+function showLogin(){ document.getElementById('login-screen').classList.remove('gone'); }
+function hideLogin(){ document.getElementById('login-screen').classList.add('gone'); }
+
+async function doLogin(){
+  var u   = document.getElementById('login-user').value.trim().toLowerCase();
+  var p   = document.getElementById('login-pass').value;
+  var btn = document.querySelector('.login-btn');
+  var err = document.getElementById('login-err');
+  if(!u || !p){ err.textContent='enter your credentials'; return; }
+  btn.textContent='...'; btn.disabled=true; err.textContent='';
+  try{
+    var r = await fetch('/api/auth/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:u,password:p})
+    });
+    var d = await r.json();
+    if(d.ok){
+      localStorage.setItem('vh_token', d.token);
+      localStorage.setItem('vh_user', u);
+      hideLogin();
+    } else {
+      err.textContent = d.error || 'incorrect username or password';
+      document.getElementById('login-pass').value='';
+      document.getElementById('login-pass').focus();
+    }
+  } catch(e){
+    err.textContent='connection error, try again';
+  }
+  btn.textContent='ENTER'; btn.disabled=false;
+}
+
+// Periodically verify token is still valid (kicks out if owner revokes / another login happens)
+async function checkSession(){
+  var token = localStorage.getItem('vh_token');
+  if(!token){ showLogin(); return false; }
+  try{
+    var r = await fetch('/api/auth/check',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token})
+    });
+    var d = await r.json();
+    if(!d.ok){
+      localStorage.removeItem('vh_token');
+      localStorage.removeItem('vh_user');
+      showLogin();
+      return false;
+    }
+    return true;
+  } catch(e){ return true; } // network blip — don't kick
+}
+
+// On load: check existing token
+(async function(){
+  var valid = await checkSession();
+  if(!valid) showLogin();
+})();
+
+// Recheck every 60 seconds — kicks user if owner logs in elsewhere
+setInterval(checkSession, 60000);
 </script>
 
 </body>
