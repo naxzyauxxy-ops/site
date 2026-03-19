@@ -962,34 +962,36 @@ function importData(){
         clearInterval(iv);
         document.getElementById('loaderSub').textContent='done.';
         spawnPx(30);
-        setTimeout(function(){document.getElementById('loader').classList.add('hidden');},700);
+        setTimeout(function(){document.getElementById('loader').classList.add('hidden');document.getElementById('login-screen').classList.add('gone');},700);
       }
     },120);
   }
-  setTimeout(function(){
-    var l=document.getElementById('loaderLogo');if(l)l.classList.add('show');
-  },100);
-  setTimeout(function(){
-    var s=document.getElementById('loaderSub'),b=document.getElementById('loaderBarWrap');
-    if(s)s.classList.add('show');if(b)b.classList.add('show');
-    var p=document.createElement('div');
-    p.style.cssText='position:absolute;bottom:48px;left:50%;transform:translateX(-50%);font-family:"DM Mono",monospace;font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:#444;cursor:pointer';
-    p.id='clickPrompt';p.textContent='click anywhere to enter';
-    p.style.animation='blink2 1.2s infinite';
-    document.getElementById('loader').appendChild(p);
-    var st=document.createElement('style');
-    st.textContent='@keyframes blink2{0%,100%{opacity:.2}50%{opacity:1}}';
-    document.head.appendChild(st);
-  },400);
   function onGesture(){var p=document.getElementById('clickPrompt');if(p)p.remove();startLoader();}
-  // Expose triggerLoader globally so login can call it after auth
+  // triggerLoader called ONLY after successful login/auth check
   window.triggerLoader = function(){
-    // Remove any stale listeners then fire
     document.removeEventListener('click', onGesture);
     document.removeEventListener('keydown', onGesture);
-    onGesture();
+    // Show logo + click prompt
+    setTimeout(function(){
+      var l=document.getElementById('loaderLogo');if(l)l.classList.add('show');
+    },100);
+    setTimeout(function(){
+      var s=document.getElementById('loaderSub'),b=document.getElementById('loaderBarWrap');
+      if(s)s.classList.add('show');if(b)b.classList.add('show');
+      var p=document.createElement('div');
+      p.style.cssText='position:absolute;bottom:48px;left:50%;transform:translateX(-50%);font-family:"DM Mono",monospace;font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:#444;cursor:pointer';
+      p.id='clickPrompt';p.textContent='click anywhere to enter';
+      p.style.animation='blink2 1.2s infinite';
+      var loader=document.getElementById('loader');
+      if(loader) loader.appendChild(p);
+      var st=document.createElement('style');
+      st.textContent='@keyframes blink2{0%,100%{opacity:.2}50%{opacity:1}}';
+      document.head.appendChild(st);
+      // Listen for click/key to start the loading animation
+      document.addEventListener('click', onGesture, {once:true});
+      document.addEventListener('keydown', onGesture, {once:true});
+    },400);
   };
-  // Don't auto-listen for click — login controls when animation starts
 })();
 </script>
 
