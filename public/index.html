@@ -988,8 +988,14 @@ function importData(){
     document.head.appendChild(st);
   },400);
   function onGesture(){var p=document.getElementById('clickPrompt');if(p)p.remove();startLoader();}
-  document.addEventListener('click',onGesture,{once:true});
-  document.addEventListener('keydown',onGesture,{once:true});
+  // Expose triggerLoader globally so login can call it after auth
+  window.triggerLoader = function(){
+    // Remove any stale listeners then fire
+    document.removeEventListener('click', onGesture);
+    document.removeEventListener('keydown', onGesture);
+    onGesture();
+  };
+  // Don't auto-listen for click — login controls when animation starts
 })();
 </script>
 
@@ -997,7 +1003,11 @@ function importData(){
 <script>
 // ── Login system (server-enforced, one session per user) ──────────────────
 function showLogin(){ document.getElementById('login-screen').classList.remove('gone'); }
-function hideLogin(){ document.getElementById('login-screen').classList.add('gone'); }
+function hideLogin(){
+  document.getElementById('login-screen').classList.add('gone');
+  // Trigger VOID HUB animation after login
+  if(typeof triggerLoader === 'function') triggerLoader();
+}
 
 async function doLogin(){
   var u   = document.getElementById('login-user').value.trim().toLowerCase();
@@ -1028,7 +1038,6 @@ async function doLogin(){
   btn.textContent='ENTER'; btn.disabled=false;
 }
 
-// Periodically verify token is still valid (kicks out if owner revokes / another login happens)
 async function checkSession(){
   var token = localStorage.getItem('vh_token');
   if(!token){ showLogin(); return false; }
@@ -1046,16 +1055,21 @@ async function checkSession(){
       return false;
     }
     return true;
-  } catch(e){ return true; } // network blip — don't kick
+  } catch(e){ return true; }
 }
 
-// On load: check existing token
+// On load: if valid token skip login and go straight to VOID HUB animation
 (async function(){
   var valid = await checkSession();
-  if(!valid) showLogin();
+  if(valid){
+    document.getElementById('login-screen').classList.add('gone');
+    if(typeof triggerLoader === 'function') triggerLoader();
+  } else {
+    showLogin();
+  }
 })();
 
-// Recheck every 60 seconds — kicks user if owner logs in elsewhere
+// Kick every 60s if another session takes over
 setInterval(checkSession, 60000);
 </script>
 
