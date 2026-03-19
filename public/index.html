@@ -161,47 +161,24 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
 <div id="purchase-screen">
   <div class="purchase-box">
-    <div class="purchase-logo">LUMI GAMES</div>
-    <div class="purchase-sub">get access</div>
-
-    <div class="purchase-price">$15<span>one-time payment</span></div>
-
-    <div class="purchase-card">
-      <h3>How to purchase</h3>
-      <div class="purchase-step">
-        <div class="purchase-step-num">1</div>
-        <div class="purchase-step-text">Send <b>$15</b> to <b>$skylerondat</b> on CashApp. Include your <b>full name</b> in the payment note so we know who you are.</div>
-      </div>
-      <div class="purchase-step">
-        <div class="purchase-step-num">2</div>
-        <div class="purchase-step-text">After payment is confirmed, you will receive your <b>username and password</b> via CashApp.</div>
-      </div>
-      <div class="purchase-step">
-        <div class="purchase-step-num">3</div>
-        <div class="purchase-step-text">Log in and enjoy <b>full access</b> to Lumi Games — proxy, games, and bot flooder.</div>
-      </div>
+    <div style="font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:900;color:#fff;text-align:center">LUMI GAMES</div>
+    <div style="font-size:0.5rem;letter-spacing:0.2em;color:#444;text-align:center">GET ACCESS</div>
+    <div style="font-family:'Unbounded',sans-serif;font-size:1.4rem;font-weight:900;color:#fff;text-align:center">$15<span style="font-size:0.55rem;color:#555;display:block;font-family:'DM Mono',monospace;font-weight:400;margin-top:2px">one-time</span></div>
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:12px 14px;font-size:0.62rem;color:#999;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:10px"><span style="color:#555;min-width:16px">1.</span><span>Send <b style="color:#ddd">$15</b> to <b style="color:#ddd">$skylerondat</b> on CashApp with your name in the note.</span></div>
+      <div style="display:flex;gap:10px"><span style="color:#555;min-width:16px">2.</span><span>You'll receive your login via CashApp once confirmed.</span></div>
+      <div style="display:flex;gap:10px"><span style="color:#555;min-width:16px">3.</span><span>Log in and enjoy full access.</span></div>
     </div>
-
-    <a class="cashapp-btn" href="https://cash.app/$skylerondat" target="_blank">Pay $15 on CashApp →</a>
-
-    <div class="terms-box">
-      <b>Terms of Service</b><br><br>
-      • <b>No refunds.</b> All payments are final and non-refundable under any circumstances. Once payment is sent, it will not be returned.<br><br>
-      • <b>No account sharing.</b> Your login is strictly personal. If you share your username or password with anyone, your account will be <b>permanently disabled immediately</b> with no refund.<br><br>
-      • <b>Unban fee.</b> If your account is disabled for sharing, the only way to regain access is to pay a <b>$30 reactivation fee</b>.<br><br>
-      • <b>One session at a time.</b> Logging in from multiple devices simultaneously will trigger an automatic session kick and may result in account termination.<br><br>
-      • <b>No chargebacks.</b> Initiating a chargeback or dispute will result in a permanent ban with no possibility of return.<br><br>
-      • By proceeding, you agree to these terms in full.
+    <a href="https://cash.app/$skylerondat" target="_blank" style="background:#00D632;color:#000;border:none;border-radius:8px;padding:12px;font-family:'Unbounded',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.05em;cursor:pointer;text-decoration:none;display:block;text-align:center">Pay $15 on CashApp →</a>
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:10px 12px;font-size:0.57rem;color:#444;line-height:1.6">
+      <b style="color:#666">Terms:</b> No refunds. No account sharing — violators get permanently disabled and must pay $30 to reactivate. No chargebacks.
     </div>
-
-    <div class="terms-check-row">
-      <input type="checkbox" id="terms-cb" onchange="termsToggle(this.checked)"/>
-      <label for="terms-cb" style="cursor:pointer">I have read and agree to the Terms of Service</label>
+    <div style="display:flex;align-items:center;gap:8px">
+      <input type="checkbox" id="terms-cb" onchange="termsToggle(this.checked)" style="width:14px;height:14px;cursor:pointer;accent-color:#fff"/>
+      <label for="terms-cb" style="cursor:pointer;font-size:0.6rem;color:#666">I agree to the Terms of Service</label>
     </div>
-
-    <a class="terms-agree-btn" id="terms-agree-btn" href="https://cash.app/$skylerondat" target="_blank" style="display:block;text-align:center;text-decoration:none;pointer-events:none;opacity:0.3;background:#fff;color:#000;border-radius:6px;padding:10px;font-family:'Unbounded',monospace;font-size:0.6rem;font-weight:700;letter-spacing:0.08em">I AGREE — PROCEED TO PAYMENT</a>
-
-    <div class="purchase-back" onclick="closePurchase()">← back to login</div>
+    <a id="terms-agree-btn" href="https://cash.app/$skylerondat" target="_blank" style="display:block;text-align:center;text-decoration:none;pointer-events:none;opacity:0.3;background:#fff;color:#000;border-radius:6px;padding:10px;font-family:'Unbounded',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.08em">I AGREE — PROCEED TO PAYMENT</a>
+    <div style="font-size:0.52rem;color:#333;text-align:center;cursor:pointer;letter-spacing:0.1em;text-transform:uppercase" onclick="closePurchase()">← back</div>
   </div>
 </div>
 
@@ -1561,6 +1538,7 @@ function closePurchase(){
   var btn = document.getElementById('terms-agree-btn');
   if(cb) cb.checked = false;
   termsToggle(false);
+  var btn=document.getElementById("terms-agree-btn"); if(btn){btn.style.pointerEvents="none";btn.style.opacity="0.3";}
 }
 
 // Terms checkbox
@@ -1569,6 +1547,7 @@ function termsToggle(checked){
   if(!btn) return;
   btn.style.pointerEvents = checked ? 'auto' : 'none';
   btn.style.opacity = checked ? '1' : '0.3';
+  btn.style.cursor = checked ? 'pointer' : 'not-allowed';
 }
 
 
@@ -1653,42 +1632,40 @@ async function deleteSug(id){
 var _udpUser = null;
 function openUserDetail(username){
   var u = _userMap[username];
-  if(!u){ alert('User data not found. Try refreshing.'); return; }
-  var popup = document.getElementById('user-detail-popup');
-  var isOwner = (localStorage.getItem('vh_user')||'').toLowerCase()==='naxzyauxxy';
+  if(!u){ console.error('no user for', username, 'map keys:', Object.keys(_userMap)); alert('Try clicking Refresh first'); return; }
   document.getElementById('udp-name').textContent = u.username;
+  var isOwner = (localStorage.getItem('vh_user')||'').toLowerCase()==='naxzyauxxy';
   var rows = [
-    ['Status', u.online ? '<span style="color:#4caf50">● Online</span>' : '<span style="color:#444">○ Offline</span>'],
-    ['Password', '<span style="color:#fff;font-family:monospace">'+u.pw+'</span>'],
-    ['Role', u.username==='naxzyauxxy'?'Owner':u.isAdmin?'Admin':'Member'],
-    ['IPs', (u.ipCount||0)+' unique'+(u.ipCount>1?' <span style="color:#ff3c5a">⚠ sharing?</span>':'')],
-    ['IP List', u.ips&&u.ips.length?u.ips.join(', '):'None recorded'],
-    ['Account', u.disabled?'<span style="color:#ff9800">DISABLED — '+(u.banInfo?u.banInfo.reason:'')+'</span>':'<span style="color:#4caf50">Active</span>'],
+    ['Status', u.online ? '<span style="color:#4caf50">&#9679; Online</span>' : '<span style="color:#666">&#9675; Offline</span>'],
+    ['Password', '<span style="color:#fff;font-family:monospace;letter-spacing:.05em">' + (u.pw||'—') + '</span>'],
+    ['Role', u.username==='naxzyauxxy'?'<span style="color:#ff3c5a">Owner</span>':u.isAdmin?'<span style="color:#ff9800">Admin</span>':'Member'],
+    ['IPs', (u.ipCount||0)+' unique IP'+(u.ipCount===1?'':'s')+(u.ipCount>1?' <span style="color:#ff3c5a">&#9888; possible sharing</span>':'')],
+    ['IP List', u.ips&&u.ips.length?'<span style="font-family:monospace;color:#888">'+u.ips.join('</span><br><span style="font-family:monospace;color:#888">')+'</span>':'<span style="color:#333">None</span>'],
+    ['Account', u.disabled?'<span style="color:#ff9800">DISABLED'+(u.banInfo?' — '+u.banInfo.reason:'')+'</span>':'<span style="color:#4caf50">Active</span>'],
   ];
   if(u.banInfo) rows.push(['Duration', u.banInfo.duration||'Permanent']);
   document.getElementById('udp-body').innerHTML = rows.map(function(r){
-    return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #111">'
-      +'<div style="color:#555;min-width:80px;flex-shrink:0">'+r[0]+'</div>'
-      +'<div style="color:#aaa;word-break:break-all">'+r[1]+'</div>'
-      +'</div>';
+    return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #111"><div style="color:#555;min-width:80px;flex-shrink:0">'+r[0]+'</div><div style="color:#aaa;word-break:break-all">'+r[1]+'</div></div>';
   }).join('');
   var btns = '';
   if(u.username!=='naxzyauxxy'){
-    var dn = u.username;
-    if(isOwner&&!u.isAdmin) btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff9800;border-color:#ff980044" onclick="adminPromote(''+dn+'');document.getElementById('user-detail-popup').style.display='none'">Make Admin</button>';
-    if(isOwner&&u.isAdmin) btns += '<button class="kbtn" style="font-size:0.65rem;color:#aaa;border-color:#aaa4" onclick="adminDemote(''+dn+'');document.getElementById('user-detail-popup').style.display='none'">Remove Admin</button>';
-    btns += '<button class="kbtn" style="font-size:0.65rem" onclick="adminKick(''+dn+'')">Kick</button>';
+    var n = u.username;
+    var closePopup = "document.getElementById('user-detail-popup').style.display='none';";
+    if(isOwner&&!u.isAdmin)  btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff9800;border-color:#ff980044" onclick="adminPromote(\''+n+'\');'+closePopup+'">Make Admin</button>';
+    if(isOwner&&u.isAdmin)   btns += '<button class="kbtn" style="font-size:0.65rem;color:#aaa;border-color:#aaa4" onclick="adminDemote(\''+n+'\');'+closePopup+'">Remove Admin</button>';
+    btns += '<button class="kbtn" style="font-size:0.65rem" onclick="adminKick(\''+n+'\')">Kick</button>';
     if(u.disabled){
-      btns += '<button class="kbtn" style="font-size:0.65rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle(''+dn+'',false);document.getElementById('user-detail-popup').style.display='none'">Enable</button>';
+      btns += '<button class="kbtn" style="font-size:0.65rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle(\''+n+'\',false);'+closePopup+'">Enable</button>';
     } else {
-      btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle(''+dn+'',true);document.getElementById('user-detail-popup').style.display='none'">Disable</button>';
+      btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle(\''+n+'\',true);'+closePopup+'">Disable</button>';
     }
-    btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="if(confirm('Delete '+''+dn+''+'?'))adminDelete(''+dn+'')">Delete</button>';
+    btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="if(confirm(\'Delete '+n+'?\'))adminDelete(\''+n+'\')">Delete</button>';
+  } else {
+    btns = '<span style="font-size:0.65rem;color:#555">Owner — protected</span>';
   }
-  document.getElementById('udp-actions').innerHTML = btns || '<span style="font-size:0.65rem;color:#555">Owner account — protected</span>';
-  popup.style.display='flex';
+  document.getElementById('udp-actions').innerHTML = btns;
+  document.getElementById('user-detail-popup').style.display='flex';
 }
-
 
 // Tab close warning — hooks onto first real user interaction
 (function(){
