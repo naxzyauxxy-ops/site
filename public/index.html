@@ -226,6 +226,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="tab" onclick="show('flood',this)">Flood</button>
     <button class="tab" onclick="show('settings',this)">Settings</button>
     <button class="tab" onclick="show('suggest',this)">Suggestions</button>
+    <button class="tab" onclick="show('bugs',this)">Bugs</button>
     <button class="tab" id="admin-tab" style="display:none;color:#ff3c5a" onclick="show('admin',this)">Admin</button>
   </div>
 </nav>
@@ -341,6 +342,33 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
       <div id="sug-list" style="display:flex;flex-direction:column;gap:10px">
         <div style="color:#555;font-size:0.7rem">Loading...</div>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- BUGS TAB -->
+<div class="panel" id="panel-bugs">
+  <h1>BUG REPORTS</h1>
+  <div class="scard">
+    <h3>Report a Bug</h3>
+    <p>Found something broken? Let us know and we'll fix it.</p>
+    <div class="field" style="margin-top:10px">
+      <label>What's broken?</label>
+      <input id="bug-title" placeholder="e.g. Proxy not loading" autocomplete="off" maxlength="80"/>
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label>Steps to reproduce <span style="color:#333">(optional)</span></label>
+      <input id="bug-desc" placeholder="What did you do when it broke?" autocomplete="off" maxlength="280"/>
+    </div>
+    <button class="kbtn" style="margin-top:10px" onclick="submitBug()">Report Bug</button>
+    <div id="bug-msg" style="font-size:0.65rem;margin-top:8px"></div>
+  </div>
+  <div class="scard">
+    <h3 style="margin-bottom:4px">All Bug Reports</h3>
+    <p style="margin-bottom:12px">Vote up bugs you've also experienced — most reported rise to the top.</p>
+    <div id="bug-list" style="display:flex;flex-direction:column;gap:10px">
+      <div style="color:#555;font-size:0.7rem">Loading...</div>
     </div>
   </div>
 </div>
@@ -711,6 +739,7 @@ function show(id,el){
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
 
+  if(id==='bugs') loadBugs();
   if(id==='suggest'){
     var m=document.getElementById('sug-maintenance');
     var c=document.getElementById('sug-content');
@@ -1600,7 +1629,7 @@ async function loadSuggestions(){
       var vCol    = voted  ? 'var(--acc)' : '#555';
       var dCol    = dvoted ? '#ff3c5a'    : '#555';
       var sCol    = s.votes > 0 ? 'var(--acc)' : s.votes < 0 ? '#ff3c5a' : '#555';
-      var row = '<div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;gap:12px;align-items:flex-start">';
+      var row = '<div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">';
       row += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:32px">';
       row += '<button onclick="voteSug(\'' + sid + '\',1)" style="background:none;border:none;color:' + vCol + ';font-size:1.2rem;cursor:pointer;padding:2px">&#9650;</button>';
       row += '<span style="font-size:0.75rem;font-weight:700;color:' + sCol + '">' + s.votes + '</span>';
@@ -1612,6 +1641,23 @@ async function loadSuggestions(){
       row += '<div style="font-size:0.55rem;color:#333">by ' + s.user + ' &middot; ' + new Date(s.at).toLocaleDateString() + '</div>';
       row += '</div>';
       if(isOwner) row += '<button onclick="deleteSug(\'' + sid + '\')" class="kbtn" style="padding:3px 8px;font-size:0.55rem;color:#ff3c5a;border-color:#ff3c5a33;flex-shrink:0;align-self:flex-start">&#10005;</button>';
+      // Comments section
+      var cmts = s.comments||[];
+      row += '<div style="width:100%;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">';
+      row += '<div style="font-size:0.6rem;color:#444;margin-bottom:6px">Comments ('+cmts.length+')</div>';
+      if(cmts.length){
+        cmts.forEach(function(c){
+          row += '<div style="display:flex;gap:8px;margin-bottom:6px">';
+          row += '<span style="font-size:0.6rem;color:var(--acc);flex-shrink:0">'+c.user+'</span>';
+          row += '<span style="font-size:0.6rem;color:#888">'+c.text+'</span>';
+          row += '</div>';
+        });
+      }
+      row += '<div style="display:flex;gap:6px;margin-top:6px">';
+      row += '<input id="cmt-'+sid+'" placeholder="Add a comment..." style="flex:1;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:monospace;font-size:0.62rem;outline:none" maxlength="200" onkeydown="if(event.key===\'Enter\')addComment(\'sug\',\''+sid+'\')"/>';
+      row += '<button class="kbtn" style="padding:4px 10px;font-size:0.6rem" onclick="addComment(\'sug\',\''+sid+'\')">Send</button>';
+      row += '</div>';
+      row += '</div>';
       row += '</div>';
       rows += row;
     }
@@ -1745,6 +1791,126 @@ function openUserDetail(username){
   }
   document.getElementById('udp-actions').innerHTML = btns;
   document.getElementById('user-detail-popup').style.display = 'flex';
+}
+
+
+// ── Bug Reports ────────────────────────────────────────────
+async function loadBugs(){
+  var el = document.getElementById('bug-list');
+  if(!el) return;
+  var token = localStorage.getItem('vh_token');
+  if(!token){ setTimeout(loadBugs, 800); return; }
+  el.innerHTML = '<div style="color:#555;font-size:0.7rem">Loading...</div>';
+  try{
+    var r = await fetch('/api/bugs');
+    var d = await r.json();
+    if(!Array.isArray(d)||!d.length){
+      el.innerHTML = '<div style="color:#aaa;font-size:0.75rem;padding:12px 0">No bug reports yet.</div>';
+      return;
+    }
+    var user = (localStorage.getItem('vh_user')||'').toLowerCase();
+    var isOwner = user === 'naxzyauxxy';
+    var rows = '';
+    for(var i=0;i<d.length;i++){
+      var b = d[i];
+      var bid = b.id;
+      var voted = (b.voters||[]).map(function(x){return x.toLowerCase();}).indexOf(user) !== -1;
+      var vCol = voted ? 'var(--acc)' : '#555';
+      var sCol = b.votes > 0 ? 'var(--acc)' : '#555';
+      var row = '<div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">';
+      row += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:32px">';
+      row += '<button onclick="voteBug(\'' + bid + '\')" style="background:none;border:none;color:'+vCol+';font-size:1.2rem;cursor:pointer;padding:2px">&#9650;</button>';
+      row += '<span style="font-size:0.75rem;font-weight:700;color:'+sCol+'">'+b.votes+'</span>';
+      row += '</div>';
+      row += '<div style="flex:1;min-width:0">';
+      row += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">';
+      row += '<span style="font-size:0.75rem;color:#ff3c5a">🐛</span>';
+      row += '<span style="font-size:0.8rem;font-weight:600">'+b.title+'</span>';
+      row += '</div>';
+      if(b.desc) row += '<div style="font-size:0.65rem;color:#555;margin-bottom:5px">'+b.desc+'</div>';
+      row += '<div style="font-size:0.55rem;color:#333">by '+b.user+' &middot; '+new Date(b.at).toLocaleDateString()+'</div>';
+      // Comments
+      var cmts = b.comments||[];
+      row += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);width:100%">';
+      row += '<div style="font-size:0.6rem;color:#444;margin-bottom:6px">Comments ('+cmts.length+')</div>';
+      cmts.forEach(function(c){
+        row += '<div style="display:flex;gap:8px;margin-bottom:6px">';
+        row += '<span style="font-size:0.6rem;color:var(--acc);flex-shrink:0">'+c.user+'</span>';
+        row += '<span style="font-size:0.6rem;color:#888">'+c.text+'</span>';
+        row += '</div>';
+      });
+      row += '<div style="display:flex;gap:6px;margin-top:6px">';
+      row += '<input id="bcmt-'+bid+'" placeholder="Add a comment..." style="flex:1;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:monospace;font-size:0.62rem;outline:none" maxlength="200" onkeydown="if(event.key===\'Enter\')addComment(\'bug\',\''+bid+'\')"/>';
+      row += '<button class="kbtn" style="padding:4px 10px;font-size:0.6rem" onclick="addComment(\'bug\',\''+bid+'\')">Send</button>';
+      row += '</div>';
+      row += '</div>';
+      row += '</div>';
+      if(isOwner) row += '<button onclick="deleteBug(\'' + bid + '\')" class="kbtn" style="padding:3px 8px;font-size:0.55rem;color:#ff3c5a;border-color:#ff3c5a33;flex-shrink:0;align-self:flex-start">&#10005;</button>';
+      row += '</div>';
+      rows += row;
+    }
+    el.innerHTML = rows;
+  } catch(e){
+    el.innerHTML = '<div style="color:#ff3c5a;font-size:0.7rem">Error: '+e.message+'</div>';
+  }
+}
+
+async function submitBug(){
+  var title = document.getElementById('bug-title').value.trim();
+  var desc  = document.getElementById('bug-desc').value.trim();
+  var msg   = document.getElementById('bug-msg');
+  if(!title){ msg.style.color='#ff3c5a'; msg.textContent='Enter a title'; return; }
+  if(hasBadWord(title)||hasBadWord(desc)){ msg.style.color='#ff3c5a'; msg.textContent='Inappropriate language'; return; }
+  var token = localStorage.getItem('vh_token');
+  try{
+    var r = await fetch('/api/bugs', {method:'POST', headers:{'Content-Type':'application/json','x-auth-token':token||''}, body:JSON.stringify({title:title, desc:desc})});
+    var d = await r.json();
+    if(d.ok){
+      msg.style.color='#4caf50'; msg.textContent='Bug reported!';
+      document.getElementById('bug-title').value='';
+      document.getElementById('bug-desc').value='';
+      loadBugs();
+      setTimeout(function(){ msg.textContent=''; }, 3000);
+    } else { msg.style.color='#ff3c5a'; msg.textContent=d.error||'Error'; }
+  } catch(e){ msg.style.color='#ff3c5a'; msg.textContent='Network error'; }
+}
+
+async function voteBug(id){
+  var token = localStorage.getItem('vh_token');
+  try{
+    var r = await fetch('/api/bugs/vote', {method:'POST', headers:{'Content-Type':'application/json','x-auth-token':token||''}, body:JSON.stringify({id:id})});
+    var d = await r.json();
+    if(d.ok) loadBugs();
+  } catch(e){}
+}
+
+async function deleteBug(id){
+  if(!confirm('Delete this bug report?')) return;
+  var token = localStorage.getItem('vh_token');
+  try{
+    var r = await fetch('/api/admin/bugs/delete', {method:'POST', headers:{'Content-Type':'application/json','x-auth-token':token||''}, body:JSON.stringify({id:id})});
+    var d = await r.json();
+    if(d.ok) loadBugs();
+  } catch(e){}
+}
+
+async function addComment(type, id){
+  var inputId = type==='bug' ? 'bcmt-'+id : 'cmt-'+id;
+  var input = document.getElementById(inputId);
+  if(!input) return;
+  var text = input.value.trim();
+  if(!text) return;
+  if(hasBadWord(text)){ alert('Inappropriate language'); return; }
+  var token = localStorage.getItem('vh_token');
+  try{
+    var endpoint = type==='bug' ? '/api/bugs/comment' : '/api/suggestions/comment';
+    var r = await fetch(endpoint, {method:'POST', headers:{'Content-Type':'application/json','x-auth-token':token||''}, body:JSON.stringify({id:id, text:text})});
+    var d = await r.json();
+    if(d.ok){
+      input.value = '';
+      if(type==='bug') loadBugs(); else loadSuggestions();
+    } else { alert(d.error||'Error'); }
+  } catch(e){ alert('Network error'); }
 }
 
 // Tab close warning — hooks onto first real user interaction
