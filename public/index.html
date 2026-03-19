@@ -186,10 +186,12 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
     <div class="terms-box">
       <b>Terms of Service</b><br><br>
-      • <b>No refunds.</b> All payments are final. Once payment is sent, it is non-refundable under any circumstances.<br><br>
-      • <b>No account sharing.</b> Your login is strictly personal. If you share your username or password with others, your account will be <b>permanently disabled</b> and you will be <b>banned</b> from the site with no refund.<br><br>
-      • <b>One device policy.</b> Suspicious simultaneous logins from multiple locations will result in immediate account termination.<br><br>
-      • By clicking agree, you accept these terms in full.
+      • <b>No refunds.</b> All payments are final and non-refundable under any circumstances. Once payment is sent, it will not be returned.<br><br>
+      • <b>No account sharing.</b> Your login is strictly personal. If you share your username or password with anyone, your account will be <b>permanently disabled immediately</b> with no refund.<br><br>
+      • <b>Unban fee.</b> If your account is disabled for sharing, the only way to regain access is to pay a <b>$30 reactivation fee</b>.<br><br>
+      • <b>One session at a time.</b> Logging in from multiple devices simultaneously will trigger an automatic session kick and may result in account termination.<br><br>
+      • <b>No chargebacks.</b> Initiating a chargeback or dispute will result in a permanent ban with no possibility of return.<br><br>
+      • By proceeding, you agree to these terms in full.
     </div>
 
     <div class="terms-check-row" onclick="document.getElementById('terms-cb').click()">
@@ -1088,6 +1090,11 @@ async function checkSession(){
       localStorage.setItem('vh_admin','1');
       var t=document.getElementById('admin-tab');
       if(t) t.style.display='';
+    } else {
+      // Demoted — remove admin access
+      localStorage.removeItem('vh_admin');
+      var t=document.getElementById('admin-tab');
+      if(t) t.style.display='none';
     }
     return true;
   } catch(e){
@@ -1318,6 +1325,11 @@ document.addEventListener('DOMContentLoaded',function(){
   var adminTabBtn=document.getElementById('admin-tab');
   if(adminTabBtn) adminTabBtn.addEventListener('click',function(){ setTimeout(adminLoadUsers,100); });
   loadAnnouncement();
+  // Auto-show purchase screen if URL is /purchase
+  if(window.location.pathname==='/purchase'){
+    document.getElementById('purchase-screen').classList.add('show');
+    document.getElementById('login-screen').classList.add('gone');
+  }
 });
 </script>
 
@@ -1327,12 +1339,18 @@ function openPurchase(){
 }
 function closePurchase(){
   document.getElementById('purchase-screen').classList.remove('show');
-  // Reset checkbox
   var cb = document.getElementById('terms-cb');
   var btn = document.getElementById('terms-agree-btn');
   if(cb) cb.checked = false;
   if(btn) btn.disabled = true;
 }
+
+// Warn before closing/leaving tab
+window.addEventListener('beforeunload', function(e){
+  e.preventDefault();
+  e.returnValue = '';
+  return '';
+});
 </script>
 </body>
 </html>
