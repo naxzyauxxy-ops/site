@@ -203,6 +203,12 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   </div>
 </div>
 
+<!-- Announcement Banner -->
+<div id="ann-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9000;padding:10px 48px 10px 20px;font-family:'DM Mono',monospace;font-size:0.7rem;line-height:1.4;cursor:pointer" onclick="dismissAnnouncement()">
+  <span id="ann-text"></span>
+  <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.6">×</span>
+</div>
+
 <div id="loader">
   <div class="loader-pixels" id="loaderPx"></div>
   <div class="loader-logo" id="loaderLogo">VOID HUB</div>
@@ -420,6 +426,30 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     </div>
     <button class="kbtn" onclick="adminResetPass()">Reset Password</button>
     <div id="a-rp-msg" style="font-size:0.65rem;margin-top:8px;color:#4caf50"></div>
+  </div>
+
+  <!-- Announcements -->
+  <div class="scard">
+    <h3>Announcements</h3>
+    <p>Post a banner message visible to all logged-in users.</p>
+    <div class="field" style="margin-top:10px">
+      <label>Message</label>
+      <input id="a-ann-text" placeholder="e.g. Site will be down for maintenance at 5pm..." autocomplete="off"/>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <select id="a-ann-type" style="padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.72rem">
+        <option value="info">Info (blue)</option>
+        <option value="warn">Warning (orange)</option>
+        <option value="error">Alert (red)</option>
+        <option value="success">Success (green)</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="kbtn" onclick="adminPostAnnouncement()">Post</button>
+      <button class="kbtn" style="color:#ff3c5a;border-color:#ff3c5a44" onclick="adminClearAnnouncement()">Clear</button>
+    </div>
+    <div id="a-ann-msg" style="font-size:0.65rem;margin-top:8px;color:#4caf50"></div>
+    <div id="a-ann-preview" style="margin-top:12px;font-size:0.7rem;color:#555">No active announcement</div>
   </div>
 </div>
 
@@ -1181,10 +1211,77 @@ async function adminResetPass(){
   }
 }
 
+// ── Announcements ─────────────────────────────────────────
+var ANN_COLORS = {
+  info:    {bg:'#0d1b2a',border:'#1565c044',text:'#64b5f6'},
+  warn:    {bg:'#1a1200',border:'#ff980044',text:'#ffb74d'},
+  error:   {bg:'#1a0000',border:'#ff3c5a44',text:'#ff6b6b'},
+  success: {bg:'#001a08',border:'#4caf5044',text:'#81c784'},
+};
+
+async function adminPostAnnouncement(){
+  var text = document.getElementById('a-ann-text').value.trim();
+  var type = document.getElementById('a-ann-type').value;
+  var msg = document.getElementById('a-ann-msg');
+  if(!text){ msg.style.color='#ff3c5a'; msg.textContent='enter a message'; return; }
+  var d = await adminAPI('/api/admin/announcement',{text,type});
+  if(d.ok){
+    msg.style.color='#4caf50'; msg.textContent='✓ Announcement posted';
+    document.getElementById('a-ann-preview').textContent='Active: ['+type.toUpperCase()+'] '+text;
+    showAnnouncementBanner(text, type);
+  } else {
+    msg.style.color='#ff3c5a'; msg.textContent='✗ '+d.error;
+  }
+}
+
+async function adminClearAnnouncement(){
+  var d = await adminAPI('/api/admin/announcement/clear',{});
+  var msg = document.getElementById('a-ann-msg');
+  if(d.ok){
+    msg.style.color='#4caf50'; msg.textContent='✓ Cleared';
+    document.getElementById('a-ann-preview').textContent='No active announcement';
+    document.getElementById('ann-banner').style.display='none';
+  }
+}
+
+function showAnnouncementBanner(text, type){
+  var banner = document.getElementById('ann-banner');
+  var c = ANN_COLORS[type] || ANN_COLORS.info;
+  banner.style.background = c.bg;
+  banner.style.borderBottom = '1px solid '+c.border;
+  banner.style.color = c.text;
+  document.getElementById('ann-text').textContent = text;
+  banner.style.display = 'block';
+  // Push nav down
+  var nav = document.querySelector('.nav');
+  if(nav) nav.style.top = banner.offsetHeight + 'px';
+}
+
+function dismissAnnouncement(){
+  document.getElementById('ann-banner').style.display='none';
+  var nav = document.querySelector('.nav');
+  if(nav) nav.style.top = '';
+}
+
+// Check for active announcement on load
+async function loadAnnouncement(){
+  try{
+    var r = await fetch('/api/announcement');
+    var d = await r.json();
+    if(d.text){
+      showAnnouncementBanner(d.text, d.type||'info');
+      // Update admin preview if on admin panel
+      var prev = document.getElementById('a-ann-preview');
+      if(prev) prev.textContent='Active: ['+(d.type||'info').toUpperCase()+'] '+d.text;
+    }
+  }catch(e){}
+}
+
 // Auto-load users when admin tab is clicked
 document.addEventListener('DOMContentLoaded',function(){
   var adminTabBtn=document.getElementById('admin-tab');
   if(adminTabBtn) adminTabBtn.addEventListener('click',function(){ setTimeout(adminLoadUsers,100); });
+  loadAnnouncement();
 });
 </script>
 
