@@ -596,8 +596,10 @@ function proxyGame(url){
     var reg=await navigator.serviceWorker.register('/sw.js',{scope:'/'});
     await navigator.serviceWorker.ready;
     swReady=true;
-    if(s){s.textContent='Proxy ready ✓';setTimeout(()=>{if(s.textContent==='Proxy ready ✓')s.textContent='';},2000);}
+    if(s){s.textContent='Proxy ready ✓';setTimeout(function(){if(s.textContent==='Proxy ready ✓')s.textContent='';},2000);}
+    console.log('[proxy] SW ready, prefix=/a/, bare=/ca/');
   }catch(e){
+    console.error('[proxy] SW failed:',e);
     if(s)s.textContent='⚠ Proxy unavailable';
     setTimeout(registerSW,3000);
   }
