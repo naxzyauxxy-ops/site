@@ -6,6 +6,7 @@ import { createBareServer } from '@nebula-services/bare-server-node';
 import { spawn, execSync } from 'child_process';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import zlib from 'zlib';
+import { WebSocketServer } from 'ws';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -206,6 +207,35 @@ function saveSessions() {
 }
 
 const { sessions, userSession } = loadSessions();
+
+
+// ── Tab sharing detection ───────────────────────────────────
+// tabSessions: username -> Set of wsIds currently connected
+const tabSessions = new Map();
+// wsClients: wsId -> {ws, username}  
+const wsClients = new Map();
+let wsIdCounter = 0;
+// Owner ws connection for receiving alerts
+let ownerWs = null;
+
+function sendOwnerAlert(msg) {
+  if (ownerWs && ownerWs.readyState === 1) {
+    ownerWs.send(JSON.stringify(msg));
+  }
+}
+
+function checkTabSharing(username) {
+  if (username === OWNER || NO_LIMIT.has(username)) return;
+  const tabs = tabSessions.get(username);
+  if (tabs && tabs.size > 1) {
+    sendOwnerAlert({
+      type: 'sharing_alert',
+      username,
+      tabs: tabs.size,
+      ips: [...(USER_IPS.get(username) || [])]
+    });
+  }
+}
 
 function makeToken() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -598,6 +628,24 @@ function setACS(v){_acS=parseInt(v);document.getElementById("ac-cps").textConten
 <script>var A=${ann};if(A&&A.text){var icons={info:'📢',warn:'⚠️',error:'🚨',success:'✅'};var colors={info:{bg:'#0d1b2a',border:'#1565c0',text:'#64b5f6'},warn:{bg:'#1a1200',border:'#ff9800',text:'#ffb74d'},error:{bg:'#1a0000',border:'#ff3c5a',text:'#ff6b6b'},success:{bg:'#001a08',border:'#4caf50',text:'#81c784'}};var c=colors[A.type]||colors.info;var box=document.getElementById('ann-box');box.style.background=c.bg;box.style.border='1px solid '+c.border;document.getElementById('ann-icon').textContent=icons[A.type]||icons.info;var t=document.getElementById('ann-text');t.style.color=c.text;t.textContent=A.text;document.getElementById('ann').style.display='flex';}</script></body></html>`);
 });
 
+
+// ── Force-refresh endpoint (called after disable) ─────────────────────────
+app.post('/api/admin/force-refresh', requireAdmin, (req, res) => {
+  const { username } = req.body || {};
+  const u = (username || '').trim().toLowerCase();
+  // Send force-refresh to all tabs of this user
+  const tabs = tabSessions.get(u);
+  if (tabs) {
+    for (const wsId of tabs) {
+      const client = wsClients.get(wsId);
+      if (client && client.ws.readyState === 1) {
+        client.ws.send(JSON.stringify({ type: 'force_refresh' }));
+      }
+    }
+  }
+  res.json({ ok: true });
+});
+
 app.get('*', (req, res) => {
   if (maintenance && req.path !== '/maintenance' && !req.path.startsWith('/api/') && !req.path.startsWith('/assets/') && req.path !== '/sw.js') {
     return res.redirect('/maintenance');
@@ -617,4 +665,67 @@ server.on('upgrade', (req, socket, head) => {
 });
 server.keepAliveTimeout = 65000;
 server.maxConnections = 2000;
+
+// ── WebSocket server for tab detection ─────────────────────────────────────
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (ws, req) => {
+  const wsId = ++wsIdCounter;
+  wsClients.set(wsId, { ws, username: null });
+
+  ws.on('message', (data) => {
+    try {
+      const msg = JSON.parse(data);
+      if (msg.type === 'auth') {
+        const token = msg.token;
+        if (!token || !sessions.has(token)) {
+          ws.send(JSON.stringify({ type: 'auth_fail' }));
+          return;
+        }
+        const username = sessions.get(token);
+        wsClients.get(wsId).username = username;
+        // Register this tab
+        if (!tabSessions.has(username)) tabSessions.set(username, new Set());
+        tabSessions.get(username).add(wsId);
+        // Save owner ws for alerts
+        if (username === OWNER) ownerWs = ws;
+        ws.send(JSON.stringify({ type: 'auth_ok' }));
+        // Check for sharing
+        checkTabSharing(username);
+      }
+      if (msg.type === 'disable_user') {
+        // Owner can disable from alert popup
+        if (!sessions.has(msg.token) || sessions.get(msg.token) !== OWNER) return;
+        const u = msg.username;
+        DISABLED.set(u, { reason: 'Account sharing detected', duration: 'Permanent', bannedAt: new Date().toISOString() });
+        const tok = userSession.get(u);
+        if (tok) { sessions.delete(tok); userSession.delete(u); saveSessions(); }
+        saveUsers();
+        // Force refresh all tabs of that user
+        const tabs = tabSessions.get(u) || new Set();
+        for (const id of tabs) {
+          const client = wsClients.get(id);
+          if (client && client.ws.readyState === 1) {
+            client.ws.send(JSON.stringify({ type: 'force_refresh' }));
+          }
+        }
+        console.log('[SHARING] ' + u + ' disabled and force-refreshed');
+      }
+    } catch(e) {}
+  });
+
+  ws.on('close', () => {
+    const client = wsClients.get(wsId);
+    if (client && client.username) {
+      const tabs = tabSessions.get(client.username);
+      if (tabs) {
+        tabs.delete(wsId);
+        if (tabs.size === 0) tabSessions.delete(client.username);
+      }
+      if (ownerWs === ws) ownerWs = null;
+    }
+    wsClients.delete(wsId);
+  });
+});
+
 server.listen(PORT, () => console.log('Blooket Hub listening on ' + PORT + ' | max floods: ' + MAX));
