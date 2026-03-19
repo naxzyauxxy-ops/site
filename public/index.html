@@ -1354,8 +1354,12 @@ async function toggleMaintenance(on){
 (function pollMaintenance(){
   if(localStorage.getItem('vh_admin')==='1'){ setTimeout(pollMaintenance, 10000); return; }
   fetch('/api/maintenance').then(function(r){ return r.json(); }).then(function(d){
-    if(d.maintenance) window.location.href = '/maintenance';
-    else setTimeout(pollMaintenance, 5000);
+    if(d.maintenance){
+      window.onbeforeunload = null; // disable leave-site warning before redirect
+      window.location.href = '/maintenance';
+    } else {
+      setTimeout(pollMaintenance, 5000);
+    }
   }).catch(function(){ setTimeout(pollMaintenance, 8000); });
   setTimeout(pollMaintenance, 5000);
 })();
