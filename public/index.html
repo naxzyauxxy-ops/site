@@ -224,6 +224,17 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="kbtn" onclick="dismissUpdate()" style="margin-top:4px;align-self:flex-start">Got it →</button>
   </div>
 </div>
+<!-- User Detail Popup -->
+<div id="user-detail-popup" style="display:none;position:fixed;inset:0;z-index:99985;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px)">
+  <div style="width:min(500px,92vw);background:#0a0a0a;border:1px solid #1a1a1a;border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:14px;max-height:85vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div id="udp-name" style="font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:900"></div>
+      <button onclick="document.getElementById('user-detail-popup').style.display='none'" style="background:none;border:none;color:#555;font-size:1.2rem;cursor:pointer">✕</button>
+    </div>
+    <div id="udp-body" style="display:flex;flex-direction:column;gap:10px;font-size:0.72rem"></div>
+    <div id="udp-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px"></div>
+  </div>
+</div>
 <!-- Announcement Banner -->
 <div id="ann-banner" style="display:none;position:fixed;inset:0;z-index:99990;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px)">
   <div id="ann-box" style="width:min(560px,90vw);padding:40px;border-radius:14px;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;gap:20px">
@@ -1210,6 +1221,7 @@ async function checkSession(){
       if(t) t.style.display='';
     }
     if(typeof triggerLoader === 'function') triggerLoader();
+    setTimeout(showUpdatePopup, 2000);
   } else {
     showLogin();
   }
@@ -1269,7 +1281,7 @@ function renderUserList(users){
       else btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle(\''+u.username+'\',true)">Disable</button>';
       btns += '<button class="kbtn" style="padding:4px 8px;font-size:0.6rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="adminDelete(\''+u.username+'\')">Delete</button>';
     }
-    return '<div style="padding:10px 12px;background:var(--bg2);border:1px solid '+(u.ipCount>1?'#ff3c5a44':u.disabled?'#ff980033':'var(--border)')+';border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">'
+    return '<div onclick="openUserDetail('+JSON.stringify(u)+')" style="padding:10px 12px;background:var(--bg2);border:1px solid '+(u.ipCount>1?'#ff3c5a44':u.disabled?'#ff980033':'var(--border)')+';border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;cursor:pointer" onmouseover="this.style.borderColor='#333'" onmouseout="this.style.borderColor=''+(u.ipCount>1?'#ff3c5a44':u.disabled?'#ff980033':'var(--border)')+''">
       +'<div style="min-width:0">'
       +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">'
       +'<span style="font-size:0.8rem;font-weight:600;'+nameStyle+'">'+u.username+'</span>'+badges
@@ -1610,6 +1622,8 @@ function hasBadWord(t){ var s=t.toLowerCase(); return BAD_WORDS.some(function(w)
 async function loadSuggestions(){
   var el=document.getElementById('sug-list');
   if(!el) return;
+  var token=localStorage.getItem('vh_token');
+  if(!token){ el.innerHTML='<div style="color:#555;font-size:0.7rem">Loading...</div>'; setTimeout(loadSuggestions,600); return; }
   try{
     var r=await fetch('/api/suggestions');
     var d=await r.json();
@@ -1620,7 +1634,7 @@ async function loadSuggestions(){
     el.innerHTML=d.map(function(s){
       var voted=(s.voters||[]).includes(user);
       var downvoted=(s.downvoters||[]).includes(user);
-      return '<div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;gap:12px;align-items:flex-start">'
+      return '<div onclick="openUserDetail('+JSON.stringify(u)+')" style="cursor:pointer;padding:12px;background:var(--bg2);border:1px solid '+(u.ipCount>1?'#ff3c5a44':u.disabled?'#ff980033':'var(--border)')+';border-radius:8px;display:flex;gap:12px;align-items:flex-start">'
         +'<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:32px">'
         +'<button onclick="voteSug(''+s.id+'',1)" style="background:none;border:none;color:'+(voted?'var(--acc)':'#444')+';font-size:1.1rem;cursor:pointer;line-height:1;padding:0">▲</button>'
         +'<span style="font-size:0.75rem;font-weight:700;color:'+(s.votes>0?'var(--acc)':s.votes<0?'#ff3c5a':'#555')+'">'+s.votes+'</span>'
@@ -1669,6 +1683,49 @@ async function deleteSug(id){
   var d=await r.json();
   if(d.ok) loadSuggestions();
   else alert('Error: '+(d.error||'failed'));
+}
+
+
+// ── User detail popup ─────────────────────────────────────
+var _udpUser = null;
+function openUserDetail(u){
+  _udpUser = u;
+  var popup = document.getElementById('user-detail-popup');
+  var isOwner = (localStorage.getItem('vh_user')||'').toLowerCase()==='naxzyauxxy';
+  document.getElementById('udp-name').textContent = u.username;
+
+  var rows = [
+    ['Status', u.online ? '<span style="color:#4caf50">● Online now</span>' : '<span style="color:#444">○ Offline</span>'],
+    ['Password', '<span style="color:#aaa;letter-spacing:0.05em">'+u.pw+'</span>'],
+    ['Role', u.username==='naxzyauxxy'?'Owner':u.isAdmin?'Admin':'Member'],
+    ['IP Count', u.ipCount+' unique IP'+(u.ipCount===1?'':'s')+(u.ipCount>1?' <span style="color:#ff3c5a">⚠ Possible sharing</span>':'')],
+    ['IPs Seen', u.ips&&u.ips.length?u.ips.map(function(ip){return '<span style="color:#666;font-family:monospace">'+ip+'</span>';}).join('<br>'):'<span style="color:#333">None recorded</span>'],
+    ['Account', u.disabled?'<span style="color:#ff9800">DISABLED — '+(u.banInfo?u.banInfo.reason:'no reason')+'</span>':'<span style="color:#4caf50">Active</span>'],
+  ];
+  if(u.banInfo) rows.push(['Ban Duration', u.banInfo.duration||'Permanent'], ['Banned At', new Date(u.banInfo.bannedAt).toLocaleString()]);
+
+  document.getElementById('udp-body').innerHTML = rows.map(function(r){
+    return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #111">'
+      +'<div style="color:#555;min-width:90px;flex-shrink:0">'+r[0]+'</div>'
+      +'<div style="color:#aaa;word-break:break-all">'+r[1]+'</div>'
+      +'</div>';
+  }).join('');
+
+  // Action buttons
+  var btns = '';
+  if(u.username!=='naxzyauxxy'){
+    if(isOwner&&!u.isAdmin) btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff9800;border-color:#ff980044" onclick="adminPromote(''+u.username+'');document.getElementById('user-detail-popup').style.display='none'">Make Admin</button>';
+    if(isOwner&&u.isAdmin) btns += '<button class="kbtn" style="font-size:0.65rem;color:#aaa;border-color:#aaa4" onclick="adminDemote(''+u.username+'');document.getElementById('user-detail-popup').style.display='none'">Remove Admin</button>';
+    btns += '<button class="kbtn" style="font-size:0.65rem" onclick="adminKick(''+u.username+'')">Kick</button>';
+    if(u.disabled){
+      btns += '<button class="kbtn" style="font-size:0.65rem;color:#4caf50;border-color:#4caf5044" onclick="adminToggle(''+u.username+'',false);document.getElementById('user-detail-popup').style.display='none'">Enable Account</button>';
+    } else {
+      btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff9800;border-color:#ff980044" onclick="adminToggle(''+u.username+'',true);document.getElementById('user-detail-popup').style.display='none'">Disable Account</button>';
+    }
+    btns += '<button class="kbtn" style="font-size:0.65rem;color:#ff3c5a;border-color:#ff3c5a44" onclick="adminDelete(''+u.username+'');document.getElementById('user-detail-popup').style.display='none'">Delete Account</button>';
+  }
+  document.getElementById('udp-actions').innerHTML = btns;
+  popup.style.display='flex';
 }
 
 // Tab close warning — hooks onto first real user interaction
