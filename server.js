@@ -116,17 +116,14 @@ app.post('/api/flood/stop/:id', (req, res) => {
 app.get('/api/health', (req, res) => res.json({ ok: true, floods: activeFloods, uptime: process.uptime() | 0 }));
 
 // ── Auth / session API ─────────────────────────────────────
-// One active session per user. New login kicks old session.
-// Accounts in NO_LIMIT get unlimited concurrent sessions.
 const USERS = {
   'naxzyauxxy': 'Gmoder23',
   'admin':  'voidhub2024',
-  'user1':  'pass1',
-  'user2':  'pass2'
 };
-const NO_LIMIT = new Set(['naxzyauxxy']); // these accounts skip the one-session rule
-const sessions = new Map(); // token -> username
-const userSession = new Map(); // username -> token
+const ADMINS   = new Set(['naxzyauxxy']);
+const NO_LIMIT = new Set(['naxzyauxxy']);
+const sessions    = new Map();
+const userSession = new Map();
 
 function makeToken() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -137,22 +134,21 @@ app.post('/api/auth/login', (req, res) => {
   if (!username || !password) return res.json({ ok: false, error: 'missing fields' });
   const u = username.trim().toLowerCase();
   if (!USERS[u] || USERS[u] !== password) return res.json({ ok: false, error: 'invalid credentials' });
-  // Only enforce one-session limit for non-admin accounts
   if (!NO_LIMIT.has(u)) {
     const oldToken = userSession.get(u);
     if (oldToken) sessions.delete(oldToken);
   }
-  // Create new session
   const token = makeToken();
   sessions.set(token, u);
   userSession.set(u, token);
-  res.json({ ok: true, token });
+  res.json({ ok: true, token, isAdmin: ADMINS.has(u) });
 });
 
 app.post('/api/auth/check', (req, res) => {
   const { token } = req.body || {};
   if (!token || !sessions.has(token)) return res.json({ ok: false });
-  res.json({ ok: true });
+  const u = sessions.get(token);
+  res.json({ ok: true, isAdmin: ADMINS.has(u) });
 });
 
 app.post('/api/auth/logout', (req, res) => {
@@ -165,7 +161,68 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Admin API ───────────────────────────────────────────────
+function requireAdmin(req, res, next) {
+  const token = req.headers['x-auth-token'] || (req.body && req.body.token);
+  if (!token || !sessions.has(token)) return res.json({ ok: false, error: 'not authenticated' });
+  const u = sessions.get(token);
+  if (!ADMINS.has(u)) return res.json({ ok: false, error: 'not authorized' });
+  req.adminUser = u;
+  next();
+}
 
+app.get('/api/admin/users', requireAdmin, (req, res) => {
+  const list = Object.keys(USERS).map(u => ({
+    username: u,
+    isAdmin: ADMINS.has(u),
+    noLimit: NO_LIMIT.has(u),
+    online: userSession.has(u),
+  }));
+  res.json({ ok: true, users: list });
+});
+
+app.post('/api/admin/users/create', requireAdmin, (req, res) => {
+  const { username, password, noLimit } = req.body || {};
+  if (!username || !password) return res.json({ ok: false, error: 'username and password required' });
+  const u = username.trim().toLowerCase();
+  if (USERS[u]) return res.json({ ok: false, error: 'username already exists' });
+  if (!/^[a-z0-9_]{3,20}$/.test(u)) return res.json({ ok: false, error: '3-20 chars, letters/numbers/underscore only' });
+  USERS[u] = password;
+  if (noLimit) NO_LIMIT.add(u);
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/users/delete', requireAdmin, (req, res) => {
+  const { username } = req.body || {};
+  const u = (username || '').trim().toLowerCase();
+  if (ADMINS.has(u)) return res.json({ ok: false, error: 'cannot delete admin accounts' });
+  if (!USERS[u]) return res.json({ ok: false, error: 'user not found' });
+  const tok = userSession.get(u);
+  if (tok) sessions.delete(tok);
+  userSession.delete(u);
+  delete USERS[u];
+  NO_LIMIT.delete(u);
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/users/password', requireAdmin, (req, res) => {
+  const { username, password } = req.body || {};
+  const u = (username || '').trim().toLowerCase();
+  if (!USERS[u]) return res.json({ ok: false, error: 'user not found' });
+  if (!password || password.length < 4) return res.json({ ok: false, error: 'password too short' });
+  USERS[u] = password;
+  const tok = userSession.get(u);
+  if (tok) { sessions.delete(tok); userSession.delete(u); }
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/users/kick', requireAdmin, (req, res) => {
+  const { username } = req.body || {};
+  const u = (username || '').trim().toLowerCase();
+  const tok = userSession.get(u);
+  if (tok) { sessions.delete(tok); userSession.delete(u); }
+  res.json({ ok: true });
+});
 
 // ── UV ─────────────────────────────────────────────────────
 // ── SW at root scope ───────────────────────────────────────
