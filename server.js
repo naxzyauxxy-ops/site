@@ -439,6 +439,82 @@ app.post('/api/suggestions/vote', (req,res) => {
   res.json({ok:true});
 });
 
+
+// ── Bugs ────────────────────────────────────────────────────
+const BUGS_FILE = './bugs.json';
+let bugs = [];
+try { if (existsSync(BUGS_FILE)) bugs = JSON.parse(readFileSync(BUGS_FILE,'utf8')); } catch(e){}
+function saveBugs(){ try{ writeFileSync(BUGS_FILE, JSON.stringify(bugs,null,2)); }catch(e){} }
+
+app.get('/api/bugs', (req,res) => {
+  res.json([...bugs].sort((a,b) => b.votes - a.votes));
+});
+
+app.post('/api/bugs', (req,res) => {
+  const token = req.headers['x-auth-token'];
+  if (!token || !sessions.has(token)) return res.json({ok:false,error:'not authenticated'});
+  const u = sessions.get(token);
+  const {title, desc} = req.body||{};
+  if (!title||!title.trim()) return res.json({ok:false,error:'title required'});
+  const today = new Date().toDateString();
+  const recent = bugs.find(b => b.user===u && new Date(b.at).toDateString()===today);
+  if (recent) return res.json({ok:false,error:'One bug report per day'});
+  const id = Date.now().toString(36)+Math.random().toString(36).slice(2);
+  bugs.push({id, title:title.trim(), desc:(desc||'').trim(), user:u, votes:0, voters:[], comments:[], at:new Date().toISOString()});
+  saveBugs();
+  res.json({ok:true});
+});
+
+app.post('/api/bugs/vote', (req,res) => {
+  const token = req.headers['x-auth-token'];
+  if (!token || !sessions.has(token)) return res.json({ok:false,error:'not authenticated'});
+  const u = sessions.get(token);
+  const {id} = req.body||{};
+  const b = bugs.find(x=>x.id===id);
+  if (!b) return res.json({ok:false,error:'not found'});
+  const idx = (b.voters||[]).indexOf(u);
+  if (idx === -1) { b.voters.push(u); b.votes++; }
+  else { b.voters.splice(idx,1); b.votes--; }
+  saveBugs();
+  res.json({ok:true});
+});
+
+app.post('/api/bugs/comment', (req,res) => {
+  const token = req.headers['x-auth-token'];
+  if (!token || !sessions.has(token)) return res.json({ok:false,error:'not authenticated'});
+  const u = sessions.get(token);
+  const {id, text} = req.body||{};
+  if (!text||!text.trim()) return res.json({ok:false,error:'empty comment'});
+  const b = bugs.find(x=>x.id===id);
+  if (!b) return res.json({ok:false,error:'not found'});
+  if (!b.comments) b.comments = [];
+  b.comments.push({user:u, text:text.trim().slice(0,200), at:new Date().toISOString()});
+  saveBugs();
+  res.json({ok:true});
+});
+
+app.post('/api/admin/bugs/delete', requireAdmin, (req,res) => {
+  const {id} = req.body||{};
+  bugs = bugs.filter(b=>b.id!==id);
+  saveBugs();
+  res.json({ok:true});
+});
+
+// Add comment to suggestions
+app.post('/api/suggestions/comment', (req,res) => {
+  const token = req.headers['x-auth-token'];
+  if (!token || !sessions.has(token)) return res.json({ok:false,error:'not authenticated'});
+  const u = sessions.get(token);
+  const {id, text} = req.body||{};
+  if (!text||!text.trim()) return res.json({ok:false,error:'empty comment'});
+  const s = suggestions.find(x=>x.id===id);
+  if (!s) return res.json({ok:false,error:'not found'});
+  if (!s.comments) s.comments = [];
+  s.comments.push({user:u, text:text.trim().slice(0,200), at:new Date().toISOString()});
+  saveSugg();
+  res.json({ok:true});
+});
+
 app.post('/api/admin/suggestions/delete', requireAdmin, (req,res) => {
   const {id} = req.body||{};
   suggestions = suggestions.filter(s=>s.id!==id);
