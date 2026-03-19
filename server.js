@@ -129,7 +129,7 @@ function loadUsers() {
   } catch(e) { console.error('Failed to load users.json:', e.message); }
   // Defaults — only used on first ever boot
   return {
-    users: { 'naxzyauxxy': 'Gmoder23' },
+    users: { 'naxzyauxxy': 'Gmoder23' }, // only owner by default
     admins: ['naxzyauxxy'],
     noLimit: ['naxzyauxxy'],
     disabled: []
@@ -150,6 +150,8 @@ function saveUsers() {
 }
 
 const data     = loadUsers();
+// Remove any leftover test/demo accounts on startup
+['admin','sss','test'].forEach(function(u){ if(data.users[u]) delete data.users[u]; });
 const USERS    = data.users;
 const ADMINS   = new Set(data.admins);
 const NO_LIMIT = new Set(data.noLimit);
