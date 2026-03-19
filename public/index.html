@@ -112,7 +112,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 .login-input::placeholder{color:#333}
 .login-btn{background:#fff;color:#000;border:none;border-radius:6px;padding:11px;font-family:'Unbounded',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;cursor:pointer;transition:opacity .15s}
 .login-btn:hover{opacity:0.85}
-.login-err{font-size:0.6rem;color:#ff3c5a;text-align:center;min-height:14px;letter-spacing:0.05em}
+.login-err{font-size:0.6rem;color:#ff3c5a;text-align:center;min-height:14px;letter-spacing:0.05em;line-height:1.5;max-width:280px;margin:0 auto}
 .login-footer{font-size:0.5rem;color:#222;text-align:center;margin-top:4px}
 .login-footer a{color:#333;text-decoration:none}
 
@@ -775,7 +775,22 @@ function openAB(){
     doc.title=name;
     var lnk=doc.createElement('link');lnk.rel='icon';lnk.href=icon;
     var ifr=doc.createElement('iframe');
-    ifr.src=location.href;ifr.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;border:none';
+    ifr.src=location.href;
+    ifr.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;border:none';
+    // Pass all localStorage keys into the iframe once it loads so session is preserved
+    var token=localStorage.getItem('vh_token')||'';
+    var user=localStorage.getItem('vh_user')||'';
+    var admin=localStorage.getItem('vh_admin')||'';
+    ifr.onload=function(){
+      try{
+        ifr.contentWindow.postMessage({
+          type:'vh_session',
+          vh_token:token,
+          vh_user:user,
+          vh_admin:admin
+        },'*');
+      }catch(e){}
+    };
     var scr=doc.createElement('script');
     scr.textContent='window.onbeforeunload=function(e){var m="Leave Site?";(e||window.event).returnValue=m;return m;};';
     doc.head.appendChild(lnk);doc.head.appendChild(scr);doc.body.appendChild(ifr);
@@ -1163,8 +1178,9 @@ async function adminLoadUsers(){
             ${u.isAdmin&&u.username!=='naxzyauxxy'?'<span style="font-size:0.55rem;background:#ff980033;color:#ff9800;padding:2px 7px;border-radius:4px">ADMIN</span>':''}
             ${u.noLimit&&!u.isAdmin?'<span style="font-size:0.55rem;background:#4caf5022;color:#4caf50;padding:2px 7px;border-radius:4px">∞</span>':''}
             ${u.disabled?'<span style="font-size:0.55rem;background:#ff980022;color:#ff9800;padding:2px 7px;border-radius:4px">DISABLED</span>':''}
+            ${u.ipCount>1?'<span style="font-size:0.55rem;background:#ff3c5a33;color:#ff3c5a;padding:2px 7px;border-radius:4px">⚠ '+u.ipCount+' IPs</span>':''}
           </div>
-          <div style="font-size:0.6rem;margin-top:3px;color:${u.online?'#4caf50':'#444'}">${u.online?'● online now':'○ offline'}</div>
+          <div style="font-size:0.6rem;margin-top:3px;color:${u.online?'#4caf50':'#444'}">${u.online?'● online now':'○ offline'}${u.ipCount?'  •  '+u.ipCount+' unique IP'+(u.ipCount===1?'':'s')+(u.ips&&u.ips.length?' ('+u.ips.join(', ')+')'):'':''}</div>
         </div>
         ${u.username==='naxzyauxxy'?'<span style="font-size:0.6rem;color:#555">owner</span>':`
         <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
@@ -1321,6 +1337,23 @@ async function loadAnnouncement(){
 }
 
 // Auto-load users when admin tab is clicked
+// Receive session token from about:blank parent wrapper
+window.addEventListener('message', function(e){
+  if(!e.data || e.data.type !== 'vh_session') return;
+  if(e.data.vh_token){
+    localStorage.setItem('vh_token', e.data.vh_token);
+    if(e.data.vh_user) localStorage.setItem('vh_user', e.data.vh_user);
+    if(e.data.vh_admin) localStorage.setItem('vh_admin', e.data.vh_admin);
+    // Hide login and load the site as normal
+    document.getElementById('login-screen').classList.add('gone');
+    if(e.data.vh_admin==='1'){
+      var t=document.getElementById('admin-tab');
+      if(t) t.style.display='';
+    }
+    if(typeof triggerLoader==='function') triggerLoader();
+  }
+});
+
 document.addEventListener('DOMContentLoaded',function(){
   var adminTabBtn=document.getElementById('admin-tab');
   if(adminTabBtn) adminTabBtn.addEventListener('click',function(){ setTimeout(adminLoadUsers,100); });
