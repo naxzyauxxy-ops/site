@@ -226,51 +226,8 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   <div class="scard">
     <h3>About:Blank Cloaking</h3>
     <p>Cloak the site in an about:blank tab and toggle on startup (enabled by default).</p>
-    <div class="srow">
-      <label class="toggle"><input type="checkbox" id="ab-switch" onchange="toggleAB()"><span class="slider"></span></label>
-      <button class="kbtn" onclick="openAB()">Open Popup</button>
-    
-
-<!-- ADMIN PANEL -->
-<div class="panel" id="panel-admin">
-  <h1>ADMIN<br><span>PANEL</span></h1>
-
-  <!-- Create User -->
-  <div class="scard">
-    <h3>Create Account</h3>
-    <p>Create a new account for a paying user.</p>
-    <div class="g2" style="margin-top:10px">
-      <div class="field"><label>Username</label><input id="a-new-user" placeholder="username" autocomplete="off"/></div>
-      <div class="field"><label>Password</label><input id="a-new-pass" placeholder="password" autocomplete="off"/></div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;margin:10px 0">
-      <input type="checkbox" id="a-no-limit" style="width:16px;height:16px;cursor:pointer"/>
-      <label for="a-no-limit" style="font-size:0.7rem;cursor:pointer">No session limit (for trusted users)</label>
-    </div>
-    <button class="kbtn" onclick="adminCreate()">Create Account</button>
-    <div id="a-create-msg" style="font-size:0.65rem;margin-top:8px;color:#4caf50"></div>
   </div>
-
-  <!-- User List -->
-  <div class="scard">
-    <h3 style="margin-bottom:12px">All Accounts</h3>
-    <div id="a-user-list" style="display:flex;flex-direction:column;gap:8px">
-      <div style="color:#333;font-size:0.7rem">Loading...</div>
-    </div>
-    <button class="kbtn" style="margin-top:12px" onclick="adminLoadUsers()">↻ Refresh</button>
-  </div>
-
-  <!-- Reset Password -->
-  <div class="scard">
-    <h3>Reset Password</h3>
-    <div class="g2" style="margin-top:10px">
-      <div class="field"><label>Username</label><input id="a-rp-user" placeholder="username"/></div>
-      <div class="field"><label>New Password</label><input id="a-rp-pass" placeholder="new password"/></div>
-    </div>
-    <button class="kbtn" onclick="adminResetPass()">Reset Password</button>
-    <div id="a-rp-msg" style="font-size:0.65rem;margin-top:8px;color:#4caf50"></div>
-  </div>
-</div>
 
   <div class="scard">
     <h3>Panic Key</h3>
@@ -354,122 +311,208 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
 </div>
 
+<!-- ADMIN PANEL -->
+<div class="panel" id="panel-admin">
+  <h1>ADMIN<br><span>PANEL</span></h1>
+
+  <div class="scard">
+    <h3>Create Account</h3>
+    <p>Create a new account for a paying user.</p>
+    <div class="g2" style="margin-top:10px">
+      <div class="field"><label>Username</label><input id="a-new-user" placeholder="username" autocomplete="off"/></div>
+      <div class="field"><label>Password</label><input id="a-new-pass" placeholder="password" autocomplete="off"/></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin:10px 0">
+      <input type="checkbox" id="a-no-limit" style="width:16px;height:16px;cursor:pointer"/>
+      <label for="a-no-limit" style="font-size:0.7rem;cursor:pointer">No session limit (for trusted users)</label>
+    </div>
+    <button class="kbtn" onclick="adminCreate()">Create Account</button>
+    <div id="a-create-msg" style="font-size:0.65rem;margin-top:8px;color:#4caf50"></div>
+  </div>
+
+  <div class="scard">
+    <h3 style="margin-bottom:12px">All Accounts</h3>
+    <div id="a-user-list" style="display:flex;flex-direction:column;gap:8px">
+      <div style="color:#555;font-size:0.7rem">Click refresh to load accounts</div>
+    </div>
+    <button class="kbtn" style="margin-top:12px" onclick="adminLoadUsers()">&#8635; Refresh</button>
+  </div>
+
+  <div class="scard">
+    <h3>Reset Password</h3>
+    <div class="g2" style="margin-top:10px">
+      <div class="field"><label>Username</label><input id="a-rp-user" placeholder="username"/></div>
+      <div class="field"><label>New Password</label><input id="a-rp-pass" placeholder="new password"/></div>
+    </div>
+    <button class="kbtn" onclick="adminResetPass()">Reset Password</button>
+    <div id="a-rp-msg" style="font-size:0.65rem;margin-top:8px;color:#4caf50"></div>
+  </div>
+</div>
+
 <script>
 // ── Games list (from Interstellar + extras) ───────────────────────────────
 const GAMES = [
-  {name:"10 Minutes Till Dawn",url:"/games/10-minutes-till-dawn/",tag:"shooter",img:""},
-  {name:"1v1.LOL",url:"/games/1v1-lol/",tag:"shooter",img:""},
-  {name:"2048",url:"/games/2048/",tag:"puzzle",img:""},
-  {name:"A Dark Room",url:"/games/a-dark-room/",tag:"rpg",img:""},
-  {name:"Abandoned",url:"/games/abandoned/",tag:"adventure",img:""},
-  {name:"Abandoned 2",url:"/games/abandoned-2/",tag:"adventure",img:""},
-  {name:"Ages of Conflict",url:"/games/ages-of-conflict/",tag:"strategy",img:""},
-  {name:"Aground",url:"/games/aground/",tag:"sandbox",img:""},
-  {name:"Amidst the Sky",url:"/games/amidst-the-sky/",tag:"arcade",img:""},
-  {name:"Eaglercraft",url:"/games/ampler-launcher/",tag:"sandbox",img:""},
-  {name:"Another Gentleman's Adventure",url:"/games/another-gentlemans-adventure/",tag:"adventure",img:""},
-  {name:"Awesome Tanks",url:"/games/awesome-tanks/",tag:"shooter",img:""},
-  {name:"Awesome Tanks 2",url:"/games/awesome-tanks-2/",tag:"shooter",img:""},
-  {name:"Babel Tower",url:"/games/babel-tower/",tag:"puzzle",img:""},
-  {name:"Basket Random",url:"/games/basket-random/",tag:"sports",img:""},
-  {name:"Basketball Stars",url:"/games/basketball-stars/",tag:"sports",img:""},
-  {name:"BitLife",url:"/games/bit-life/",tag:"sim",img:""},
-  {name:"Boxing Random",url:"/games/boxing-random/",tag:"sports",img:""},
-  {name:"Brawl Stars",url:"/games/brawl-stars-project-laser/",tag:"shooter",img:""},
-  {name:"Breaklock",url:"/games/breaklock/",tag:"puzzle",img:""},
-  {name:"Chrome Dino",url:"/games/chrome-dino/",tag:"classic",img:""},
-  {name:"Clicker Heroes",url:"/games/clicker-heroes/",tag:"idle",img:""},
-  {name:"Clicker Heroes+",url:"/games/clicker-heroes-updated/",tag:"idle",img:""},
-  {name:"Conway's Game of Life",url:"/games/conways-game-of-life/",tag:"puzzle",img:""},
-  {name:"Core Ball",url:"/games/core-ball/",tag:"arcade",img:""},
-  {name:"Crossy Road",url:"/games/crossy-road/",tag:"classic",img:""},
-  {name:"Cut the Rope",url:"/games/cut-the-rope/",tag:"puzzle",img:""},
-  {name:"Doge Miner",url:"/games/doge-miner/",tag:"idle",img:""},
-  {name:"Doodle Jump",url:"/games/doodle-jump/",tag:"arcade",img:""},
-  {name:"Drift Boss",url:"/games/drift-boss/",tag:"racing",img:""},
-  {name:"Drive Mad",url:"/games/drive-mad/",tag:"racing",img:""},
-  {name:"Drive Mad S",url:"/games/drive-mad-s/",tag:"racing",img:""},
-  {name:"Duck Life 4",url:"/games/duck-life-4/",tag:"sim",img:""},
-  {name:"Dune",url:"/games/dune/",tag:"strategy",img:""},
-  {name:"Eggy Car",url:"/games/eggy-car/",tag:"racing",img:""},
-  {name:"EvoWars.io",url:"/games/evowars/",tag:"io",img:""},
-  {name:"Family Feud",url:"/games/family-feud/",tag:"trivia",img:""},
-  {name:"Fireboy & Watergirl",url:"/games/fireboy-and-watergirl/",tag:"platformer",img:""},
-  {name:"Fireboy & Watergirl 2",url:"/games/fireboy-and-watergirl-2/",tag:"platformer",img:""},
-  {name:"Fireboy & Watergirl 3",url:"/games/fireboy-and-watergirl-3/",tag:"platformer",img:""},
-  {name:"Fireboy & Watergirl 4",url:"/games/fireboy-and-watergirl-4/",tag:"platformer",img:""},
-  {name:"Five Nights at Epstein's",url:"/games/five-nights-at-epsteins/",tag:"horror",img:""},
-  {name:"Flappy Bird",url:"/games/flappy-bird/",tag:"classic",img:""},
-  {name:"Flash Emulator",url:"/games/flash/",tag:"arcade",img:""},
-  {name:"Friday Night Funkin",url:"/games/friday-night-funkin/",tag:"rhythm",img:""},
-  {name:"Geometry Dash Lite",url:"/games/geometry-dash-lite/",tag:"rhythm",img:""},
-  {name:"Geometry Dash",url:"/games/geometry-dash-remastered/",tag:"rhythm",img:""},
-  {name:"Geometry Vibes",url:"/games/geometry-vibes/",tag:"rhythm",img:""},
-  {name:"Geometry Vibes Monster",url:"/games/geometry-vibes-monster/",tag:"rhythm",img:""},
-  {name:"Geometry Vibes X",url:"/games/geometry-vibes-x-ball/",tag:"rhythm",img:""},
-  {name:"Getaway Shootout",url:"/games/getaway-shootout/",tag:"shooter",img:""},
-  {name:"Gons.io",url:"/games/gons-io/",tag:"io",img:""},
-  {name:"GunSpin",url:"/games/gunspin/",tag:"arcade",img:""},
-  {name:"Hextris",url:"/games/hextris/",tag:"puzzle",img:""},
-  {name:"Idle Breakout",url:"/games/idle-breakout/",tag:"idle",img:""},
-  {name:"Incremancer",url:"/games/incremancer/",tag:"idle",img:""},
-  {name:"Lion Soldiers",url:"/games/lion-soldiers-vengeance/",tag:"strategy",img:""},
-  {name:"Maptroid",url:"/games/maptroid/",tag:"adventure",img:""},
-  {name:"Mario Game",url:"/games/mario-game/",tag:"platformer",img:""},
-  {name:"Monkey Mart",url:"/games/monkey-mart/",tag:"sim",img:""},
-  {name:"Moto X3M",url:"/games/motox3m/",tag:"racing",img:""},
-  {name:"N-Gon",url:"/games/n-gon/",tag:"arcade",img:""},
-  {name:"N-Step Steve",url:"/games/n-step-steve-part-1/",tag:"platformer",img:""},
-  {name:"N-Step Steve 2",url:"/games/n-step-steve-part-2/",tag:"platformer",img:""},
-  {name:"Particle Clicker",url:"/games/particle-clicker/",tag:"idle",img:""},
-  {name:"PCraft",url:"/games/pcraft/",tag:"sandbox",img:""},
-  {name:"Planet Life",url:"/games/planet-life/",tag:"sim",img:""},
-  {name:"Progress Knight Quest",url:"/games/progress-knight-quest/",tag:"rpg",img:""},
-  {name:"Progress Knight",url:"/games/progress-knight-reborn/",tag:"rpg",img:""},
-  {name:"Pull of War",url:"/games/pull-of-war/",tag:"arcade",img:""},
-  {name:"Reach the Core",url:"/games/reach-the-core/",tag:"arcade",img:""},
-  {name:"Restless Wing Syndrome",url:"/games/restless-wing-syndrome/",tag:"arcade",img:""},
-  {name:"Retro Bowl",url:"/games/retro-bowl/",tag:"sports",img:""},
-  {name:"Retro Bowl Classic",url:"/games/retro-bowl-old/",tag:"sports",img:""},
-  {name:"Rift Shift",url:"/games/rift-shift/",tag:"puzzle",img:""},
-  {name:"Rocket League 2D",url:"/games/rocket-league-2d/",tag:"sports",img:""},
-  {name:"Rooftop Snipers",url:"/games/rooftop-snipers/",tag:"shooter",img:""},
-  {name:"Rookie Bowman",url:"/games/rookie-bowman/",tag:"arcade",img:""},
-  {name:"Run 3",url:"/games/run-3/",tag:"endless",img:""},
-  {name:"Run 3 Beta",url:"/games/run-3-beta/",tag:"endless",img:""},
-  {name:"Sabercut",url:"/games/sabercut/",tag:"arcade",img:""},
-  {name:"Sandspiel",url:"/games/sandspiel/",tag:"sandbox",img:""},
-  {name:"Scuba Bear",url:"/games/scuba-bear/",tag:"arcade",img:""},
-  {name:"Shadow Fight",url:"/games/shadow-fight/",tag:"fighting",img:""},
-  {name:"Slice Master",url:"/games/slice-master/",tag:"arcade",img:""},
-  {name:"Slope",url:"/games/slope/",tag:"racing",img:""},
-  {name:"Smart Ball",url:"/games/smart-ball/",tag:"platformer",img:""},
-  {name:"Soccer Random",url:"/games/soccer-random/",tag:"sports",img:""},
-  {name:"Station Saturn",url:"/games/station-saturn/",tag:"shooter",img:""},
-  {name:"Stickman Hook",url:"/games/stickman-hook/",tag:"platformer",img:""},
-  {name:"Subway Surfers",url:"/games/subway-surfers/",tag:"endless",img:""},
-  {name:"Subway Surfers NY",url:"/games/subway-surfers-ny/",tag:"endless",img:""},
-  {name:"Tanuki Sunset",url:"/games/tanuki-sunset/",tag:"racing",img:""},
-  {name:"Temple Run 2",url:"/games/temple-run-2/",tag:"endless",img:""},
-  {name:"The Final Earth",url:"/games/the-final-earth/",tag:"strategy",img:""},
-  {name:"The Treasure",url:"/games/the-treasure/",tag:"adventure",img:""},
-  {name:"There Is No Game",url:"/games/there-is-no-game/",tag:"adventure",img:""},
-  {name:"Tic Tac What",url:"/games/tic-tac-what/",tag:"puzzle",img:""},
-  {name:"Time Shooter",url:"/games/time-shooter/",tag:"shooter",img:""},
-  {name:"Time Shooter 3",url:"/games/time-shooter-3/",tag:"shooter",img:""},
-  {name:"Tiny Fishing",url:"/games/tiny-fishing/",tag:"idle",img:""},
-  {name:"Trace",url:"/games/trace/",tag:"puzzle",img:""},
-  {name:"Tunnel Rush",url:"/games/tunnel-rush/",tag:"racing",img:""},
-  {name:"Two Ball 3D",url:"/games/two-ball-3d/",tag:"racing",img:""},
-  {name:"Vex 3",url:"/games/vex-3/",tag:"platformer",img:""},
-  {name:"Vex 4",url:"/games/vex-4/",tag:"platformer",img:""},
-  {name:"Vex 5",url:"/games/vex-5/",tag:"platformer",img:""},
-  {name:"Vex 6",url:"/games/vex-6/",tag:"platformer",img:""},
-  {name:"Vex 7",url:"/games/vex-7/",tag:"platformer",img:""},
-  {name:"Volley Random",url:"/games/volley-random/",tag:"sports",img:""},
-  {name:"osu!",url:"/games/web-osu/",tag:"rhythm",img:""},
-  {name:"Where Is the Water",url:"/games/where-is-the-water/",tag:"puzzle",img:""},
-  {name:"X-Trench Run",url:"/games/x-trench-run/",tag:"shooter",img:""},
+  {name:"Shell Shockers",url:"https://shellshock.io/",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Shell-Shockers.webp"},
+  {name:"1v1.LOL",url:"https://1v1.lol",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/UQFryp4dnh1hfWhqpSboSrlumGoxQVhjZmG.webp"},
+  {name:"Krunker.io",url:"https://krunker.io",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Krunker-IO.webp"},
+  {name:"Smash Karts",url:"https://smashkarts.io/",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/Thqie3x1PmUzmKesC09fHuMNg.webp"},
+  {name:"Narrow One",url:"https://narrow.one",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Narrow-One.webp"},
+  {name:"Slither.io",url:"https://slither.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/NBM9XWVkWA9kRjIh.webp"},
+  {name:"Agar.io",url:"https://agar.io",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/sIEICm5FB4hcLZEIeW7hUFnJUZuath.webp"},
+  {name:"Diep.io",url:"https://diep.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/Diep-IO.webp"},
+  {name:"Paper.io",url:"https://paper-io.com/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/jxSJp32JKASDv366hJjf1E9im2WdzGTPSnEQds.webp"},
+  {name:"MooMoo.io",url:"https://moomoo.io",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/o6zsEpgE2mvjmXO2W7kqBPcPETSAGPW4yMVy7SKl.webp"},
+  {name:"Zombs Royale",url:"https://zombsroyale.io",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/Zombs-Royale.webp"},
+  {name:"Zombs.io",url:"https://zombs.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/VXgFyaPRKRJ.webp"},
+  {name:"Bloxd.io",url:"https://bloxd.io",tag:"sandbox",img:"https://interstellar.sevecom.com/assets/media/icons/Bloxd-IO.webp"},
+  {name:"Florr.io",url:"https://florr.io",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/Florr-IO.webp"},
+  {name:"Taming.io",url:"https://taming.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/Taming-IO.webp"},
+  {name:"Territorial.io",url:"https://territorial.io",tag:"strategy",img:"https://interstellar.sevecom.com/assets/media/icons/vYJyEC2xtegW.webp"},
+  {name:"Starblast",url:"https://starblast.io",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Starblast.webp"},
+  {name:"Tetr.io",url:"https://tetr.io/",tag:"puzzle",img:"https://interstellar.sevecom.com/assets/media/icons/QJXz6RGCknSqQmh6it2V.jpg"},
+  {name:"ev.io",url:"https://ev.io",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/wERFGYINkYoUCgBrfg7yNammi.webp"},
+  {name:"Venge.io",url:"https://venge.io",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/s4J3kuhTnC6wLxk4nKQ4JCEvyxLfS3.webp"},
+  {name:"Kirka.io",url:"https://kirka.io",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/lbPEL1SVbZykA2Yq2xNzzqxwoWMdnDXt.webp"},
+  {name:"Voxiom.io",url:"https://voxiom.io/",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/v1GJyOoRjwFpyfpxX2Pilo4KQDdO.webp"},
+  {name:"Kiomet",url:"https://kiomet.com",tag:"strategy",img:"https://interstellar.sevecom.com/assets/media/icons/xAMA2GQZupyfQFqk6wtnzZzSv.webp"},
+  {name:"Hordes.io",url:"https://hordes.io",tag:"rpg",img:"https://interstellar.sevecom.com/assets/media/icons/Hordes-IO.webp"},
+  {name:"Tribals.io",url:"https://tribals.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/Tribals-IO.webp"},
+  {name:"Deadshot.io",url:"https://deadshot.io",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Deadshot.webp"},
+  {name:"Swordbattle.io",url:"https://swordbattle.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/SATSlqrLyR3nvCiJxY7s9V.webp"},
+  {name:"Stabfish.io",url:"https://stabfish.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/ZRZZyxczXAuPWkT.webp"},
+  {name:"Dynast.io",url:"https://dynast.io",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/KyvdBdeidoHNd.webp"},
+  {name:"DigDig.io",url:"https://digdig.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/DigDig-IO.webp"},
+  {name:"AntWar.io",url:"https://antwar.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/plEVrwtgbA63yuquZQ9qweipNcG.webp"},
+  {name:"Skribbl.io",url:"https://skribbl.io/",tag:"multiplayer",img:"https://interstellar.sevecom.com/assets/media/icons/Skribbl-IO.webp"},
+  {name:"Gartic Phone",url:"https://garticphone.com",tag:"multiplayer",img:"https://interstellar.sevecom.com/assets/media/icons/Gartic-Phone.webp"},
+  {name:"Bomb Party",url:"https://jklm.fun",tag:"multiplayer",img:"https://interstellar.sevecom.com/assets/media/icons/JKLM.webp"},
+  {name:"JustFall.LOL",url:"https://justfall.lol",tag:"multiplayer",img:"https://interstellar.sevecom.com/assets/media/icons/nSpZAHuSQ7PA5TUX7OGAlgiF5troTh.webp"},
+  {name:"Hole.IO",url:"https://hole-io.com/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/RKNmMvZrIYumd4pEB5ecBcQFu.webp"},
+  {name:"HexArena",url:"https://hexarena.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/PZwVkJDUvnNdd6Uci5L76PHar.webp"},
+  {name:"Rocket Bot Royale",url:"https://rocketbotroyale2.winterpixel.io/",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Rocket-Bot-Royale.webp"},
+  {name:"Cryzen.io",url:"https://cryzen.io",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Cryzen-IO.webp"},
+  {name:"ShipCraft.io",url:"https://shipcraft.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/Default.jpg"},
+  {name:"Arras.io",url:"https://arras.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/Arras-IO.webp"},
+  {name:"mk48.io",url:"https://mk48.io/",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/tUIGSAbSLeIuUG2zA3FR2K1gaQfGq747u41W.webp"},
+  {name:"Powerline.IO",url:"https://powerline.io",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/nYCSOMhVskOJapck6QyKgFWmd.webp"},
+  {name:"Stomped.io",url:"https://stomped.io",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/Stomped-IO.webp"},
+  {name:"Lordz.io",url:"https://lordz.io/",tag:"strategy",img:"https://interstellar.sevecom.com/assets/media/icons/YNdtX0VHkgqYkhkCtzugfj5x95wA5Eoi6a9ZFiGl.webp"},
+  {name:"Evades.io",url:"https://evades.io",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/Evades.webp"},
+  {name:"Pokemon Showdown",url:"https://play.pokemonshowdown.com",tag:"multiplayer",img:"https://interstellar.sevecom.com/assets/media/icons/Pokemon-Shadow.webp"},
+  {name:"Chess.com",url:"https://chess.com",tag:"classic",img:"https://interstellar.sevecom.com/assets/media/icons/YEKw4fRbiRM0FpVJemRGrESM2cOXdmjb4N.webp"},
+  {name:"Moto X3M",url:"https://html5.gamedistribution.com/rvvASMiM/5b0abd4c0faa4f5eb190a9a16d5a1b4c/index.html",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/KyT5V0ncwGvtwsMpcP7tA0BlOrFzMC5.webp"},
+  {name:"MX3M Spooky Land",url:"https://html5.gamedistribution.com/rvvASMiM/b8a342904608470a9f3382337aca3558/index.html",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/JnwYfI4HUuwshY1wIeRepPMyxKNjoihxZDjmyZn.webp"},
+  {name:"Rooftop Snipers",url:"https://html5.gamedistribution.com/rvvASMiM/c3a70ae98547407a92ebedca8b79fdfa/index.html",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Rooftop-Snipers.webp"},
+  {name:"Snow Rider 3D",url:"https://html5.gamedistribution.com/rvvASMiM/3b79a8537ebc414fb4f9672a9b8c68c8/index.html",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/WocOhB52xCTH1HkqLKYjOLFdYX.webp"},
+  {name:"Basket Random",url:"https://html5.gamedistribution.com/rvvASMiM/bf1268dccb5d43e7970bb3edaa54afc8/index.html",tag:"sports",img:"https://interstellar.sevecom.com/assets/media/icons/Basket-Random.webp"},
+  {name:"Basketball Stars",url:"https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/",tag:"sports",img:"https://interstellar.sevecom.com/assets/media/icons/Basketball-Stars.webp"},
+  {name:"Time Shooter 2",url:"https://html5.gamedistribution.com/62a72f2da7cb4b609579a47653546e6a/",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Time-Shooter-2.webp"},
+  {name:"Merge Fruit",url:"https://html5.gamedistribution.com/2dee9d404697435aa76111eb4015e1d5/",tag:"puzzle",img:"https://interstellar.sevecom.com/assets/media/icons/XKWzQaGW5SncwrXVXqol.webp"},
+  {name:"Survivor.io",url:"https://html5.gamedistribution.com/rvvASMiM/f1c451e586c04b4c8cba01b0c50d9090/index.html",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/lKa9r5UOGg0lFFD5zlMsthMa.webp"},
+  {name:"Gunspin",url:"https://html5.gamedistribution.com/rvvASMiM/917cce8c44c44638a8cdc2a1794b65c8/index.html",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/G-nspin.webp"},
+  {name:"FW6 Fairy Tales",url:"https://html5.gamedistribution.com/rvvASMiM/be3cff113c4e4f069b7614851825ffe9/index.html",tag:"platformer",img:"https://interstellar.sevecom.com/assets/media/icons/Fireboy-And-Watergirl-6.webp"},
+  {name:"Ninja Cat Exploit",url:"https://html5.gamedistribution.com/rvvASMiM/903ba9346b9d437e9c7e81d672cead44/index.html",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/SphRB044LFuUwxYtReTrmdxlJ818uyzv8Tfz.webp"},
+  {name:"Stickman Archero",url:"https://html5.gamedistribution.com/rvvASMiM/3f4c166817ad4fd4b5b05d9adba22fcd/index.html",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Stickman-Archero-Fight.webp"},
+  {name:"Helix Jump",url:"https://helix-jump.game-files.crazygames.com/helix-jump/1/index.html",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/ztaJ9bbrbW5.webp"},
+  {name:"Age of War",url:"https://age-of-war.game-files.crazygames.com/ruffle/ageofwar.html",tag:"strategy",img:"https://interstellar.sevecom.com/assets/media/icons/Age-Of-War.webp"},
+  {name:"Impossible Quiz",url:"https://the-impossible-quiz.game-files.crazygames.com/ruffle/theimpossiblequiz.html",tag:"puzzle",img:"https://interstellar.sevecom.com/assets/media/icons/oOFgWxrHhCs5vdjfeYIhpsleeDRfAvwVgV.webp"},
+  {name:"Riddle School 3",url:"https://riddle-school-3.game-files.crazygames.com/ruffle/riddleschool3.html",tag:"adventure",img:"https://interstellar.sevecom.com/assets/media/icons/sfKappHCcxoxG1akVusu5cLsw85.webp"},
+  {name:"Riddle School 4",url:"https://riddle-school-4.game-files.crazygames.com/ruffle/riddleschool4.html",tag:"adventure",img:"https://interstellar.sevecom.com/assets/media/icons/lLa6YaGotU8dorNm9mt9a9LZ2zPQ45FCEVx.webp"},
+  {name:"Riddle School 5",url:"https://riddle-school-5.game-files.crazygames.com/ruffle/riddleschool5.html",tag:"adventure",img:"https://interstellar.sevecom.com/assets/media/icons/NBWHD0TVoHiUZoMvnTPSKGTcFdZEzBHT3wZsFK.webp"},
+  {name:"Happy Wheels",url:"https://files.crazygames.com/ruffle/happywheels.html",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/Happy-Wheels.webp"},
+  {name:"Papa's Scooperia",url:"https://files.crazygames.com/ruffle/papasscooperia.html",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/Papas-Scooperia.webp"},
+  {name:"Papa's Sushiria",url:"https://files.crazygames.com/ruffle/papassushiria.html",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/Papas-Sushiria.webp"},
+  {name:"Sandtrix",url:"https://files.crazygames.com/sandtrix/16/index.html",tag:"puzzle",img:"https://interstellar.sevecom.com/assets/media/icons/Mi2DNRAG7Y3y8sPfOgMXfh.webp"},
+  {name:"Haunted School",url:"https://games.crazygames.com/en_US/haunted-school---horror-game/index.html",tag:"horror",img:"https://interstellar.sevecom.com/assets/media/icons/Default.jpg"},
+  {name:"Madalin Cars Multi",url:"https://games.crazygames.com/en_US/madalin-cars-multiplayer/index.html",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/uzJGNGAtkdUPUqfMeZDAvjuoIGeSQflBc9ARof.webp"},
+  {name:"Madalin Stunt Cars 2",url:"https://games.crazygames.com/en_US/madalin-stunt-cars-2/index.html",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/Madalin-Stunt-Cars-2.webp"},
+  {name:"Madalin Stunt Cars 3",url:"https://games.crazygames.com/en_US/madalin-stunt-cars-3/index.html",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/Madalin-Stunt-Cars-3.webp"},
+  {name:"BuildNow GG",url:"https://games.crazygames.com/en_US/buildnow-gg/index.html",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Build-Now-GG.webp"},
+  {name:"Snowball.io",url:"https://games.crazygames.com/en_US/snowball-io/index.html",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/TtfIhwVGwhDI4.webp"},
+  {name:"Fancy Pants",url:"https://games.crazygames.com/en_US/fancy-pants-adventure-world/index.html",tag:"platformer",img:"https://interstellar.sevecom.com/assets/media/icons/Fancy-Pants-Adventure.webp"},
+  {name:"Twisted Cooking Mama",url:"https://twisted-cooking-mama.game-files.crazygames.com/ruffle/twisted-cooking-mama/1/twistedcookingmama.html",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/Twisted-Cooking-Mama.webp"},
+  {name:"Rooftop Snipers 2",url:"https://h5cdn.github.io/s6/rooftop-snipers-2/",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Rooftop-Snipers-2.webp"},
+  {name:"FNAF 2",url:"https://sussygamedeveloper.github.io/FNAF2/",tag:"horror",img:"https://interstellar.sevecom.com/assets/media/icons/JmG7En9dZDgnGa8rJ48RDNBfcOve.webp"},
+  {name:"FNAF 3",url:"https://sussygamedeveloper.github.io/fnaf3/",tag:"horror",img:"https://interstellar.sevecom.com/assets/media/icons/FNAF-3.webp"},
+  {name:"FNAF Web",url:"https://wellsousaaa.github.io/Five-Nights-at-Freddys-Web/",tag:"horror",img:"https://interstellar.sevecom.com/assets/media/icons/FNAF-Web.webp"},
+  {name:"Gladihoppers",url:"https://bonbang.github.io/store99/gladihoppers/index.html",tag:"fighting",img:"https://interstellar.sevecom.com/assets/media/icons/OUNcdGsBug0KNH.webp"},
+  {name:"Tube Jumpers",url:"https://unblocked76.github.io/tube-jumpers/",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/K4ZKfH7gWvVdEFZWzYgm8v0Z5sdrDbsIKxee.webp"},
+  {name:"Temple of Boom",url:"https://temple-of-boom.github.io/file/",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Temple-Of-Boom.webp"},
+  {name:"DOOM",url:"https://browncha023.github.io/GBA/launcher.html#dm",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/xllYoz5Wp8cmNdrXNpdN9EGuncJYjvx4ILdn.webp"},
+  {name:"DOOM 2",url:"https://browncha023.github.io/GBA/launcher.html#dm2",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/qgddmrHfSuG8UqiO.webp"},
+  {name:"Pokemon Light Plat.",url:"https://browncha023.github.io/GBA/launcher.html#pokemonlp",tag:"rpg",img:"https://interstellar.sevecom.com/assets/media/icons/mBw1swW4ZiPklOh.webp"},
+  {name:"South Park",url:"https://retrobowl-game.github.io/South-Park/",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/kxHE4JqVGaKUZwJBg.jpg"},
+  {name:"Drive Mad",url:"https://raw.githack.com/3kh0/3kh0-assets/main/drive-mad/index.html",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/Drive-Mad.webp"},
+  {name:"Precision Client",url:"https://raw.githack.com/3kh0/3kh0-assets/main/precision-client/index.html",tag:"sandbox",img:"https://interstellar.sevecom.com/assets/media/icons/Precision-Client.webp"},
+  {name:"N-Gon",url:"https://landgreen.github.io/sidescroller/",tag:"platformer",img:"https://interstellar.sevecom.com/assets/media/icons/N-GON.webp"},
+  {name:"RetroArch",url:"https://binbashbanana.github.io/webretro/",tag:"emulator",img:"https://interstellar.sevecom.com/assets/media/icons/m6Z56Ept7X52DF4pAUWsfCe.webp"},
+  {name:"Adventure Capitalist",url:"https://than1089.github.io/adventure-capitalist/",tag:"idle",img:"https://interstellar.sevecom.com/assets/media/icons/Adventure-Capitalist.webp"},
+  {name:"BFDIA 5b",url:"https://coppersalts.github.io/HTML5b/",tag:"adventure",img:"https://interstellar.sevecom.com/assets/media/icons/p1ZxLhKoUQw5QNGiF.WEBP"},
+  {name:"Flappy 2048",url:"https://hczhcz.github.io/Flappy-2048/",tag:"classic",img:"https://interstellar.sevecom.com/assets/media/icons/xWByQ0ZGa7.webp"},
+  {name:"GBA Games",url:"https://cattn.github.io/gba/",tag:"emulator",img:"https://interstellar.sevecom.com/assets/media/icons/jCP6ts4SLNyyHXr.webp"},
+  {name:"Half-Life",url:"https://x8bitrain.github.io/webXash/",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Half-Life.webp"},
+  {name:"Mario Party",url:"https://classwork-heaven.pages.dev/g/marioparty/",tag:"multiplayer",img:"https://interstellar.sevecom.com/assets/media/icons/zjNjnhMGpnhr1enMxR.jpg"},
+  {name:"Eaglercraft 1.5",url:"https://interstellar-assets.pages.dev/minecraft-15/",tag:"sandbox",img:"https://interstellar.sevecom.com/assets/media/icons/Minecraft.webp"},
+  {name:"10 Min Till Dawn",url:"https://selenite.cc/semag/10minutestilldawn/index.html",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/10-Minutes-Till-Dawn.png"},
+  {name:"13 Days in Hell",url:"https://selenite.cc/semag/13/index.html",tag:"horror",img:"https://interstellar.sevecom.com/assets/media/icons/13-Days-In-Hell.webp"},
+  {name:"Super Mario 64 DS",url:"https://selenite.cc/semag/supermario64ds/index.html",tag:"platformer",img:"https://interstellar.sevecom.com/assets/media/icons/NZfPHIBtXqfJobCkM.png"},
+  {name:"Nintendogs",url:"https://selenite.cc/semag/nintendogs/index.html",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/oldJ7eH1rPQdirqbnrCmAx.jpg"},
+  {name:"World's Hardest Game",url:"https://selenite.cc/semag/worldshardestgame/index.html",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/WY9pIl9e0dteRNiJPzjD.png"},
+  {name:"World's Hardest Game 2",url:"https://selenite.cc/semag/worldshardestgame2/index.html",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/qfgvA1L1cdw9syp4QJFG7E2.jpg"},
+  {name:"Super Mario 64",url:"https://f.kbhgames.com/r/n64/game.php?file=32112_super-mario-64-usa.zip",tag:"platformer",img:"https://interstellar.sevecom.com/assets/media/icons/Super-Mario-64.webp"},
+  {name:"GoldenEye 007",url:"https://f.kbhgames.com/r/n64/game.php?file=007-golden-eye.zip",tag:"shooter",img:"https://interstellar.sevecom.com/assets/media/icons/Golden-Eye-007.webp"},
+  {name:"Paper Mario 64",url:"https://f.kbhgames.com/r/n64/game.php?file=Paper%20Mario%20(USA).zip",tag:"rpg",img:"https://interstellar.sevecom.com/assets/media/icons/Paper-Mario-64.webp"},
+  {name:"Mortal Kombat 4",url:"https://f.kbhgames.com/r/n64/game.php?file=Mortal-Kombat-4-U.zip",tag:"fighting",img:"https://interstellar.sevecom.com/assets/media/icons/VdmT7bhTI1vvJupcq.webp"},
+  {name:"Super Smash Flash",url:"https://f.kbhgames.com/RS/game.php?r=//f.kbhgames.com/2018/swf/smashflash.swf&w=1521&h=753",tag:"fighting",img:"https://interstellar.sevecom.com/assets/media/icons/Super-Smash-Flash.webp"},
+  {name:"Ace Attorney",url:"https://f.kbhgames.com/r/gba/?r=ace-attorney",tag:"adventure",img:"https://interstellar.sevecom.com/assets/media/icons/Ace-Attorney.webp"},
+  {name:"Deal or No Deal",url:"https://f.kbhgames.com/RS/game.php?r=//f.kbhgames.com/2018/swf/dondeal2.swf&w=640&h=480",tag:"trivia",img:"https://interstellar.sevecom.com/assets/media/icons/NdxudKuXFiO8anG70JEAtt6xjLMffbi4PGuDKT.webp"},
+  {name:"Mario Kart 64",url:"https://static.arcadespot.com/retroemulator.php?system=n64&game=2017/06/mario-kart-64.zip",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/UhtFVcqq7xd82lgjXo2oOs0CW.webp"},
+  {name:"Pokemon Heart Gold",url:"https://static.arcadespot.com/retroemulator.php?system=nds&game=2017/10/pokemon-heartgold-version1.zip",tag:"rpg",img:"https://interstellar.sevecom.com/assets/media/icons/vBt6un0EQpqzcZ35nkRHWPgSVn16bw.webp"},
+  {name:"AC: Wild World",url:"https://static.arcadespot.com/retroemulator.php?system=nds&game=2017/10/animal-crossing-wild-world1.zip",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/VhUc6S7i20TiQeIlrW7IrDI8ui1.webp"},
+  {name:"Papa's Pizzeria",url:"https://f.silvergames.com/ruffle/player.php?id=1360",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/YWiQkEJodTxqLwgtEnLz9pP4skHp.webp"},
+  {name:"Papa Louie 1",url:"https://f.silvergames.com/ruffle/player.php?id=1373",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/Papa-Louie-1.webp"},
+  {name:"Papa Louie 2",url:"https://f.silvergames.com/emu/waffle/?id=3042",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/ZSOuZUz3vQbJcK2RKd.webp"},
+  {name:"Papa Louie 3",url:"https://f.silvergames.com/emu/waffle/?id=4693",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/Papa-Louie-3.webp"},
+  {name:"Papa's Bakeria",url:"https://f.silvergames.com/emu/waffle/?id=5458",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/JWqp20DygE67glyjFxPIeUxJdKaL9rYjzLgyq.webp"},
+  {name:"Papa's Cupcakeria",url:"https://f.silvergames.com/emu/waffle/?id=3246",tag:"sim",img:"https://interstellar.sevecom.com/assets/media/icons/Papas-Cupcakeria.webp"},
+  {name:"Impossible Quiz 2",url:"https://f.silvergames.com/ruffle/player.php?id=3742",tag:"puzzle",img:"https://interstellar.sevecom.com/assets/media/icons/Wp61JnjmPom.webp"},
+  {name:"Riddle School 2",url:"https://f.silvergames.com/ruffle/player.php?id=8564",tag:"adventure",img:"https://interstellar.sevecom.com/assets/media/icons/Riddle-School-2.webp"},
+  {name:"Burrito Bison",url:"https://f.silvergames.com/awayfl/index.html?swf=burrito-bison.swf",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/Burrito-Bison.webp"},
+  {name:"Interactive Buddy",url:"https://f.silvergames.com/ruffle/player.php?id=204",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/Interactive-Buddy.webp"},
+  {name:"Learn to Fly 3",url:"https://www.silvergames.com/en/learn-to-fly-3/iframe",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/Rm4xFc5S7qxWHtST5Kkh0mFxE0f7.webp"},
+  {name:"Friday Night Funkin",url:"https://w8.snokido.com/games/html5/friday-night-funkin/0281/index.html",tag:"rhythm",img:"https://interstellar.sevecom.com/assets/media/icons/Friday-Night-Funkin.webp"},
+  {name:"FNF Lofi Mod",url:"https://fnf.kdata1.com/lofi-funkin/2/",tag:"rhythm",img:"https://interstellar.sevecom.com/assets/media/icons/FNF-Lofi-Mod.webp"},
+  {name:"FNF VS Snorlax",url:"https://fnf.kdata1.com/snorlax/1/",tag:"rhythm",img:"https://interstellar.sevecom.com/assets/media/icons/pXzg37jCo8N0O9dzbjfeyLj9gcJ1FScAI7rnP2jF.webp"},
+  {name:"GBA Emulator",url:"https://ds.44670.org/gba/",tag:"emulator",img:"https://interstellar.sevecom.com/assets/media/icons/jCP6ts4SLNyyHXr.webp"},
+  {name:"DS Emulator",url:"https://ds.44670.org/",tag:"emulator",img:"https://interstellar.sevecom.com/assets/media/icons/Nintendo-DS-Emulator.webp"},
+  {name:"Minecraft Classic",url:"https://classic.minecraft.net",tag:"sandbox",img:"https://interstellar.sevecom.com/assets/media/icons/Minecraft.webp"},
+  {name:"Cookie Clicker",url:"https://orteil.dashnet.org/cookieclicker/",tag:"idle",img:"https://interstellar.sevecom.com/assets/media/icons/Cookie-Clicker.webp"},
+  {name:"A Dark Room",url:"https://adarkroom.doublespeakgames.com",tag:"rpg",img:"https://interstellar.sevecom.com/assets/media/icons/A-Dark-Room.webp"},
+  {name:"Sandspiel",url:"https://sandspiel.club/",tag:"sandbox",img:"https://interstellar.sevecom.com/assets/media/icons/Sand-Spiel.webp"},
+  {name:"Shapez.io",url:"https://shapez.io",tag:"puzzle",img:"https://interstellar.sevecom.com/assets/media/icons/Shapez-IO.webp"},
+  {name:"Neal.Fun",url:"https://neal.fun",tag:"arcade",img:"https://interstellar.sevecom.com/assets/media/icons/WZW8oq8z1DrkK0ZtepWAU1u.webp"},
+  {name:"Wordle Unlimited",url:"https://wordleunlimited.org/",tag:"classic",img:"https://interstellar.sevecom.com/assets/media/icons/OHv1YXMfwymIaBUbQssu1V.webp"},
+  {name:"Wordle NYT",url:"https://www.nytimes.com/games/wordle/index.html",tag:"classic",img:"https://interstellar.sevecom.com/assets/media/icons/OHv1YXMfwymIaBUbQssu1V.webp"},
+  {name:"Connections",url:"https://1games.io/game/connections-game/",tag:"puzzle",img:"https://interstellar.sevecom.com/assets/media/icons/PONI3UCEOnk5Gb3j2fyyoqPF.png"},
+  {name:"Globle",url:"https://globle.org",tag:"classic",img:"https://interstellar.sevecom.com/assets/media/icons/OHv1YXMfwymIaBUbQssu1V.webp"},
+  {name:"Google Snake Modded",url:"https://googlesnakemods.com/v/current/",tag:"classic",img:"https://interstellar.sevecom.com/assets/media/icons/JzWlW0D3D3dB6n.webp"},
+  {name:"This is Sand",url:"https://thisissand.com/",tag:"sandbox",img:"https://interstellar.sevecom.com/assets/media/icons/This-Is-Sand.webp"},
+  {name:"Celeste PICO-8",url:"https://exok.com/minigames/celeste.html",tag:"platformer",img:"https://interstellar.sevecom.com/assets/media/icons/Celeste-PICO-8.webp"},
+  {name:"Windows 96",url:"https://windows96.net",tag:"sandbox",img:"https://interstellar.sevecom.com/assets/media/icons/pKSIaVtPXf0qlSz0tc.webp"},
+  {name:"Buckshot Roulette",url:"https://buckshotroulette.online/game/v11/",tag:"horror",img:"https://interstellar.sevecom.com/assets/media/icons/WCQvg8YyoBUmGb1JDa7Va8e3ocEgXvfw4.webp"},
+  {name:"Drift Hunters",url:"https://webglmath.github.io/drift-hunters/",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/Drift-Hunters.webp"},
+  {name:"Red Ball 1",url:"https://www.algebrashelper.com/redball",tag:"platformer",img:"https://interstellar.sevecom.com/assets/media/icons/O2XP0ZPJuoc6vBJxEg6Ft.webp"},
+  {name:"Red Ball 4",url:"https://www.algebrashelper.com/redball-4",tag:"platformer",img:"https://interstellar.sevecom.com/assets/media/icons/SHPOjYCLf0cPYURrb41plsQ0rV.webp"},
+  {name:"Super Mario Bros",url:"https://topoi.pooq.com/hendrik/notmine/FullScreenMario/mario.html",tag:"platformer",img:"https://interstellar.sevecom.com/assets/media/icons/TVctxpMYR4VM0FvlFuYz4W1jGILDapYI9VBeQn.webp"},
+  {name:"Isleward",url:"https://play.isleward.com",tag:"rpg",img:"https://interstellar.sevecom.com/assets/media/icons/vLOF8KRLe2b7IGB7Er.webp"},
+  {name:"Tanuki Sunset",url:"https://watchdocumentaries.com/wp-content/uploads/games/tanuki-sunset",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/Tanuki-Sunset.webp"},
+  {name:"Slope",url:"https://watchdocumentaries.com/wp-content/uploads/games/slope/",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/wF5lk8QvWTXE0MuOLkjx.webp"},
+  {name:"Drift Boss",url:"https://watchdocumentaries.com/wp-content/uploads/games/drift-boss/",tag:"racing",img:"https://interstellar.sevecom.com/assets/media/icons/Drift-Boss.webp"},
+  {name:"Temple Run 2",url:"https://watchdocumentaries.com/wp-content/uploads/games/temple-run-2/",tag:"endless",img:"https://interstellar.sevecom.com/assets/media/icons/Temple-Run-2.webp"},
+  {name:"Now.GG (Roblox)",url:"https://nowgg.me/apps/roblox-corporation/5349/roblox.html",tag:"sandbox",img:"https://interstellar.sevecom.com/assets/media/icons/LXZTNchn1kt8I2RizD92nri93i.webp"},
+  {name:"Masked IO",url:"https://unblocked-games.s3.amazonaws.com/games/masked-io/index.html",tag:"io",img:"https://interstellar.sevecom.com/assets/media/icons/Masked-IO.webp"},
+  {name:"Five Nights at Winston's",url:"https://g.deev.is/fnaw/",tag:"horror",img:"https://interstellar.sevecom.com/assets/media/icons/Five-Nights-At-Wintons.webp"},
+  {name:"Space Plan",url:"https://jhollands.co.uk/spaceplan/",tag:"idle",img:"https://interstellar.sevecom.com/assets/media/icons/Space-Plan.webp"},
 ];
 
 function buildGames(list){
@@ -524,8 +567,15 @@ async function launchProxy(){
 
 // Proxy sites to try in order - if one fails, next one is used
 function proxyGame(url){
-  // Games are self-hosted on this server - open directly, no proxy needed
-  window.open(url, '_blank');
+  if(swReady){
+    try{
+      var enc=__uv$config.encodeUrl(url);
+      window.open('/a/'+enc,'_blank');
+      return;
+    }catch(e){}
+  }
+  // fallback: open direct if proxy not ready
+  window.open(url,'_blank');
 }
 
 // Register service worker
