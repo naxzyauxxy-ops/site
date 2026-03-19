@@ -115,19 +115,50 @@ app.post('/api/flood/stop/:id', (req, res) => {
 app.get('/api/health', (req, res) => res.json({ ok: true, floods: activeFloods, uptime: process.uptime() | 0 }));
 
 // ── Auth / session API ─────────────────────────────────────
-const USERS = {
-  'naxzyauxxy': 'Gmoder23',
-  'admin':  'voidhub2024',
-};
-const OWNER    = 'naxzyauxxy'; // protected — cannot be modified by other admins
-const ADMINS   = new Set(['naxzyauxxy']);
-const NO_LIMIT = new Set(['naxzyauxxy']);
-const DISABLED = new Set(); // accounts blocked from logging in
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+
+const OWNER    = 'naxzyauxxy';
+const USERS_FILE = './users.json';
+
+// Load users from disk, fallback to defaults
+function loadUsers() {
+  try {
+    if (existsSync(USERS_FILE)) {
+      return JSON.parse(readFileSync(USERS_FILE, 'utf8'));
+    }
+  } catch(e) { console.error('Failed to load users.json:', e.message); }
+  // Defaults — only used on first ever boot
+  return {
+    users: { 'naxzyauxxy': 'Gmoder23' },
+    admins: ['naxzyauxxy'],
+    noLimit: ['naxzyauxxy'],
+    disabled: []
+  };
+}
+
+function saveUsers() {
+  try {
+    writeFileSync(USERS_FILE, JSON.stringify({
+      users: USERS,
+      admins: [...ADMINS],
+      noLimit: [...NO_LIMIT],
+      disabled: [...DISABLED]
+    }, null, 2));
+  } catch(e) { console.error('Failed to save users.json:', e.message); }
+}
+
+const data     = loadUsers();
+const USERS    = data.users;
+const ADMINS   = new Set(data.admins);
+const NO_LIMIT = new Set(data.noLimit);
+const DISABLED = new Set(data.disabled);
+
 const sessions    = new Map();
 const userSession = new Map();
 
 function makeToken() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+
 }
 
 app.post('/api/auth/login', (req, res) => {
@@ -192,6 +223,7 @@ app.post('/api/admin/users/create', requireAdmin, (req, res) => {
   if (!/^[a-z0-9_]{3,20}$/.test(u)) return res.json({ ok: false, error: '3-20 chars, letters/numbers/underscore only' });
   USERS[u] = password;
   if (noLimit) NO_LIMIT.add(u);
+  saveUsers();
   res.json({ ok: true });
 });
 
@@ -206,6 +238,9 @@ app.post('/api/admin/users/delete', requireAdmin, (req, res) => {
   userSession.delete(u);
   delete USERS[u];
   NO_LIMIT.delete(u);
+  ADMINS.delete(u);
+  DISABLED.delete(u);
+  saveUsers();
   res.json({ ok: true });
 });
 
@@ -217,6 +252,7 @@ app.post('/api/admin/users/password', requireAdmin, (req, res) => {
   USERS[u] = password;
   const tok = userSession.get(u);
   if (tok) { sessions.delete(tok); userSession.delete(u); }
+  saveUsers();
   res.json({ ok: true });
 });
 
@@ -234,7 +270,8 @@ app.post('/api/admin/users/promote', requireAdmin, (req, res) => {
   const u = (username || '').trim().toLowerCase();
   if (!USERS[u]) return res.json({ ok: false, error: 'user not found' });
   ADMINS.add(u);
-  NO_LIMIT.add(u); // admins always get no limit
+  NO_LIMIT.add(u);
+  saveUsers();
   res.json({ ok: true });
 });
 
@@ -244,6 +281,7 @@ app.post('/api/admin/users/demote', requireAdmin, (req, res) => {
   const u = (username || '').trim().toLowerCase();
   if (u === OWNER) return res.json({ ok: false, error: 'cannot demote the owner' });
   ADMINS.delete(u);
+  saveUsers();
   res.json({ ok: true });
 });
 
@@ -254,6 +292,7 @@ app.post('/api/admin/users/disable', requireAdmin, (req, res) => {
   if (ADMINS.has(u) && req.adminUser !== OWNER) return res.json({ ok: false, error: 'only the owner can modify admin accounts' });
   if (!USERS[u]) return res.json({ ok: false, error: 'user not found' });
   DISABLED.add(u);
+  saveUsers();
   // Kick their session immediately
   const tok = userSession.get(u);
   if (tok) { sessions.delete(tok); userSession.delete(u); }
@@ -264,6 +303,7 @@ app.post('/api/admin/users/enable', requireAdmin, (req, res) => {
   const { username } = req.body || {};
   const u = (username || '').trim().toLowerCase();
   DISABLED.delete(u);
+  saveUsers();
   res.json({ ok: true });
 });
 
