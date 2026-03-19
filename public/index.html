@@ -1049,6 +1049,8 @@ function hideLogin(isAdmin){
   if(isAdmin){
     var t=document.getElementById('admin-tab');
     if(t) t.style.display='';
+    // Pre-load users list as soon as admin logs in
+    setTimeout(adminLoadUsers, 800);
   }
   // Trigger VOID HUB animation after login
   if(typeof triggerLoader === 'function') triggerLoader();
@@ -1170,13 +1172,8 @@ async function adminAPI(path, body){
 async function adminLoadUsers(){
   var el = document.getElementById('a-user-list');
   if(!el) return;
-  // Wait for token if not ready yet
   var token = localStorage.getItem('vh_token');
-  if(!token){
-    el.innerHTML='<div style="color:#555;font-size:0.7rem">Waiting for session...</div>';
-    setTimeout(adminLoadUsers, 500);
-    return;
-  }
+  if(!token){ setTimeout(adminLoadUsers, 600); return; }
   el.innerHTML='<div style="color:#555;font-size:0.7rem">Loading...</div>';
   try {
     var d = await adminAPI('/api/admin/users');
