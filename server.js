@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createBareServer } from '@nebula-services/bare-server-node';
 import { spawn, execSync } from 'child_process';
-import { existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import zlib from 'zlib';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -115,7 +115,6 @@ app.post('/api/flood/stop/:id', (req, res) => {
 app.get('/api/health', (req, res) => res.json({ ok: true, floods: activeFloods, uptime: process.uptime() | 0 }));
 
 // ── Auth / session API ─────────────────────────────────────
-import { readFileSync, writeFileSync, existsSync } from 'fs';
 
 const OWNER    = 'naxzyauxxy';
 const USERS_FILE = './users.json';
