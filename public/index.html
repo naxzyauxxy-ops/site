@@ -1185,6 +1185,7 @@ function renderUserList(users){
     if(u.ipCount>1) badges += '<span style="font-size:0.55rem;background:#ff3c5a44;color:#ff3c5a;padding:2px 7px;border-radius:4px">⚠ '+u.ipCount+' IPs</span>';
     var ipLine = u.online ? '● online' : '○ offline';
     if(u.ips&&u.ips.length) ipLine += ' &nbsp;|&nbsp; IPs: '+u.ips.join(', ');
+    if(u.banInfo) ipLine += '<br><span style="color:#ff9800">⛔ Reason: '+u.banInfo.reason+' &nbsp;|&nbsp; Duration: '+u.banInfo.duration+'</span>';
     var nameStyle = u.disabled ? 'color:#555;text-decoration:line-through' : '';
     var btns = '';
     if(u.username!=='naxzyauxxy'){
@@ -1256,9 +1257,19 @@ async function adminDelete(username){
 }
 
 async function adminToggle(username, disable){
-  var d=await adminAPI('/api/admin/users/'+(disable?'disable':'enable'),{username});
-  if(d.ok) adminLoadUsers();
-  else alert('Error: '+d.error);
+  if(disable){
+    var reason = prompt('Reason for disabling ' + username + ':\n(e.g. Account sharing, Chargeback, ToS violation)', 'Account sharing');
+    if(reason === null) return; // cancelled
+    var duration = prompt('Ban duration:\n(e.g. Permanent, 7 days, 30 days)', 'Permanent');
+    if(duration === null) return; // cancelled
+    var d = await adminAPI('/api/admin/users/disable', {username, reason, duration});
+    if(d.ok) adminLoadUsers();
+    else alert('Error: ' + d.error);
+  } else {
+    var d = await adminAPI('/api/admin/users/enable', {username});
+    if(d.ok) adminLoadUsers();
+    else alert('Error: ' + d.error);
+  }
 }
 
 async function adminPromote(username){
