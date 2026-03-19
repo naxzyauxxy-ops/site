@@ -383,7 +383,7 @@ app.post('/api/admin/users/enable', requireAdmin, (req, res) => {
 });
 
 // ── Static files (includes pre-built UV assets in public/) ──
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d', etag: true }));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0, etag: false }));
 
 // ── Announcements ───────────────────────────────────────────
 let announcement = null; // { text, type }
