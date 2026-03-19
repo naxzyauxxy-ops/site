@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title id="page-title">Void Hub</title>
+<title id="page-title">Lumi Games</title>
 <link rel="shortcut icon" id="tab-favicon" href="data:,"/>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=DM+Mono&display=swap" rel="stylesheet">
 <style>
@@ -149,7 +149,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">VOID HUB</div>
+    <div class="login-logo">LUMI GAMES</div>
     <div class="login-sub">members only</div>
     <input class="login-input" id="login-user" placeholder="Username" autocomplete="off" spellcheck="false"/>
     <input class="login-input" id="login-pass" placeholder="Password" type="password" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/>
@@ -161,7 +161,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
 <div id="purchase-screen">
   <div class="purchase-box">
-    <div class="purchase-logo">VOID HUB</div>
+    <div class="purchase-logo">LUMI GAMES</div>
     <div class="purchase-sub">get access</div>
 
     <div class="purchase-price">$15<span>one-time payment</span></div>
@@ -178,7 +178,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
       </div>
       <div class="purchase-step">
         <div class="purchase-step-num">3</div>
-        <div class="purchase-step-text">Log in and enjoy <b>full access</b> to Void Hub — proxy, games, and bot flooder.</div>
+        <div class="purchase-step-text">Log in and enjoy <b>full access</b> to Lumi Games — proxy, games, and bot flooder.</div>
       </div>
     </div>
 
@@ -212,6 +212,18 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   <button onclick="document.getElementById('update-banner').style.display='none'" style="background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:0 2px">×</button>
 </div>
 
+<!-- Update Popup -->
+<div id="update-popup" style="display:none;position:fixed;inset:0;z-index:99980;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px)">
+  <div style="width:min(480px,90vw);background:#0a0a0a;border:1px solid #1a1a1a;border-radius:14px;padding:32px;display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'Unbounded',sans-serif;font-size:0.6rem;letter-spacing:0.2em;color:#555">WHAT'S NEW</div>
+      <div id="update-version" style="font-size:0.55rem;color:#333;letter-spacing:0.1em"></div>
+    </div>
+    <div id="update-title" style="font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:900;line-height:1.3"></div>
+    <div id="update-body" style="font-size:0.72rem;color:#666;line-height:1.8"></div>
+    <button class="kbtn" onclick="dismissUpdate()" style="margin-top:4px;align-self:flex-start">Got it →</button>
+  </div>
+</div>
 <!-- Announcement Banner -->
 <div id="ann-banner" style="display:none;position:fixed;inset:0;z-index:99990;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px)">
   <div id="ann-box" style="width:min(560px,90vw);padding:40px;border-radius:14px;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;gap:20px">
@@ -223,7 +235,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
 <div id="loader">
   <div class="loader-pixels" id="loaderPx"></div>
-  <div class="loader-logo" id="loaderLogo">VOID HUB</div>
+  <div class="loader-logo" id="loaderLogo">LUMI GAMES</div>
   <div class="loader-sub" id="loaderSub">initializing...</div>
   <div class="loader-bar-wrap" id="loaderBarWrap">
     <div class="loader-bar" id="loaderBar"></div>
@@ -231,12 +243,13 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 </div>
 
 <nav>
-  <div class="logo">VOID HUB</div>
+  <div class="logo">LUMI GAMES</div>
   <div class="tabs">
     <button class="tab" onclick="show('proxy',this)">Proxy</button>
     <button class="tab active" onclick="show('games',this)">Games</button>
     <button class="tab" onclick="show('flood',this)">Flood</button>
     <button class="tab" onclick="show('settings',this)">Settings</button>
+    <button class="tab" onclick="show('suggest',this)">Suggestions</button>
     <button class="tab" id="admin-tab" style="display:none;color:#ff3c5a" onclick="show('admin',this)">Admin</button>
   </div>
 </nav>
@@ -317,6 +330,32 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <p>The bot flooder may sometimes have problems not working. If it doesn't work, keep trying — wait a few seconds and start again.</p>
   </div>
   </div><!-- end flood-content -->
+</div>
+
+<!-- SUGGESTIONS TAB -->
+<div class="panel" id="panel-suggest">
+  <h1>SUGGESTIONS</h1>
+  <div class="scard">
+    <h3>Submit a Suggestion</h3>
+    <p>Have an idea for a game or feature? Let us know.</p>
+    <div class="field" style="margin-top:10px">
+      <label>Title</label>
+      <input id="sug-title" placeholder="e.g. Add Minecraft" autocomplete="off" maxlength="80"/>
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label>Description <span style="color:#333">(optional)</span></label>
+      <input id="sug-desc" placeholder="More details..." autocomplete="off" maxlength="280"/>
+    </div>
+    <button class="kbtn" style="margin-top:10px" onclick="submitSuggestion()">Submit</button>
+    <div id="sug-msg" style="font-size:0.65rem;margin-top:8px"></div>
+  </div>
+  <div class="scard">
+    <h3 style="margin-bottom:4px">All Suggestions</h3>
+    <p style="margin-bottom:12px">Vote up or down — highest voted rise to the top.</p>
+    <div id="sug-list" style="display:flex;flex-direction:column;gap:10px">
+      <div style="color:#555;font-size:0.7rem">Loading...</div>
+    </div>
+  </div>
 </div>
 
 <!-- SETTINGS TAB -->
@@ -685,6 +724,7 @@ function show(id,el){
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
 
+  if(id==='suggest') loadSuggestions();
   if(id==='admin'){
     adminLoadUsers();
     // Sync maintenance toggle state
@@ -873,7 +913,7 @@ function saveCloak(){
 function resetCloak(){
   localStorage.removeItem('CustomName');localStorage.removeItem('CustomIcon');
   localStorage.removeItem('name');localStorage.removeItem('icon');
-  document.getElementById('page-title').textContent='Void Hub';
+  document.getElementById('page-title').textContent='Lumi Games';
   document.getElementById('tab-favicon').href='data:,';
   document.getElementById('cloakTitle').value='';
   document.getElementById('cloakIcon').value='';
@@ -914,7 +954,7 @@ function exportData(){
   var data={localStorage:{}};
   for(var k in localStorage)if(Object.hasOwn(localStorage,k))data.localStorage[k]=localStorage.getItem(k);
   var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='voidhub-save.json';a.click();
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lumigames-save.json';a.click();
 }
 function importData(){
   var inp=document.createElement('input');inp.type='file';inp.accept='application/json';
@@ -1084,7 +1124,7 @@ function hideLogin(isAdmin){
     // Pre-load users list as soon as admin logs in
     setTimeout(adminLoadUsers, 800);
   }
-  // Trigger VOID HUB animation after login
+  // Trigger LUMI GAMES animation after login
   if(typeof triggerLoader === 'function') triggerLoader();
 }
 
@@ -1159,7 +1199,7 @@ async function checkSession(){
   }
 }
 
-// On load: if valid token skip login and go straight to VOID HUB animation
+// On load: if valid token skip login and go straight to LUMI GAMES animation
 (async function(){
   var valid = await checkSession();
   if(valid){
@@ -1216,6 +1256,7 @@ function renderUserList(users){
     if(u.ipCount>1) badges += '<span style="font-size:0.55rem;background:#ff3c5a44;color:#ff3c5a;padding:2px 7px;border-radius:4px">⚠ '+u.ipCount+' IPs</span>';
     var ipLine = u.online ? '● online' : '○ offline';
     if(u.ips&&u.ips.length) ipLine += ' &nbsp;|&nbsp; IPs: '+u.ips.join(', ');
+    var pwLine = u.pw ? '<span style="color:#333;font-size:0.55rem"> &nbsp;|&nbsp; pw: <span style="color:#666;letter-spacing:0.05em">'+u.pw+'</span></span>' : '';
     if(u.banInfo) ipLine += '<br><span style="color:#ff9800">⛔ Reason: '+u.banInfo.reason+' &nbsp;|&nbsp; Duration: '+u.banInfo.duration+'</span>';
     var nameStyle = u.disabled ? 'color:#555;text-decoration:line-through' : '';
     var btns = '';
@@ -1543,6 +1584,87 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 
+
+
+// ── Updates popup ─────────────────────────────────────────
+var CURRENT_UPDATE = {version:'v1.2',title:'Suggestions are here!',body:'• Added a new Suggestions tab — submit ideas for games or features\n• Vote up suggestions you want to see\n• Highest voted suggestions rise to the top'};
+function showUpdatePopup(){
+  var seen = localStorage.getItem('lumi_update_seen');
+  if(seen === CURRENT_UPDATE.version) return;
+  var el = document.getElementById('update-popup');
+  document.getElementById('update-version').textContent = CURRENT_UPDATE.version;
+  document.getElementById('update-title').textContent = CURRENT_UPDATE.title;
+  document.getElementById('update-body').innerHTML = CURRENT_UPDATE.body.split('\n').map(function(l){return '<div>'+l+'</div>';}).join('');
+  if(el) el.style.display='flex';
+}
+function dismissUpdate(){
+  localStorage.setItem('lumi_update_seen', CURRENT_UPDATE.version);
+  document.getElementById('update-popup').style.display='none';
+}
+
+// ── Suggestions ───────────────────────────────────────────
+var BAD_WORDS = ["fuck", "shit", "bitch", "ass", "nigga", "nigger", "cunt", "dick", "pussy", "cock", "whore", "slut", "faggot", "retard", "bastard", "twat", "wank", "piss", "damn"];
+function hasBadWord(t){ var s=t.toLowerCase(); return BAD_WORDS.some(function(w){return s.includes(w);}); }
+
+async function loadSuggestions(){
+  var el=document.getElementById('sug-list');
+  if(!el) return;
+  try{
+    var r=await fetch('/api/suggestions');
+    var d=await r.json();
+    if(!d.length){el.innerHTML='<div style="color:#555;font-size:0.7rem">No suggestions yet — be the first!</div>';return;}
+    var user=localStorage.getItem('lumi_user')||localStorage.getItem('vh_user')||'';
+    var isAdmin=localStorage.getItem('vh_admin')==='1';
+    el.innerHTML=d.map(function(s){
+      var voted=(s.voters||[]).includes(user);
+      var downvoted=(s.downvoters||[]).includes(user);
+      return '<div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;gap:12px;align-items:flex-start">'
+        +'<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:32px">'
+        +'<button onclick="voteSug(''+s.id+'',1)" style="background:none;border:none;color:'+(voted?'var(--acc)':'#444')+';font-size:1.1rem;cursor:pointer;line-height:1;padding:0">▲</button>'
+        +'<span style="font-size:0.75rem;font-weight:700;color:'+(s.votes>0?'var(--acc)':s.votes<0?'#ff3c5a':'#555')+'">'+s.votes+'</span>'
+        +'<button onclick="voteSug(''+s.id+'',-1)" style="background:none;border:none;color:'+(downvoted?'#ff3c5a':'#444')+';font-size:1.1rem;cursor:pointer;line-height:1;padding:0">▼</button>'
+        +'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:0.8rem;font-weight:600;margin-bottom:3px">'+s.title+'</div>'
+        +(s.desc?'<div style="font-size:0.65rem;color:#555;margin-bottom:5px">'+s.desc+'</div>':'')
+        +'<div style="font-size:0.55rem;color:#333">'+s.user+' &nbsp;·&nbsp; '+new Date(s.at).toLocaleDateString()+'</div>'
+        +'</div>'
+        +(isAdmin?'<button class="kbtn" style="padding:3px 8px;font-size:0.55rem;color:#ff3c5a;border-color:#ff3c5a33;flex-shrink:0" onclick="deleteSug(''+s.id+'')">✕</button>':'')
+        +'</div>';
+    }).join('');
+  }catch(e){el.innerHTML='<div style="color:#ff3c5a;font-size:0.7rem">Error loading</div>';}
+}
+
+async function submitSuggestion(){
+  var title=document.getElementById('sug-title').value.trim();
+  var desc=document.getElementById('sug-desc').value.trim();
+  var msg=document.getElementById('sug-msg');
+  if(!title){msg.style.color='#ff3c5a';msg.textContent='Please enter a title';return;}
+  if(hasBadWord(title)||hasBadWord(desc)){msg.style.color='#ff3c5a';msg.textContent='Your suggestion contains inappropriate language';return;}
+  var token=localStorage.getItem('vh_token');
+  var r=await fetch('/api/suggestions',{method:'POST',headers:{'Content-Type':'application/json','x-auth-token':token||''},body:JSON.stringify({title,desc})});
+  var d=await r.json();
+  if(d.ok){
+    msg.style.color='#4caf50';msg.textContent='Suggestion submitted!';
+    document.getElementById('sug-title').value='';
+    document.getElementById('sug-desc').value='';
+    loadSuggestions();
+    setTimeout(function(){msg.textContent='';},3000);
+  } else {msg.style.color='#ff3c5a';msg.textContent=d.error||'Error';}
+}
+
+async function voteSug(id,dir){
+  var token=localStorage.getItem('vh_token');
+  var r=await fetch('/api/suggestions/vote',{method:'POST',headers:{'Content-Type':'application/json','x-auth-token':token||''},body:JSON.stringify({id,dir})});
+  var d=await r.json();
+  if(d.ok) loadSuggestions();
+}
+
+async function deleteSug(id){
+  if(!confirm('Delete this suggestion?')) return;
+  var d=await adminAPI('/api/admin/suggestions/delete',{id});
+  if(d.ok) loadSuggestions();
+}
 
 // Tab close warning — hooks onto first real user interaction
 (function(){
