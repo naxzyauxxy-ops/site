@@ -452,6 +452,27 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <div id="a-rp-msg" style="font-size:0.65rem;margin-top:8px;color:#4caf50"></div>
   </div>
 
+  <!-- Maintenance Mode -->
+  <div class="scard" id="maintenance-card" style="border-color:#ff980044">
+    <h3 style="color:#ff9800">Maintenance Mode</h3>
+    <p>Kicks all users to a maintenance page. They auto-redirect back when you turn it off.</p>
+    <div style="display:flex;align-items:center;gap:14px;margin-top:12px">
+      <label class="toggle"><input type="checkbox" id="maintenance-toggle" onchange="toggleMaintenance(this.checked)"><span class="slider"></span></label>
+      <span id="maintenance-status" style="font-size:0.7rem;color:#555">Off</span>
+    </div>
+  </div>
+
+  <!-- Maintenance Mode -->
+  <div class="scard" id="maintenance-card">
+    <h3>Maintenance Mode</h3>
+    <p>Kicks everyone off the site and shows a maintenance page. You and admins can still access the site.</p>
+    <div style="display:flex;align-items:center;gap:14px;margin-top:12px;flex-wrap:wrap">
+      <div id="maintenance-status" style="font-size:0.7rem;color:#555">Status: checking...</div>
+      <button id="maintenance-on-btn" class="kbtn" style="color:#ff3c5a;border-color:#ff3c5a44" onclick="setMaintenance(true)">🔧 Enable Maintenance</button>
+      <button id="maintenance-off-btn" class="kbtn" style="color:#4caf50;border-color:#4caf5044;display:none" onclick="setMaintenance(false)">✓ Disable Maintenance</button>
+    </div>
+  </div>
+
   <!-- Announcements -->
   <div class="scard">
     <h3>Announcements</h3>
@@ -663,7 +684,16 @@ function show(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
-  if(id==='admin'){ adminLoadUsers(); }
+  if(id==='admin'){
+    adminLoadUsers();
+    // Sync maintenance toggle state
+    fetch('/api/maintenance').then(function(r){return r.json();}).then(function(d){
+      var tog = document.getElementById('maintenance-toggle');
+      var st  = document.getElementById('maintenance-status');
+      if(tog) tog.checked = !!d.maintenance;
+      if(st){ st.textContent = d.maintenance ? '🔧 ON — users are being redirected' : 'Off'; st.style.color = d.maintenance ? '#ff9800' : '#555'; }
+    });
+  }
   if(id==='flood'){
     var isAdmin = localStorage.getItem('vh_admin')==='1';
     var maintenance = document.getElementById('flood-maintenance');
@@ -1307,6 +1337,29 @@ async function adminResetPass(){
   }
 }
 
+// ── Maintenance Mode ───────────────────────────────────────
+async function toggleMaintenance(on){
+  var status = document.getElementById('maintenance-status');
+  var d = await adminAPI('/api/admin/maintenance', {enabled: on});
+  if(d.ok){
+    status.textContent = on ? '🔧 ON — users are being redirected' : 'Off';
+    status.style.color = on ? '#ff9800' : '#555';
+  } else {
+    alert('Error: ' + d.error);
+    document.getElementById('maintenance-toggle').checked = !on;
+  }
+}
+
+// Poll for maintenance mode — redirect non-admins to /maintenance
+(function pollMaintenance(){
+  if(localStorage.getItem('vh_admin')==='1'){ setTimeout(pollMaintenance, 10000); return; }
+  fetch('/api/maintenance').then(function(r){ return r.json(); }).then(function(d){
+    if(d.maintenance) window.location.href = '/maintenance';
+    else setTimeout(pollMaintenance, 5000);
+  }).catch(function(){ setTimeout(pollMaintenance, 8000); });
+  setTimeout(pollMaintenance, 5000);
+})();
+
 // ── Announcements ─────────────────────────────────────────
 var ANN_COLORS = {
   info:    {bg:'#0d1b2a',border:'#1565c044',text:'#64b5f6'},
@@ -1362,6 +1415,41 @@ function showAnnouncementBanner(text, type){
 function dismissAnnouncement(){
   document.getElementById('ann-banner').style.display='none';
 }
+
+// ── Maintenance Mode ──────────────────────────────────────
+async function setMaintenance(enabled){
+  var d = await adminAPI('/api/admin/maintenance', {enabled});
+  if(d.ok) updateMaintenanceUI(d.maintenance);
+  else alert('Error: ' + d.error);
+}
+
+function updateMaintenanceUI(on){
+  var status = document.getElementById('maintenance-status');
+  var onBtn  = document.getElementById('maintenance-on-btn');
+  var offBtn = document.getElementById('maintenance-off-btn');
+  var card   = document.getElementById('maintenance-card');
+  if(status) status.textContent = on ? '🔴 Status: MAINTENANCE ON' : '🟢 Status: Off';
+  if(status) status.style.color = on ? '#ff3c5a' : '#4caf50';
+  if(onBtn)  onBtn.style.display  = on ? 'none' : '';
+  if(offBtn) offBtn.style.display = on ? '' : 'none';
+  if(card)   card.style.borderColor = on ? '#ff3c5a44' : '';
+}
+
+async function checkMaintenance(){
+  try {
+    var r = await fetch('/api/maintenance');
+    var d = await r.json();
+    updateMaintenanceUI(d.maintenance);
+    // If maintenance is on and user is NOT admin, redirect
+    if(d.maintenance && localStorage.getItem('vh_admin') !== '1'){
+      window.location.href = '/maintenance';
+    }
+  } catch(e){}
+}
+
+// Check maintenance on load and every 30s
+checkMaintenance();
+setInterval(checkMaintenance, 30000);
 
 // Check for active announcement on load
 async function loadAnnouncement(){
