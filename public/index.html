@@ -1357,29 +1357,29 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 });
 
-// Force Chrome to show "Leave site?" warning on tab close
-// Chrome requires a user gesture - we simulate one via a hidden interaction trick
-window.addEventListener('beforeunload', function(e){
-  e.preventDefault();
-  e.returnValue = 'Changes you made may not be saved.';
-  return 'Changes you made may not be saved.';
-});
-
-// Trigger the user gesture requirement by dispatching a synthetic event on first load
+// Tab close warning — hooks onto first real user interaction
 (function(){
-  function armUnloadWarning(){
-    // Simulate a user gesture so Chrome registers the beforeunload handler
-    document.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true}));
-    document.removeEventListener('DOMContentLoaded', armUnloadWarning);
+  var armed = false;
+  function arm(){
+    if(armed) return;
+    armed = true;
+    window.onbeforeunload = function(e){
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    };
   }
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', armUnloadWarning);
-  } else {
-    armUnloadWarning();
-  }
-  // Also re-arm on any real click/key just to be safe
-  document.addEventListener('click', function(){}, {once:true, capture:true});
-  document.addEventListener('keydown', function(){}, {once:true, capture:true});
+  // Arm on any real interaction
+  ['click','keydown','mousedown','touchstart','scroll','input'].forEach(function(ev){
+    document.addEventListener(ev, arm, {capture:true, passive:true});
+  });
+  // Also arm after login completes (guaranteed real interaction)
+  document.addEventListener('DOMContentLoaded', function(){
+    var loginBtn = document.getElementById('login-btn');
+    if(loginBtn) loginBtn.addEventListener('click', arm);
+    // Arm after a short delay as fallback — by then user has interacted with login
+    setTimeout(arm, 3000);
+  });
 })();
 </script>
 </body>
