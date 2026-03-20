@@ -1953,6 +1953,34 @@ function connectSharingWS() {
           window.onbeforeunload = null;
           location.reload();
         }
+        if (msg.type === 'online_list') {
+          // Update _allUsers online status from server
+          if (msg.users && _allUsers) {
+            _allUsers.forEach(function(u) {
+              u.online = !!(msg.users[u.username]);
+              _userMap[u.username] = u;
+            });
+            var q = (document.getElementById('a-search')||{}).value||'';
+            filterUserList(q);
+          }
+        }
+        if (msg.type === 'user_online') {
+          var u2 = _userMap[msg.username];
+          if (u2) { u2.online = true; u2.tabs = msg.tabs; _userMap[msg.username] = u2; }
+          // Re-render if admin panel is open
+          if (document.getElementById('panel-admin') && document.getElementById('panel-admin').classList.contains('active')) {
+            var q2 = (document.getElementById('a-search')||{}).value||'';
+            filterUserList(q2);
+          }
+        }
+        if (msg.type === 'user_offline') {
+          var u3 = _userMap[msg.username];
+          if (u3) { u3.online = false; _userMap[msg.username] = u3; }
+          if (document.getElementById('panel-admin') && document.getElementById('panel-admin').classList.contains('active')) {
+            var q3 = (document.getElementById('a-search')||{}).value||'';
+            filterUserList(q3);
+          }
+        }
         if (msg.type === 'sharing_alert') {
           // Only shown to owner
           _lsSharingUser = msg.username;
