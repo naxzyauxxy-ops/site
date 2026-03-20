@@ -1,5 +1,5 @@
 const GAMES = [
-  {name:"Five Nights at Epstein's",url:"https://monkeygg2.github.io/games/five-nights-at-epsteins/",tag:"horror",img:"https://cdn.jsdelivr.net/gh/UseInterstellar/Interstellar-Astro@main/public/assets/media/icons/FiveNightsatFreddys.webp"},
+  {name:"Five Nights at Epstein's",url:"https://monkeygg2.github.io/games/five-nights-at-epsteins/",tag:"horror",img:"/assets/fnae.webp"},
   {name:"Shell Shockers",url:"https://shellshock.io/",tag:"shooter",img:"https://cdn.jsdelivr.net/gh/UseInterstellar/Interstellar-Astro@main/public/assets/media/icons/Shell-Shockers.webp"},
   {name:"1v1.LOL",url:"https://1v1.lol",tag:"shooter",img:"https://cdn.jsdelivr.net/gh/UseInterstellar/Interstellar-Astro@main/public/assets/media/icons/UQFryp4dnh1hfWhqpSboSrlumGoxQVhjZmG.webp"},
   {name:"Krunker.io",url:"https://krunker.io",tag:"shooter",img:"https://cdn.jsdelivr.net/gh/UseInterstellar/Interstellar-Astro@main/public/assets/media/icons/Krunker-IO.webp"},
