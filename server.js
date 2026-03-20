@@ -659,16 +659,21 @@ const server = http.createServer((req, res) => {
   if (bareServer.shouldRoute(req)) return bareServer.routeRequest(req, res);
   app(req, res);
 });
-server.on('upgrade', (req, socket, head) => {
-  if (bareServer.shouldRoute(req)) bareServer.routeUpgrade(req, socket, head);
-  else socket.destroy();
-});
-server.keepAliveTimeout = 65000;
-server.maxConnections = 2000;
 
 // ── WebSocket server for tab detection ─────────────────────────────────────
 const wss = new WebSocketServer({ server });
 
+server.on('upgrade', (req, socket, head) => {
+  if (req.url === '/ws') {
+    wss.handleUpgrade(req, socket, head, (ws) => wss.emit('connection', ws, req));
+  } else if (bareServer.shouldRoute(req)) {
+    bareServer.routeUpgrade(req, socket, head);
+  } else {
+    socket.destroy();
+  }
+});
+server.keepAliveTimeout = 65000;
+server.maxConnections = 2000;
 wss.on('connection', (ws, req) => {
   const wsId = ++wsIdCounter;
   wsClients.set(wsId, { ws, username: null });
@@ -727,5 +732,15 @@ wss.on('connection', (ws, req) => {
     wsClients.delete(wsId);
   });
 });
+
+
+// Periodic sharing check every 30s
+setInterval(() => {
+  for (const [username, tabs] of tabSessions.entries()) {
+    if (tabs.size > 1) {
+      checkTabSharing(username);
+    }
+  }
+}, 30000);
 
 server.listen(PORT, () => console.log('Blooket Hub listening on ' + PORT + ' | max floods: ' + MAX));
