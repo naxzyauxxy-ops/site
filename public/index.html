@@ -241,6 +241,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="tab" onclick="show('suggest',this)">Suggestions</button>
     <button class="tab" onclick="show('bugs',this)">Bugs</button>
     <button class="tab" onclick="show('settings',this)">Settings</button>
+    <button class="tab" onclick="show('mirrors',this)">Mirrors</button>
     <button class="tab" id="admin-tab" style="display:none;color:#ff3c5a" onclick="show('admin',this)">Admin</button>
   </div>
 </nav>
@@ -383,6 +384,140 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <p style="margin-bottom:12px">Vote up bugs you've also experienced — most reported rise to the top.</p>
     <div id="bug-list" style="display:flex;flex-direction:column;gap:10px">
       <div style="color:#555;font-size:0.7rem">Loading...</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MIRRORS TAB -->
+<div class="panel" id="panel-mirrors">
+  <h1>MIRRORS</h1>
+  <div class="scard">
+    <h3>Alternative Access</h3>
+    <p>If the main site gets blocked, use any of these mirror links to access Lumi Games. They all work the same way.</p>
+  </div>
+  <div class="scard">
+    <h3 style="margin-bottom:12px">Mirror Links</h3>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <a href="https://canvas.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Canvas</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">canvas.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://canvaslms.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Canvas LMS</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">canvaslms.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://canvasassignment.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Canvas Assignment</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">canvasassignment.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://performancematters.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Performance Matters</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">performancematters.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://performancematterstesting.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Performance Matters Testing</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">performancematterstesting.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://mathspace.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Mathspace</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">mathspace.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://desmossciencecalculator.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Desmos Science Calculator</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">desmossciencecalculator.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://powerschool.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">PowerSchool</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">powerschool.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://brainpop.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">BrainPop</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">brainpop.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://literacy.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Literacy</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">literacy.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://codeorg.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Code.org</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">codeorg.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://destinydiscover.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Destiny Discover</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">destinydiscover.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://discoveryeducation.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Discovery Education</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">discoveryeducation.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://kahoot.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Kahoot</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">kahoot.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://newsela.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Newsela</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">newsela.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://adobeexpress.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Adobe Express</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">adobeexpress.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
+      <a href="https://googledrive.naxzyauxxy.workers.dev/" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:border-color .15s" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div>
+          <div style="font-size:0.78rem;font-weight:600;margin-bottom:2px">Google Drive</div>
+          <div style="font-size:0.55rem;color:#555;font-family:monospace">googledrive.naxzyauxxy.workers.dev/</div>
+        </div>
+        <span style="color:#555;font-size:0.8rem">&#8599;</span>
+      </a>
     </div>
   </div>
 </div>
