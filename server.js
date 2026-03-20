@@ -122,18 +122,56 @@ const OWNER    = 'naxzyauxxy';
 const USERS_FILE = './users.json';
 
 // Load users from disk, fallback to defaults
+// GitHub backup config
+const GH_TOKEN = process.env.GH_TOKEN || '';
+const GH_REPO  = process.env.GH_REPO  || 'naxzyauxxy-ops/site';
+const GH_FILE  = 'users-data.json';
+
+async function saveUsersToGitHub(data) {
+  if (!GH_TOKEN) return;
+  try {
+    const content = Buffer.from(JSON.stringify(data, null, 2)).toString('base64');
+    // Get current SHA
+    const getRes = await fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE, {
+      headers: { 'Authorization': 'token ' + GH_TOKEN, 'User-Agent': 'lumi-games' }
+    });
+    const getSha = getRes.ok ? (await getRes.json()).sha : undefined;
+    await fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE, {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + GH_TOKEN, 'Content-Type': 'application/json', 'User-Agent': 'lumi-games' },
+      body: JSON.stringify({ message: 'sync users', content, ...(getSha ? { sha: getSha } : {}) })
+    });
+    console.log('[users] Synced to GitHub');
+  } catch(e) { console.error('[users] GitHub sync failed:', e.message); }
+}
+
+async function loadUsersFromGitHub() {
+  if (!GH_TOKEN) return null;
+  try {
+    const res = await fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE, {
+      headers: { 'Authorization': 'token ' + GH_TOKEN, 'User-Agent': 'lumi-games' }
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const data = JSON.parse(Buffer.from(json.content, 'base64').toString('utf8'));
+    console.log('[users] Loaded from GitHub:', Object.keys(data.users || {}).length, 'accounts');
+    return data;
+  } catch(e) { console.error('[users] GitHub load failed:', e.message); return null; }
+}
+
 function loadUsers() {
   try {
     if (existsSync(USERS_FILE)) {
-      return JSON.parse(readFileSync(USERS_FILE, 'utf8'));
+      const data = JSON.parse(readFileSync(USERS_FILE, 'utf8'));
+      console.log('[users] Loaded from disk:', Object.keys(data.users || {}).length, 'accounts');
+      return data;
     }
   } catch(e) { console.error('Failed to load users.json:', e.message); }
-  // Defaults — only used on first ever boot
   return {
-    users: { 'naxzyauxxy': 'Gmoder23' }, // only owner by default
+    users: { 'naxzyauxxy': 'Gmoder23' },
     admins: ['naxzyauxxy'],
     noLimit: ['naxzyauxxy'],
-    disabled: []
+    disabled: {}
   };
 }
 
@@ -141,16 +179,30 @@ function saveUsers() {
   try {
     const disabledObj = {};
     for (const [k,v] of DISABLED.entries()) disabledObj[k] = v;
-    writeFileSync(USERS_FILE, JSON.stringify({
+    const data = {
       users: USERS,
       admins: [...ADMINS],
       noLimit: [...NO_LIMIT],
       disabled: disabledObj
-    }, null, 2));
+    };
+    writeFileSync(USERS_FILE, JSON.stringify(data, null, 2));
+    // Also sync to GitHub so it survives redeploys
+    saveUsersToGitHub(data);
   } catch(e) { console.error('Failed to save users.json:', e.message); }
 }
 
-const data     = loadUsers();
+// Try loading from GitHub if disk is empty (after a redeploy)
+let _startupData = loadUsers();
+if (Object.keys(_startupData.users).length <= 1 && GH_TOKEN) {
+  // Disk was wiped - fetch from GitHub backup
+  const ghData = await loadUsersFromGitHub();
+  if (ghData && Object.keys(ghData.users || {}).length > 0) {
+    _startupData = ghData;
+    // Write back to disk
+    try { writeFileSync(USERS_FILE, JSON.stringify(_startupData, null, 2)); } catch(e) {}
+  }
+}
+const data = _startupData;
 const USERS    = data.users;
 const ADMINS   = new Set(data.admins);
 const NO_LIMIT = new Set(data.noLimit);
