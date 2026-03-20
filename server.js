@@ -218,9 +218,13 @@ let wsIdCounter = 0;
 // Owner ws connection for receiving alerts
 let ownerWs = null;
 
+const pendingAlerts = [];
 function sendOwnerAlert(msg) {
   if (ownerWs && ownerWs.readyState === 1) {
     ownerWs.send(JSON.stringify(msg));
+  } else {
+    // Queue it — send when owner connects
+    pendingAlerts.push(msg);
   }
 }
 
@@ -693,10 +697,24 @@ wss.on('connection', (ws, req) => {
         if (!tabSessions.has(username)) tabSessions.set(username, new Set());
         tabSessions.get(username).add(wsId);
         // Save owner ws for alerts
-        if (username === OWNER) ownerWs = ws;
+        if (username === OWNER) {
+          ownerWs = ws;
+          // Flush queued alerts
+          while (pendingAlerts.length) ownerWs.send(JSON.stringify(pendingAlerts.shift()));
+          // Send current online users list
+          const onlineList = {};
+          for (const [u, tabs] of tabSessions.entries()) {
+            onlineList[u] = tabs.size;
+          }
+          ws.send(JSON.stringify({ type: 'online_list', users: onlineList }));
+        }
         ws.send(JSON.stringify({ type: 'auth_ok' }));
         // Check for sharing
         checkTabSharing(username);
+        // Notify owner of online status change
+        if (username !== OWNER && ownerWs && ownerWs.readyState === 1) {
+          ownerWs.send(JSON.stringify({ type: 'user_online', username, tabs: tabSessions.get(username)?.size || 1 }));
+        }
       }
       if (msg.type === 'disable_user') {
         // Owner can disable from alert popup
@@ -722,10 +740,19 @@ wss.on('connection', (ws, req) => {
   ws.on('close', () => {
     const client = wsClients.get(wsId);
     if (client && client.username) {
-      const tabs = tabSessions.get(client.username);
+      const u = client.username;
+      const tabs = tabSessions.get(u);
       if (tabs) {
         tabs.delete(wsId);
-        if (tabs.size === 0) tabSessions.delete(client.username);
+        if (tabs.size === 0) {
+          tabSessions.delete(u);
+          // Notify owner user went offline
+          if (ownerWs && ownerWs.readyState === 1 && u !== OWNER) {
+            ownerWs.send(JSON.stringify({ type: 'user_offline', username: u }));
+          }
+        } else if (ownerWs && ownerWs.readyState === 1 && u !== OWNER) {
+          ownerWs.send(JSON.stringify({ type: 'user_online', username: u, tabs: tabs.size }));
+        }
       }
       if (ownerWs === ws) ownerWs = null;
     }
