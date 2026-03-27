@@ -30,14 +30,25 @@ async function getIntent(roomId, botName) {
 }
 
 async function joinRoom(serverUrl, roomId, sessionId) {
-  // Colyseus join via HTTP then upgrade to WS
   const joinUrl = `${serverUrl}/matchmake/joinById/${roomId}`;
+
   const res = await fetch(joinUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0' },
-    body: JSON.stringify({ sessionId })
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0"
+    },
+    body: JSON.stringify({
+      sessionId: sessionId,
+      roomId: roomId
+    })
   });
-  if (!res.ok) throw new Error(`join HTTP ${res.status}`);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`join HTTP ${res.status} ${text}`);
+  }
+
   return res.json();
 }
 
