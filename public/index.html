@@ -772,11 +772,10 @@ function show(id,el){
     });
   }
   if(id==='flood'){
-    var isAdmin = localStorage.getItem('vh_admin')==='1';
-    var maintenance = document.getElementById('flood-maintenance');
-    var content = document.getElementById('flood-content');
-    if(maintenance) maintenance.style.display = isAdmin ? 'none' : 'flex';
-    if(content) content.style.display = isAdmin ? '' : 'none';
+    // Always show picker when switching to flood tab, hide flooder
+    document.getElementById('flood-maintenance').style.display='none';
+    document.getElementById('flood-picker').style.display='';
+    document.getElementById('flood-content').style.display='none';
   }
 }
 
