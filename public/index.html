@@ -294,10 +294,18 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   <!-- Actual flooder — shown to admins only -->
   <div id="flood-content">
   <div class="card">
-    <div class="mrow">
+    <!-- Game selector -->
+    <div class="mrow" style="margin-bottom:8px">
+      <div class="mb active" onclick="setGame('blooket',this)">Blooket</div>
+      <div class="mb" onclick="setGame('gimkit',this)">Gimkit</div>
+    </div>
+
+    <!-- Blooket mode selector (only shown for blooket) -->
+    <div id="blooket-modes" class="mrow">
       <div class="mb active" onclick="setMode('beta',this)">New Modes</div>
       <div class="mb" onclick="setMode('legacy',this)">Classic</div>
     </div>
+
     <div class="g2">
       <div class="field"><label>Game Code</label><input id="gameCode" placeholder="123456" maxlength="8"/></div>
       <div class="field"><label>Bot Count (max 30)</label><input type="number" id="botCount" value="10" min="1" max="30"/></div>
@@ -320,7 +328,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   </div>
   <div class="scard" style="border-color:#ff3c5a44">
     <h3 style="color:#ff3c5a">Caution</h3>
-    <p>The bot flooder may sometimes have problems not working. If it doesn't work, keep trying — wait a few seconds and start again.</p>
+    <p>Bot flooders may sometimes not work. If it doesn't work, wait a few seconds and try again.</p>
   </div>
   </div><!-- end flood-content -->
 </div>
@@ -822,7 +830,16 @@ function proxyGame(url){
 
 // ── Flood ─────────────────────────────────────────────────────────────────
 var mode='beta',floodId=null,pollTimer=null,lastLog=0;
-function setMode(m,el){mode=m;document.querySelectorAll('.mb').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+var currentGame='blooket';
+function setGame(g,el){
+  currentGame=g;
+  document.querySelectorAll('.mrow:first-child .mb').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  var bm=document.getElementById('blooket-modes');
+  if(bm) bm.style.display=g==='blooket'?'':'none';
+  document.getElementById('logBox').innerHTML='<span class="ll linf">// ready - '+g+'</span>';
+}
+function setMode(m,el){mode=m;document.querySelectorAll('#blooket-modes .mb').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
 function setN(n){document.getElementById('botName').value=n;}
 function addLog(msg,cls){var b=document.getElementById('logBox');var s=document.createElement('span');s.className='ll'+(cls?' '+cls:'');s.textContent=msg;b.appendChild(s);if(b.children.length>200)b.removeChild(b.firstChild);b.scrollTop=b.scrollHeight;}
 function stats(j,f,e){document.getElementById('sJ').textContent=j;document.getElementById('sF').textContent=f;document.getElementById('sE').textContent=e!=null?e+'s':'-';}
@@ -845,7 +862,7 @@ async function toggleFlood(){
   btn.className='btn br';btn.innerHTML='&#9632; Stop';btn.disabled=false;
   addLog('Starting...','linf');lastLog=0;stats(0,0,0);
   try{
-    const r=await fetch('/api/flood/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gameCode:gc,name:nb,amount:cnt,mode})}).then(r=>r.json());
+    const r=await fetch('/api/flood/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gameCode:gc,name:nb,amount:cnt,mode,game:currentGame})}).then(r=>r.json());
     if(!r.ok){addLog('Error: '+(r.error||'failed'),'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';return;}
     floodId=r.id;pollTimer=setInterval(poll,800);
   }catch(e){addLog('Error: '+e.message,'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';}
