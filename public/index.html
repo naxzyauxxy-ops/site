@@ -282,24 +282,40 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
 <!-- FLOOD TAB -->
 <div class="panel" id="panel-flood">
-  <h1>BLOOKET<br><span>BOT FLOODER</span></h1>
+  <h1>BOT<br><span>FLOODER</span></h1>
 
-  <!-- Maintenance overlay — shown to non-admins -->
+  <!-- Maintenance overlay -->
   <div id="flood-maintenance" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px">
     <div style="font-size:2rem">🔧</div>
     <div style="font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:900;letter-spacing:0.05em">UNDER MAINTENANCE</div>
     <div style="font-size:0.7rem;color:#555;max-width:280px;line-height:1.6">The bot flooder is temporarily unavailable. Check back later.</div>
   </div>
 
-  <!-- Actual flooder — shown to admins only -->
-  <div id="flood-content">
-  <div class="card">
-    <!-- Game selector -->
-    <div class="mrow" style="margin-bottom:8px">
-      <div class="mb active" onclick="setGame('blooket',this)">Blooket</div>
-      <div class="mb" onclick="setGame('gimkit',this)">Gimkit</div>
+  <!-- Game picker screen -->
+  <div id="flood-picker">
+    <p style="font-size:0.65rem;color:#555;margin-bottom:20px">Choose a game to flood</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px">
+      <div onclick="selectFloodGame('blooket')" style="cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px 16px;text-align:center;transition:border-color .15s" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:2rem;margin-bottom:8px">🟦</div>
+        <div style="font-family:'Unbounded',sans-serif;font-size:0.75rem;font-weight:900">BLOOKET</div>
+        <div style="font-size:0.55rem;color:#555;margin-top:4px">Bot Flooder</div>
+      </div>
+      <div onclick="selectFloodGame('gimkit')" style="cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px 16px;text-align:center;transition:border-color .15s" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:2rem;margin-bottom:8px">🟩</div>
+        <div style="font-family:'Unbounded',sans-serif;font-size:0.75rem;font-weight:900">GIMKIT</div>
+        <div style="font-size:0.55rem;color:#555;margin-top:4px">Bot Flooder</div>
+      </div>
     </div>
+  </div>
 
+  <!-- Actual flooder -->
+  <div id="flood-content" style="display:none">
+  <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px">
+    <button onclick="backToFloodPicker()" style="background:none;border:none;color:#555;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em">← back</button>
+    <span id="flood-game-label" style="font-family:'Unbounded',sans-serif;font-size:0.7rem;font-weight:900;color:#fff"></span>
+    <span style="font-size:0.55rem;color:#444">BOT FLOODER</span>
+  </div>
+  <div class="card">
     <!-- Blooket mode selector (only shown for blooket) -->
     <div id="blooket-modes" class="mrow">
       <div class="mb active" onclick="setMode('beta',this)">New Modes</div>
@@ -831,14 +847,25 @@ function proxyGame(url){
 // ── Flood ─────────────────────────────────────────────────────────────────
 var mode='beta',floodId=null,pollTimer=null,lastLog=0;
 var currentGame='blooket';
-function setGame(g,el){
+function selectFloodGame(g){
   currentGame=g;
-  document.querySelectorAll('.mrow:first-child .mb').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
+  document.getElementById('flood-picker').style.display='none';
+  document.getElementById('flood-content').style.display='';
+  document.getElementById('flood-game-label').textContent=g.toUpperCase();
   var bm=document.getElementById('blooket-modes');
   if(bm) bm.style.display=g==='blooket'?'':'none';
   document.getElementById('logBox').innerHTML='<span class="ll linf">// ready - '+g+'</span>';
+  // Reset
+  var btn=document.getElementById('floodBtn');
+  btn.className='btn bw';btn.innerHTML='&#9654; Start';btn.disabled=false;
 }
+function backToFloodPicker(){
+  // Stop any running flood
+  if(floodId){fetch('/api/flood/stop/'+floodId,{method:'POST'});clearInterval(pollTimer);floodId=null;}
+  document.getElementById('flood-content').style.display='none';
+  document.getElementById('flood-picker').style.display='';
+}
+function setGame(g,el){ selectFloodGame(g); }
 function setMode(m,el){mode=m;document.querySelectorAll('#blooket-modes .mb').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
 function setN(n){document.getElementById('botName').value=n;}
 function addLog(msg,cls){var b=document.getElementById('logBox');var s=document.createElement('span');s.className='ll'+(cls?' '+cls:'');s.textContent=msg;b.appendChild(s);if(b.children.length>200)b.removeChild(b.firstChild);b.scrollTop=b.scrollHeight;}
