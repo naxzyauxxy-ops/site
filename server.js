@@ -61,14 +61,19 @@ setInterval(() => {
 
 // ── Flood API ──────────────────────────────────────────────
 app.post('/api/flood/start', (req, res) => {
-  const { gameCode, name, amount, mode } = req.body;
+  const { gameCode, name, amount, mode, game } = req.body;
   if (!gameCode) return res.json({ ok: false, error: 'missing gameCode' });
   if (activeFloods >= MAX) return res.json({ ok: false, error: 'Server busy' });
 
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const wrapper = mode === 'legacy'
-    ? path.join(__dirname, 'run-legacy.mjs')
-    : path.join(__dirname, 'run-beta.mjs');
+  let wrapper;
+  if (game === 'gimkit') {
+    wrapper = path.join(__dirname, 'run-gimkit.mjs');
+  } else {
+    wrapper = mode === 'legacy'
+      ? path.join(__dirname, 'run-legacy.mjs')
+      : path.join(__dirname, 'run-beta.mjs');
+  }
 
   console.log(`[flood] ${BUN} run ${wrapper} PIN=${gameCode} AMT=${amount}`);
 
