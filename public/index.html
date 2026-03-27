@@ -880,6 +880,16 @@ async function poll(){
 }
 async function toggleFlood(){
   var btn=document.getElementById('floodBtn');
+  // Gimkit uses client-side flooding (opens gimkit.com with injected script)
+  if(currentGame==='gimkit'){
+    var gc=document.getElementById('gameCode').value.trim();
+    var cnt=Math.min(parseInt(document.getElementById('botCount').value)||10,30);
+    var nb=document.getElementById('botName').value.trim()||'Bot';
+    if(!gc){addLog('Enter a game code','lerr');return;}
+    addLog('Opening Gimkit... allow popups if prompted','linf');
+    runGimkitFlood(gc,nb,cnt);
+    return;
+  }
   if(floodId){await fetch('/api/flood/stop/'+floodId,{method:'POST'});clearInterval(pollTimer);floodId=null;btn.className='btn bw';btn.innerHTML='&#9654; Start';btn.disabled=false;addLog('Stopped','lwrn');return;}
   var gc=document.getElementById('gameCode').value.trim();
   var cnt=Math.min(parseInt(document.getElementById('botCount').value)||10,30);
@@ -892,6 +902,55 @@ async function toggleFlood(){
     if(!r.ok){addLog('Error: '+(r.error||'failed'),'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';return;}
     floodId=r.id;pollTimer=setInterval(poll,800);
   }catch(e){addLog('Error: '+e.message,'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';}
+}
+
+// Gimkit client-side flood — injects script into gimkit.com via popup
+function runGimkitFlood(code, name, amount){
+  var CLIENT_TYPE = "Gimkit ⁡‍⁤‍⁡‌‍⁢‍⁢‍⁡‌‍⁢⁡⁤‍‍‍⁡⁢‍⁢⁡‍‌‍‌‍⁡⁡⁡‍‍‌⁢⁡⁢⁡⁡⁡‍⁣‌‍‌⁡⁤‍‌‍⁡⁤⁡⁢⁡⁢⁡‍⁢‍‍⁢⁣⁡‌⁢‍⁣‌⁡‍⁣⁡‌⁡⁡⁢‍‌⁤⁢‍‌⁢⁡‍⁡⁡‍⁢‍⁢‌⁡⁢⁣⁡‌⁡⁤‍⁡⁡‌‍⁢⁣⁢⁡‍⁡⁣‍‍⁢⁡⁡‍‍⁡‌⁤⁡‌⁢⁡⁢‍⁡‌‍⁢‌⁢⁡‍‌⁢⁡⁢‌⁡‌⁢‍‍‍⁡⁣⁢‍‌‍⁡‍‌⁢‌⁢⁡⁡‌⁢⁣‌⁤⁢⁡‍‍⁡‍⁢⁡⁢⁡⁣⁡‌⁡‍⁡⁡⁣‍⁤⁢⁡⁢‍⁡⁤‌⁡⁤‌⁡⁡‍‍‍‍‍‌⁢⁡⁡‍‍⁢‌‍‌‍⁢‍⁢⁡⁡⁢⁡‌⁡‌⁡⁡‌‍⁡⁢‍‌⁡⁢‌‍⁣‍‌⁤⁡⁡‍⁡‍⁢‍⁣‍⁣⁤‌‍‍⁣⁡‌‍‌⁡⁢⁡⁤‍⁤⁡⁢⁡‌‍⁡⁢‍‍‍‌‍‍‌⁢‍⁢‍⁢‌⁡‍‌⁡‌⁤‍⁡Web Client V3.1";
+  var joined=0, failed=0;
+  addLog('Flooding '+amount+' bots on '+code,'linf');
+
+  async function findRoomInfo(c){
+    var r=await fetch('https://www.gimkit.com/api/matchmaker/find-info-from-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:String(c)})});
+    return r.json();
+  }
+  async function getIntent(roomId,botName){
+    var r=await fetch('https://www.gimkit.com/api/matchmaker/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({roomId,name:botName,clientType:CLIENT_TYPE})});
+    return r.json();
+  }
+  async function joinBot(botName){
+    try{
+      var room=await findRoomInfo(code);
+      if(!room.roomId) throw new Error('Game not found');
+      var intent=await getIntent(room.roomId,botName);
+      if(!intent.serverUrl) throw new Error('Blocked: '+JSON.stringify(intent.message||intent));
+      var joinUrl=intent.serverUrl+'/matchmake/joinById/'+intent.roomId;
+      var jr=await fetch(joinUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({intentId:intent.intentId})});
+      var jd=await jr.json();
+      if(!jd.room) throw new Error('Join failed');
+      var wsUrl=intent.serverUrl.replace('https','wss')+'/'+jd.room.processId+'/'+jd.room.roomId+'?sessionId='+jd.sessionId;
+      var ws=new WebSocket(wsUrl);
+      ws.onopen=function(){joined++;document.getElementById('sJ').textContent=joined;addLog(joined+' bots joined','lok');};
+      ws.onerror=function(){failed++;document.getElementById('sF').textContent=failed;};
+    }catch(e){failed++;document.getElementById('sF').textContent=failed;addLog('Bot failed: '+e.message,'lerr');}
+  }
+
+  // Must be called from gimkit.com domain — show instructions
+  addLog('NOTE: Gimkit blocks server requests. Use the bookmarklet below instead:','lwrn');
+  addLog('Go to gimkit.com, open F12 console, and paste the flood script','linf');
+
+  // Generate a ready-to-paste console script
+  var script = 'var j=0,f=0;async function fb(n){try{var ri=await fetch("https://www.gimkit.com/api/matchmaker/find-info-from-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:"'+code+'"})});var rd=await ri.json();if(!rd.roomId)throw new Error("not found");var ii=await fetch("https://www.gimkit.com/api/matchmaker/join",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({roomId:rd.roomId,name:n,clientType:"'+CLIENT_TYPE+'"})});var id=await ii.json();if(!id.serverUrl)throw new Error("blocked");var jr=await fetch(id.serverUrl+"/matchmake/joinById/"+id.roomId,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({intentId:id.intentId})});var jd=await jr.json();new WebSocket(id.serverUrl.replace("https","wss")+"/"+jd.room.processId+"/"+jd.room.roomId+"?sessionId="+jd.sessionId);j++;console.log(j+" joined");}catch(e){f++;console.log("fail: "+e.message);}}for(var i=0;i<'+amount+';i++){await fb("'+name+'"+('+amount+'>1?i+1:""));await new Promise(r=>setTimeout(r,300));}console.log("Done. "+j+" joined, "+f+" failed.");';
+
+  // Show in logbox for copy
+  var lb=document.getElementById('logBox');
+  var pre=document.createElement('pre');
+  pre.style.cssText='background:#111;border:1px solid #333;border-radius:6px;padding:10px;font-size:0.55rem;color:#4caf50;white-space:pre-wrap;word-break:break-all;margin-top:8px;cursor:pointer;user-select:all';
+  pre.title='Click to copy';
+  pre.textContent=script;
+  pre.onclick=function(){navigator.clipboard.writeText(script).then(function(){addLog('Copied! Paste on gimkit.com F12 console','lok');});};
+  lb.appendChild(pre);
+  addLog('👆 Click the green box above to copy — then paste on gimkit.com','linf');
 }
 
 // ── Settings ───────────────────────────────────────────────────────────────
