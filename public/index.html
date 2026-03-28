@@ -148,29 +148,16 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 <body>
 
 
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">LUMI GAMES</div>
-    <div class="login-sub">members only</div>
-    <input class="login-input" id="login-user" placeholder="Username" autocomplete="off" spellcheck="false"/>
-    <input class="login-input" id="login-pass" placeholder="Password" type="password" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/>
-    <div class="login-err" id="login-err"></div>
-    <button class="login-btn" onclick="doLogin()">ENTER</button>
-    <div class="login-footer">need access? <a href="/purchase" target="_blank">buy access — $15</a></div>
-  </div>
-</div>
 
-<div id="purchase-screen">
-  <div class="purchase-box">
-    <div style="font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:900;color:#fff;text-align:center">LUMI GAMES</div>
+
     <div style="font-size:0.5rem;letter-spacing:0.2em;color:#444;text-align:center">GET ACCESS</div>
     <div style="font-family:'Unbounded',sans-serif;font-size:1.4rem;font-weight:900;color:#fff;text-align:center">$15<span style="font-size:0.55rem;color:#555;display:block;font-family:'DM Mono',monospace;font-weight:400;margin-top:2px">one-time</span></div>
     <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:12px 14px;font-size:0.62rem;color:#999;display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;gap:10px"><span style="color:#555;min-width:16px">1.</span><span>Send <b style="color:#ddd">$15</b> to <b style="color:#ddd">$skylerondat</b> on CashApp with your name in the note.</span></div>
+      <div style="display:flex;gap:10px"><span style="color:#555;min-width:16px">1.</span><span>Send <b style="color:#ddd">$15</b> to <b style="color:#ddd"></b> on CashApp with your name in the note.</span></div>
       <div style="display:flex;gap:10px"><span style="color:#555;min-width:16px">2.</span><span>You'll receive your login via CashApp once confirmed.</span></div>
       <div style="display:flex;gap:10px"><span style="color:#555;min-width:16px">3.</span><span>Log in and enjoy full access.</span></div>
     </div>
-    <a href="https://cash.app/$skylerondat" target="_blank" style="background:#00D632;color:#000;border:none;border-radius:8px;padding:12px;font-family:'Unbounded',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.05em;cursor:pointer;text-decoration:none;display:block;text-align:center">Pay $15 on CashApp →</a>
+    <a href="https://#" target="_blank" style="background:#00D632;color:#000;border:none;border-radius:8px;padding:12px;font-family:'Unbounded',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.05em;cursor:pointer;text-decoration:none;display:block;text-align:center"></a>
     <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:10px 12px;font-size:0.57rem;color:#444;line-height:1.6">
       <b style="color:#666">Terms:</b> No refunds. No account sharing — violators get permanently disabled and must pay $30 to reactivate. No chargebacks.
     </div>
@@ -178,7 +165,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
       <input type="checkbox" id="terms-cb" onchange="termsToggle(this.checked)" style="width:14px;height:14px;cursor:pointer;accent-color:#fff"/>
       <label for="terms-cb" style="cursor:pointer;font-size:0.6rem;color:#666">I agree to the Terms of Service</label>
     </div>
-    <a id="terms-agree-btn" href="https://cash.app/$skylerondat" target="_blank" style="display:block;text-align:center;text-decoration:none;pointer-events:none;opacity:0.3;background:#fff;color:#000;border-radius:6px;padding:10px;font-family:'Unbounded',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.08em">I AGREE — PROCEED TO PAYMENT</a>
+    <a id="terms-agree-btn" href="https://#" target="_blank" style="display:block;text-align:center;text-decoration:none;pointer-events:none;opacity:0.3;background:#fff;color:#000;border-radius:6px;padding:10px;font-family:'Unbounded',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.08em">I AGREE — PROCEED TO PAYMENT</a>
     <div style="font-size:0.52rem;color:#333;text-align:center;cursor:pointer;letter-spacing:0.1em;text-transform:uppercase" onclick="closePurchase()">← back</div>
   </div>
 </div>
@@ -243,6 +230,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="tab" onclick="show('bugs',this)">Bugs</button>
     <button class="tab" onclick="show('mirrors',this)">Mirrors</button>
     <button class="tab" onclick="show('settings',this)">Settings</button>
+    <button class="tab" onclick="show('hacks',this)">Hacks</button>
     <button class="tab" id="admin-tab" style="display:none;color:#ff3c5a" onclick="show('admin',this)">Admin</button>
   </div>
 </nav>
@@ -282,46 +270,22 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 
 <!-- FLOOD TAB -->
 <div class="panel" id="panel-flood">
-  <h1>BOT<br><span>FLOODER</span></h1>
+  <h1>BLOOKET<br><span>BOT FLOODER</span></h1>
 
-  <!-- Maintenance overlay -->
+  <!-- Maintenance overlay — shown to non-admins -->
   <div id="flood-maintenance" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px">
     <div style="font-size:2rem">🔧</div>
     <div style="font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:900;letter-spacing:0.05em">UNDER MAINTENANCE</div>
     <div style="font-size:0.7rem;color:#555;max-width:280px;line-height:1.6">The bot flooder is temporarily unavailable. Check back later.</div>
   </div>
 
-  <!-- Game picker screen -->
-  <div id="flood-picker">
-    <p style="font-size:0.65rem;color:#555;margin-bottom:20px">Choose a game to flood</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px">
-      <div onclick="selectFloodGame('blooket')" style="cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px 16px;text-align:center;transition:border-color .15s" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='var(--border)'">
-        <div style="font-size:2rem;margin-bottom:8px">🟦</div>
-        <div style="font-family:'Unbounded',sans-serif;font-size:0.75rem;font-weight:900">BLOOKET</div>
-        <div style="font-size:0.55rem;color:#555;margin-top:4px">Bot Flooder</div>
-      </div>
-      <div onclick="selectFloodGame('gimkit')" style="cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px 16px;text-align:center;transition:border-color .15s" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='var(--border)'">
-        <div style="font-size:2rem;margin-bottom:8px">🟩</div>
-        <div style="font-family:'Unbounded',sans-serif;font-size:0.75rem;font-weight:900">GIMKIT</div>
-        <div style="font-size:0.55rem;color:#555;margin-top:4px">Bot Flooder</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Actual flooder -->
-  <div id="flood-content" style="display:none">
-  <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px">
-    <button onclick="backToFloodPicker()" style="background:none;border:none;color:#555;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em">← back</button>
-    <span id="flood-game-label" style="font-family:'Unbounded',sans-serif;font-size:0.7rem;font-weight:900;color:#fff"></span>
-    <span style="font-size:0.55rem;color:#444">BOT FLOODER</span>
-  </div>
+  <!-- Actual flooder — shown to admins only -->
+  <div id="flood-content">
   <div class="card">
-    <!-- Blooket mode selector (only shown for blooket) -->
-    <div id="blooket-modes" class="mrow">
+    <div class="mrow">
       <div class="mb active" onclick="setMode('beta',this)">New Modes</div>
       <div class="mb" onclick="setMode('legacy',this)">Classic</div>
     </div>
-
     <div class="g2">
       <div class="field"><label>Game Code</label><input id="gameCode" placeholder="123456" maxlength="8"/></div>
       <div class="field"><label>Bot Count (max 30)</label><input type="number" id="botCount" value="10" min="1" max="30"/></div>
@@ -344,7 +308,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   </div>
   <div class="scard" style="border-color:#ff3c5a44">
     <h3 style="color:#ff3c5a">Caution</h3>
-    <p>Bot flooders may sometimes not work. If it doesn't work, wait a few seconds and try again.</p>
+    <p>The bot flooder may sometimes have problems not working. If it doesn't work, keep trying — wait a few seconds and start again.</p>
   </div>
   </div><!-- end flood-content -->
 </div>
@@ -544,6 +508,32 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
         <span style="color:#555;font-size:0.8rem">&#8599;</span>
       </a>
     </div>
+  </div>
+</div>
+
+
+<!-- HACKS TAB -->
+<div class="panel" id="panel-hacks">
+  <h1>HACKS</h1>
+
+  <!-- Maintenance for non-owners -->
+  <div id="hacks-maintenance" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px">
+    <div style="font-size:2rem">🔧</div>
+    <div style="font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:900">COMING SOON</div>
+    <div style="font-size:0.7rem;color:#555;max-width:280px;line-height:1.6">Hacks are currently unavailable. Check back later.</div>
+  </div>
+
+  <!-- Actual hacks content - owner only -->
+  <div id="hacks-content" style="display:none">
+    <div class="scard">
+      <h3>Blooket Hacks</h3>
+      <p>Powered by SchoolCheats — token required</p>
+      <div class="field" style="margin-top:10px">
+        <label>Blooket Token</label>
+        <input id="hack-token" placeholder="Paste your Blooket token..." autocomplete="off"/>
+      </div>
+    </div>
+    <div id="hacks-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:4px"></div>
   </div>
 </div>
 
@@ -752,6 +742,12 @@ function show(id,el){
   el.classList.add('active');
 
   if(id==='bugs') loadBugs();
+  if(id==='hacks'){
+    var isOwner=(localStorage.getItem('vh_user')||'').toLowerCase()==='naxzyauxxy';
+    document.getElementById('hacks-maintenance').style.display=isOwner?'none':'flex';
+    document.getElementById('hacks-content').style.display=isOwner?'':'none';
+    if(isOwner) loadHacks();
+  }
   if(id==='suggest'){
     var m=document.getElementById('sug-maintenance');
     var c=document.getElementById('sug-content');
@@ -772,10 +768,11 @@ function show(id,el){
     });
   }
   if(id==='flood'){
-    // Always show picker when switching to flood tab, hide flooder
-    document.getElementById('flood-maintenance').style.display='none';
-    document.getElementById('flood-picker').style.display='';
-    document.getElementById('flood-content').style.display='none';
+    var isAdmin = localStorage.getItem('vh_admin')==='1';
+    var maintenance = document.getElementById('flood-maintenance');
+    var content = document.getElementById('flood-content');
+    if(maintenance) maintenance.style.display = isAdmin ? 'none' : 'flex';
+    if(content) content.style.display = isAdmin ? '' : 'none';
   }
 }
 
@@ -845,27 +842,7 @@ function proxyGame(url){
 
 // ── Flood ─────────────────────────────────────────────────────────────────
 var mode='beta',floodId=null,pollTimer=null,lastLog=0;
-var currentGame='blooket';
-function selectFloodGame(g){
-  currentGame=g;
-  document.getElementById('flood-picker').style.display='none';
-  document.getElementById('flood-content').style.display='';
-  document.getElementById('flood-game-label').textContent=g.toUpperCase();
-  var bm=document.getElementById('blooket-modes');
-  if(bm) bm.style.display=g==='blooket'?'':'none';
-  document.getElementById('logBox').innerHTML='<span class="ll linf">// ready - '+g+'</span>';
-  // Reset
-  var btn=document.getElementById('floodBtn');
-  btn.className='btn bw';btn.innerHTML='&#9654; Start';btn.disabled=false;
-}
-function backToFloodPicker(){
-  // Stop any running flood
-  if(floodId){fetch('/api/flood/stop/'+floodId,{method:'POST'});clearInterval(pollTimer);floodId=null;}
-  document.getElementById('flood-content').style.display='none';
-  document.getElementById('flood-picker').style.display='';
-}
-function setGame(g,el){ selectFloodGame(g); }
-function setMode(m,el){mode=m;document.querySelectorAll('#blooket-modes .mb').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function setMode(m,el){mode=m;document.querySelectorAll('.mb').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
 function setN(n){document.getElementById('botName').value=n;}
 function addLog(msg,cls){var b=document.getElementById('logBox');var s=document.createElement('span');s.className='ll'+(cls?' '+cls:'');s.textContent=msg;b.appendChild(s);if(b.children.length>200)b.removeChild(b.firstChild);b.scrollTop=b.scrollHeight;}
 function stats(j,f,e){document.getElementById('sJ').textContent=j;document.getElementById('sF').textContent=f;document.getElementById('sE').textContent=e!=null?e+'s':'-';}
@@ -880,16 +857,6 @@ async function poll(){
 }
 async function toggleFlood(){
   var btn=document.getElementById('floodBtn');
-  // Gimkit uses client-side flooding (opens gimkit.com with injected script)
-  if(currentGame==='gimkit'){
-    var gc=document.getElementById('gameCode').value.trim();
-    var cnt=Math.min(parseInt(document.getElementById('botCount').value)||10,30);
-    var nb=document.getElementById('botName').value.trim()||'Bot';
-    if(!gc){addLog('Enter a game code','lerr');return;}
-    addLog('Opening Gimkit... allow popups if prompted','linf');
-    runGimkitFlood(gc,nb,cnt);
-    return;
-  }
   if(floodId){await fetch('/api/flood/stop/'+floodId,{method:'POST'});clearInterval(pollTimer);floodId=null;btn.className='btn bw';btn.innerHTML='&#9654; Start';btn.disabled=false;addLog('Stopped','lwrn');return;}
   var gc=document.getElementById('gameCode').value.trim();
   var cnt=Math.min(parseInt(document.getElementById('botCount').value)||10,30);
@@ -898,59 +865,10 @@ async function toggleFlood(){
   btn.className='btn br';btn.innerHTML='&#9632; Stop';btn.disabled=false;
   addLog('Starting...','linf');lastLog=0;stats(0,0,0);
   try{
-    const r=await fetch('/api/flood/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gameCode:gc,name:nb,amount:cnt,mode,game:currentGame})}).then(r=>r.json());
+    const r=await fetch('/api/flood/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gameCode:gc,name:nb,amount:cnt,mode})}).then(r=>r.json());
     if(!r.ok){addLog('Error: '+(r.error||'failed'),'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';return;}
     floodId=r.id;pollTimer=setInterval(poll,800);
   }catch(e){addLog('Error: '+e.message,'lerr');btn.className='btn bw';btn.innerHTML='&#9654; Start';}
-}
-
-// Gimkit client-side flood — injects script into gimkit.com via popup
-function runGimkitFlood(code, name, amount){
-  var CLIENT_TYPE = "Gimkit ⁡‍⁤‍⁡‌‍⁢‍⁢‍⁡‌‍⁢⁡⁤‍‍‍⁡⁢‍⁢⁡‍‌‍‌‍⁡⁡⁡‍‍‌⁢⁡⁢⁡⁡⁡‍⁣‌‍‌⁡⁤‍‌‍⁡⁤⁡⁢⁡⁢⁡‍⁢‍‍⁢⁣⁡‌⁢‍⁣‌⁡‍⁣⁡‌⁡⁡⁢‍‌⁤⁢‍‌⁢⁡‍⁡⁡‍⁢‍⁢‌⁡⁢⁣⁡‌⁡⁤‍⁡⁡‌‍⁢⁣⁢⁡‍⁡⁣‍‍⁢⁡⁡‍‍⁡‌⁤⁡‌⁢⁡⁢‍⁡‌‍⁢‌⁢⁡‍‌⁢⁡⁢‌⁡‌⁢‍‍‍⁡⁣⁢‍‌‍⁡‍‌⁢‌⁢⁡⁡‌⁢⁣‌⁤⁢⁡‍‍⁡‍⁢⁡⁢⁡⁣⁡‌⁡‍⁡⁡⁣‍⁤⁢⁡⁢‍⁡⁤‌⁡⁤‌⁡⁡‍‍‍‍‍‌⁢⁡⁡‍‍⁢‌‍‌‍⁢‍⁢⁡⁡⁢⁡‌⁡‌⁡⁡‌‍⁡⁢‍‌⁡⁢‌‍⁣‍‌⁤⁡⁡‍⁡‍⁢‍⁣‍⁣⁤‌‍‍⁣⁡‌‍‌⁡⁢⁡⁤‍⁤⁡⁢⁡‌‍⁡⁢‍‍‍‌‍‍‌⁢‍⁢‍⁢‌⁡‍‌⁡‌⁤‍⁡Web Client V3.1";
-  var joined=0, failed=0;
-  addLog('Flooding '+amount+' bots on '+code,'linf');
-
-  async function findRoomInfo(c){
-    var r=await fetch('https://www.gimkit.com/api/matchmaker/find-info-from-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:String(c)})});
-    return r.json();
-  }
-  async function getIntent(roomId,botName){
-    var r=await fetch('https://www.gimkit.com/api/matchmaker/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({roomId,name:botName,clientType:CLIENT_TYPE})});
-    return r.json();
-  }
-  async function joinBot(botName){
-    try{
-      var room=await findRoomInfo(code);
-      if(!room.roomId) throw new Error('Game not found');
-      var intent=await getIntent(room.roomId,botName);
-      if(!intent.serverUrl) throw new Error('Blocked: '+JSON.stringify(intent.message||intent));
-      var joinUrl=intent.serverUrl+'/matchmake/joinById/'+intent.roomId;
-      var jr=await fetch(joinUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({intentId:intent.intentId})});
-      var jd=await jr.json();
-      if(!jd.room) throw new Error('Join failed');
-      var wsUrl=intent.serverUrl.replace('https','wss')+'/'+jd.room.processId+'/'+jd.room.roomId+'?sessionId='+jd.sessionId;
-      var ws=new WebSocket(wsUrl);
-      ws.onopen=function(){joined++;document.getElementById('sJ').textContent=joined;addLog(joined+' bots joined','lok');};
-      ws.onerror=function(){failed++;document.getElementById('sF').textContent=failed;};
-    }catch(e){failed++;document.getElementById('sF').textContent=failed;addLog('Bot failed: '+e.message,'lerr');}
-  }
-
-  // Must be called from gimkit.com domain — show instructions
-  addLog('NOTE: Gimkit blocks server requests. Use the bookmarklet below instead:','lwrn');
-  addLog('Go to gimkit.com, open F12 console, and paste the flood script','linf');
-
-  // Generate a ready-to-paste console script
-  var script = 'var j=0,f=0;async function fb(n){try{var ri=await fetch("https://www.gimkit.com/api/matchmaker/find-info-from-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:"'+code+'"})});var rd=await ri.json();if(!rd.roomId)throw new Error("not found");var ii=await fetch("https://www.gimkit.com/api/matchmaker/join",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({roomId:rd.roomId,name:n,clientType:"'+CLIENT_TYPE+'"})});var id=await ii.json();if(!id.serverUrl)throw new Error("blocked");var jr=await fetch(id.serverUrl+"/matchmake/joinById/"+id.roomId,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({intentId:id.intentId})});var jd=await jr.json();new WebSocket(id.serverUrl.replace("https","wss")+"/"+jd.room.processId+"/"+jd.room.roomId+"?sessionId="+jd.sessionId);j++;console.log(j+" joined");}catch(e){f++;console.log("fail: "+e.message);}}for(var i=0;i<'+amount+';i++){await fb("'+name+'"+('+amount+'>1?i+1:""));await new Promise(r=>setTimeout(r,300));}console.log("Done. "+j+" joined, "+f+" failed.");';
-
-  // Show in logbox for copy
-  var lb=document.getElementById('logBox');
-  var pre=document.createElement('pre');
-  pre.style.cssText='background:#111;border:1px solid #333;border-radius:6px;padding:10px;font-size:0.55rem;color:#4caf50;white-space:pre-wrap;word-break:break-all;margin-top:8px;cursor:pointer;user-select:all';
-  pre.title='Click to copy';
-  pre.textContent=script;
-  pre.onclick=function(){navigator.clipboard.writeText(script).then(function(){addLog('Copied! Paste on gimkit.com F12 console','lok');});};
-  lb.appendChild(pre);
-  addLog('👆 Click the green box above to copy — then paste on gimkit.com','linf');
 }
 
 // ── Settings ───────────────────────────────────────────────────────────────
@@ -1396,7 +1314,7 @@ function importData(){
         clearInterval(iv);
         document.getElementById('loaderSub').textContent='done.';
         spawnPx(30);
-        setTimeout(function(){document.getElementById('loader').classList.add('hidden');document.getElementById('login-screen').classList.add('gone');},700);
+        setTimeout(function(){document.getElementById('loader').classList.add('hidden');// login removed},700);
       }
     },120);
   }
@@ -1434,7 +1352,7 @@ function importData(){
 // ── Login system (server-enforced, one session per user) ──────────────────
 function showLogin(){ document.getElementById('login-screen').classList.remove('gone'); }
 function hideLogin(isAdmin){
-  document.getElementById('login-screen').classList.add('gone');
+  // login removed
   if(isAdmin){
     var t=document.getElementById('admin-tab');
     if(t) t.style.display='';
@@ -1516,19 +1434,9 @@ async function checkSession(){
   }
 }
 
-// On load: if valid token skip login and go straight to LUMI GAMES animation
-(async function(){
-  var valid = await checkSession();
-  if(valid){
-    document.getElementById('login-screen').classList.add('gone');
-    if(localStorage.getItem('vh_admin')==='1'){
-      var t=document.getElementById('admin-tab');
-      if(t) t.style.display='';
-    }
-    if(typeof triggerLoader === 'function') triggerLoader();
-    } else {
-    showLogin();
-  }
+// Site is now free - no login required
+(function(){
+  if(typeof triggerLoader === 'function') triggerLoader();
 })();
 
 // Recheck every 5 mins, only when tab is visible
@@ -1850,7 +1758,7 @@ window.addEventListener('message', function(e){
     if(e.data.vh_user) localStorage.setItem('vh_user', e.data.vh_user);
     if(e.data.vh_admin) localStorage.setItem('vh_admin', e.data.vh_admin);
     // Hide login and load the site as normal
-    document.getElementById('login-screen').classList.add('gone');
+    // login removed
     if(e.data.vh_admin==='1'){
       var t=document.getElementById('admin-tab');
       if(t) t.style.display='';
@@ -1864,7 +1772,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // Auto-show purchase screen if URL is /purchase
   if(window.location.pathname==='/purchase'){
     document.getElementById('purchase-screen').classList.add('show');
-    document.getElementById('login-screen').classList.add('gone');
+    // login removed
   }
 });
 </script>
@@ -2292,6 +2200,34 @@ function startSharingWS() {
   if (_wsStarted) return;
   _wsStarted = true;
   connectSharingWS();
+}
+
+
+// ── Blooket Hacks (owner only) ────────────────────────────
+var HACKS = [
+  {name:'Token Login',desc:'Login with a Blooket token',fn:'tokenLogin'},
+  {name:'Flood Game',desc:'Flood a Blooket game with bots',fn:'floodFromHacks'},
+  {name:'Auto Answer',desc:'Auto answer all questions correctly',fn:'autoAnswer'},
+  {name:'Unlock All',desc:'Unlock all Blooket content',fn:'unlockAll'},
+  {name:'Max Gold',desc:'Set gold to max amount',fn:'maxGold'},
+  {name:'Speed Hack',desc:'Move faster in games',fn:'speedHack'},
+];
+
+function loadHacks(){
+  var el=document.getElementById('hacks-list');
+  if(!el) return;
+  el.innerHTML=HACKS.map(function(h){
+    return '<div class="scard" style="cursor:pointer" onclick="runHack(''+h.fn+'')">'
+      +'<h3>'+h.name+'</h3>'
+      +'<p>'+h.desc+'</p>'
+      +'</div>';
+  }).join('');
+}
+
+function runHack(fn){
+  var token=document.getElementById('hack-token').value.trim();
+  if(!token){alert('Enter your Blooket token first');return;}
+  alert('Hack: '+fn+' — Coming soon');
 }
 
 // Tab close warning — hooks onto first real user interaction
