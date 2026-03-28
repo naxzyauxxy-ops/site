@@ -117,7 +117,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 .login-footer a{color:#fff;text-decoration:none;border-bottom:1px solid #555;padding-bottom:1px}
 
 /* ── Purchase Page ─────────────────────────────────────────────────────── */
-#purchase-screen{position:fixed;inset:0;background:#000;z-index:99998;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:'DM Mono',monospace;overflow-y:auto;padding:24px 0}
+#purchase-screen{display:none!important}
 #purchase-screen.show{display:flex}
 .purchase-box{width:min(360px,90vw);display:flex;flex-direction:column;gap:10px}
 .purchase-logo{font-family:'Unbounded',sans-serif;font-size:clamp(0.9rem,3vw,1.2rem);font-weight:900;letter-spacing:-0.04em;color:#fff;text-align:center;margin-bottom:2px}
@@ -527,11 +527,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   <div id="hacks-content" style="display:none">
     <div class="scard">
       <h3>Blooket Hacks</h3>
-      <p>Powered by SchoolCheats — token required</p>
-      <div class="field" style="margin-top:10px">
-        <label>Blooket Token</label>
-        <input id="hack-token" placeholder="Paste your Blooket token..." autocomplete="off"/>
-      </div>
+      <p>Click any hack below to run it. Make sure you're on <b style="color:#fff">blooket.com</b> first.</p>
     </div>
     <div id="hacks-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:4px"></div>
   </div>
@@ -2252,15 +2248,13 @@ function loadHacks(){
 }
 
 function runHack(fn){
-  var token=document.getElementById('hack-token').value.trim();
-  if(!token){alert('Enter your Blooket token first');return;}
+
   alert('Hack: '+fn+' — Coming soon');
 }
 
 
 // ── Hacks Tab ─────────────────────────────────────────────
 function runHack(script, name){
-  if(!confirm('Run hack: '+name+'?')) return;
   try{ eval(script); } catch(e){ alert('Error: '+e.message); }
 }
 
