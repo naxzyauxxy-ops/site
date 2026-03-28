@@ -1456,15 +1456,8 @@ async function doLogin(){
 
 function checkSession(){ return true; }
 
-// Free site - show animation and go straight in
-document.addEventListener('DOMContentLoaded', function(){
-  var user = (localStorage.getItem('vh_user')||'').toLowerCase();
-  if(user === 'naxzyauxxy'){
-    var t = document.getElementById('admin-tab');
-    if(t) t.style.display='';
-  }
-  if(typeof triggerLoader === 'function') triggerLoader();
-});
+// Free site - call triggerLoader which is already defined above
+triggerLoader();
 
 // Recheck every 5 mins, only when tab is visible
 setInterval(function(){ if(!document.hidden) checkSession(); }, 5*60*1000);
@@ -1797,10 +1790,7 @@ window.addEventListener('message', function(e){
 document.addEventListener('DOMContentLoaded',function(){
   loadAnnouncement();
   // Auto-show purchase screen if URL is /purchase
-  if(window.location.pathname==='/purchase'){
-    document.getElementById('purchase-screen').classList.add('show');
-    // login removed
-  }
+  // purchase screen removed
 });
 </script>
 
