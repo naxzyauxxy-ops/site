@@ -231,7 +231,6 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="tab" onclick="show('mirrors',this)">Mirrors</button>
     <button class="tab" onclick="show('settings',this)">Settings</button>
     <button class="tab" onclick="show('hacks',this)">Hacks</button>
-    <button class="tab" onclick="show('hacks',this)">Hacks</button>
     <button class="tab" id="admin-tab" style="display:none;color:#ff3c5a" onclick="show('admin',this)">Admin</button>
   </div>
 </nav>
@@ -1457,11 +1456,17 @@ async function doLogin(){
 
 function checkSession(){ return true; }
 
-// Site is now free - no login required
+// Site is free - skip loader, show site immediately
 document.addEventListener('DOMContentLoaded', function(){
-  setTimeout(function(){
-    if(typeof triggerLoader === 'function') triggerLoader();
-  }, 100);
+  var loader = document.getElementById('loader');
+  if(loader) loader.classList.add('hidden');
+  // Show admin tab if owner
+  var user = (localStorage.getItem('vh_user')||'').toLowerCase();
+  if(user === 'naxzyauxxy'){
+    var t = document.getElementById('admin-tab');
+    if(t) t.style.display='';
+  }
+  loadAnnouncement();
 });
 
 // Recheck every 5 mins, only when tab is visible
