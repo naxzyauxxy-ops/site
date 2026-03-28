@@ -88,7 +88,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
 @media(max-width:480px){.g2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.games-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}}
 
 /* ── Loading Screen ───────────────────────────────────────── */
-#loader{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,visibility .6s ease}
+#loader{display:none!important}
 #loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
 .loader-logo{font-family:'Unbounded',sans-serif;font-size:clamp(2rem,6vw,4rem);font-weight:900;letter-spacing:-0.04em;text-transform:uppercase;color:#fff;opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
 .loader-logo.show{opacity:1;transform:translateY(0)}
@@ -1456,8 +1456,7 @@ async function doLogin(){
 
 function checkSession(){ return true; }
 
-// Free site - defer so DOM is ready
-window.addEventListener("load", function(){ triggerLoader(); });
+// no animation
 
 // Recheck every 5 mins, only when tab is visible
 setInterval(function(){ if(!document.hidden) checkSession(); }, 5*60*1000);
