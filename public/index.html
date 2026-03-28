@@ -1458,9 +1458,11 @@ async function doLogin(){
 function checkSession(){ return true; }
 
 // Site is now free - no login required
-(function(){
-  if(typeof triggerLoader === 'function') triggerLoader();
-})();
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(function(){
+    if(typeof triggerLoader === 'function') triggerLoader();
+  }, 100);
+});
 
 // Recheck every 5 mins, only when tab is visible
 setInterval(function(){ if(!document.hidden) checkSession(); }, 5*60*1000);
