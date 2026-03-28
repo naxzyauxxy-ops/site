@@ -1456,8 +1456,8 @@ async function doLogin(){
 
 function checkSession(){ return true; }
 
-// Free site - call triggerLoader which is already defined above
-triggerLoader();
+// Free site - defer so DOM is ready
+window.addEventListener("load", function(){ triggerLoader(); });
 
 // Recheck every 5 mins, only when tab is visible
 setInterval(function(){ if(!document.hidden) checkSession(); }, 5*60*1000);
