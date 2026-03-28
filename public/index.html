@@ -1456,17 +1456,15 @@ async function doLogin(){
 
 function checkSession(){ return true; }
 
-// Auto-login: skip login screen, go straight to loader
-(async function(){
-  document.getElementById('login-screen') && document.getElementById('login-screen').classList.add('gone');
+// Free site - show animation and go straight in
+document.addEventListener('DOMContentLoaded', function(){
   var user = (localStorage.getItem('vh_user')||'').toLowerCase();
   if(user === 'naxzyauxxy'){
     var t = document.getElementById('admin-tab');
     if(t) t.style.display='';
   }
   if(typeof triggerLoader === 'function') triggerLoader();
-  else document.addEventListener('DOMContentLoaded', function(){ if(typeof triggerLoader==='function') triggerLoader(); });
-})();
+});
 
 // Recheck every 5 mins, only when tab is visible
 setInterval(function(){ if(!document.hidden) checkSession(); }, 5*60*1000);
