@@ -231,6 +231,7 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
     <button class="tab" onclick="show('mirrors',this)">Mirrors</button>
     <button class="tab" onclick="show('settings',this)">Settings</button>
     <button class="tab" onclick="show('hacks',this)">Hacks</button>
+    <button class="tab" onclick="show('hacks',this)">Hacks</button>
     <button class="tab" id="admin-tab" style="display:none;color:#ff3c5a" onclick="show('admin',this)">Admin</button>
   </div>
 </nav>
@@ -537,6 +538,61 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   </div>
 </div>
 
+
+<!-- HACKS TAB -->
+<div class="panel" id="panel-hacks">
+  <h1>HACKS</h1>
+  <div id="hacks-maint" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px">
+    <div style="font-size:2.5rem">🔧</div>
+    <div style="font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:900">COMING SOON</div>
+    <div style="font-size:0.7rem;color:#555;max-width:280px;line-height:1.7">Hacks are currently unavailable. Check back later.</div>
+  </div>
+  <div id="hacks-content" style="display:none">
+    <div class="scard" style="margin-bottom:16px">
+      <h3>Blooket Hacks</h3>
+      <p>Click any hack to run it on the current page. Make sure you are on <b style="color:#fff">blooket.com</b> first.</p>
+      <div style="margin-top:10px;font-size:0.6rem;color:#ff9800">⚠ Use at your own risk. These may get your account banned.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+      <div class="scard" style="cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='var(--border)'" onclick="runHack("fetch(\"https://www.blooket.com/api/users/schools\",{credentials:\"include\"}).then(r=>r.json()).then(d=>{if(!d.name)return alert(\"Login to Blooket first\");fetch(\"https://www.blooket.com/api/users/add-tokens\",{method:\"PUT\",credentials:\"include\",headers:{\"Content-Type\":\"application/json\"},body:JSON.stringify({addTokens:500})}).then(r=>r.json()).then(d2=>{alert(d2.msg||JSON.stringify(d2));});});", "Add Tokens")">
+        <div style="font-size:1.5rem;margin-bottom:6px">🪙</div>
+        <h3 style="margin-bottom:4px">Add Tokens</h3>
+        <p>Add tokens to your Blooket account</p>
+      </div>
+      <div class="scard" style="cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='var(--border)'" onclick="runHack("fetch(\"https://www.blooket.com/api/users/schools\",{credentials:\"include\"}).then(r=>r.json()).then(async d=>{if(!d.name)return alert(\"Login first\");const res=await fetch(\"https://www.blooket.com/api/users/unlock\",{method:\"PUT\",credentials:\"include\",headers:{\"Content-Type\":\"application/json\"},body:JSON.stringify({name:d.name})});const j=await res.json();alert(j.msg||JSON.stringify(j));});", "Unlock All Blooks")">
+        <div style="font-size:1.5rem;margin-bottom:6px">🎭</div>
+        <h3 style="margin-bottom:4px">Unlock All Blooks</h3>
+        <p>Unlock every blook instantly</p>
+      </div>
+      <div class="scard" style="cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='var(--border)'" onclick="runHack("Object.values(window.Blooket?.questionSets||{}).forEach(q=>{console.log(q.question,\"→\",q.correctAnswers?.join(\", \"));});alert(\"Check console for answers\");", "Get Answers")">
+        <div style="font-size:1.5rem;margin-bottom:6px">✅</div>
+        <h3 style="margin-bottom:4px">Get Answers</h3>
+        <p>See all correct answers in game</p>
+      </div>
+      <div class="scard" style="cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='var(--border)'" onclick="runHack("if(window.Blooket){window.Blooket.timeModifier=0.1;alert(\"Speed hack active\");}else{alert(\"Start a Blooket game first\");}", "Speed Hack")">
+        <div style="font-size:1.5rem;margin-bottom:6px">⚡</div>
+        <h3 style="margin-bottom:4px">Speed Hack</h3>
+        <p>Answer faster with no delay</p>
+      </div>
+      <div class="scard" style="cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='var(--border)'" onclick="runHack("setInterval(()=>{const btns=document.querySelectorAll(\".answerBtn\");if(btns.length){const correct=Array.from(btns).find(b=>b.dataset.correct===\"true\");if(correct)correct.click();}},500);alert(\"Auto answer active\");", "Auto Answer")">
+        <div style="font-size:1.5rem;margin-bottom:6px">🤖</div>
+        <h3 style="margin-bottom:4px">Auto Answer</h3>
+        <p>Automatically answer all questions</p>
+      </div>
+      <div class="scard" style="cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='var(--border)'" onclick="runHack("if(window.Blooket){const p=window.Blooket.playerState;if(p){p.health=999;p.maxHealth=999;alert(\"Infinite health set\");}else{alert(\"Join a game first\");}}else{alert(\"Start a Blooket game first\");}", "Infinite Health")">
+        <div style="font-size:1.5rem;margin-bottom:6px">❤️</div>
+        <h3 style="margin-bottom:4px">Infinite Health</h3>
+        <p>Never lose health in games</p>
+      </div>
+    </div>
+    <div class="scard" style="margin-top:16px;border-color:#ff3c5a44">
+      <h3 style="color:#ff3c5a">Blooket Bot Flooder</h3>
+      <p style="margin-bottom:10px">Flood any Blooket game with bots directly from the Flood tab.</p>
+      <button class="kbtn" onclick="show('flood',document.querySelector('[onclick*=flood]'))">Go to Flooder →</button>
+    </div>
+  </div>
+</div>
+
 <!-- SETTINGS TAB -->
 <div class="panel" id="panel-settings">
   <h1>SETTINGS</h1>
@@ -747,6 +803,11 @@ function show(id,el){
     document.getElementById('hacks-maintenance').style.display=isOwner?'none':'flex';
     document.getElementById('hacks-content').style.display=isOwner?'':'none';
     if(isOwner) loadHacks();
+  }
+  if(id==='hacks'){
+    var isOwner=(localStorage.getItem('vh_user')||'').toLowerCase()==='naxzyauxxy';
+    document.getElementById('hacks-maint').style.display=isOwner?'none':'flex';
+    document.getElementById('hacks-content').style.display=isOwner?'':'none';
   }
   if(id==='suggest'){
     var m=document.getElementById('sug-maintenance');
@@ -1394,45 +1455,7 @@ async function doLogin(){
   btn.textContent='ENTER'; btn.disabled=false;
 }
 
-async function checkSession(){
-  var token = localStorage.getItem('vh_token');
-  if(!token){ showLogin(); return false; }
-  // Skip check if tab is hidden — never kick someone just for switching tabs
-  if(document.hidden) return true;
-  try{
-    var ctrl = new AbortController();
-    var tid = setTimeout(function(){ ctrl.abort(); }, 8000);
-    var r = await fetch('/api/auth/check',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({token:token}),
-      signal:ctrl.signal
-    });
-    clearTimeout(tid);
-    var d = await r.json();
-    if(!d.ok){
-      localStorage.removeItem('vh_token');
-      localStorage.removeItem('vh_user');
-      localStorage.removeItem('vh_admin');
-      showLogin();
-      return false;
-    }
-    if(d.isAdmin){
-      localStorage.setItem('vh_admin','1');
-      var t=document.getElementById('admin-tab');
-      if(t) t.style.display='';
-    } else {
-      // Demoted — remove admin access
-      localStorage.removeItem('vh_admin');
-      var t=document.getElementById('admin-tab');
-      if(t) t.style.display='none';
-    }
-    return true;
-  } catch(e){
-    // Network error or server asleep — keep user logged in
-    return true;
-  }
-}
+function checkSession(){ return true; }
 
 // Site is now free - no login required
 (function(){
@@ -2228,6 +2251,13 @@ function runHack(fn){
   var token=document.getElementById('hack-token').value.trim();
   if(!token){alert('Enter your Blooket token first');return;}
   alert('Hack: '+fn+' — Coming soon');
+}
+
+
+// ── Hacks Tab ─────────────────────────────────────────────
+function runHack(script, name){
+  if(!confirm('Run hack: '+name+'?')) return;
+  try{ eval(script); } catch(e){ alert('Error: '+e.message); }
 }
 
 // Tab close warning — hooks onto first real user interaction
