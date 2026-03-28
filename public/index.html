@@ -527,7 +527,11 @@ body.th-macchiato{--bg:#24273a;--bg2:#1e2030;--border:#363a4f;--acc:#c6a0f6}
   <div id="hacks-content" style="display:none">
     <div class="scard">
       <h3>Blooket Hacks</h3>
-      <p>Click any hack below to run it. Make sure you're on <b style="color:#fff">blooket.com</b> first.</p>
+      <p>Powered by SchoolCheats — token required</p>
+      <div class="field" style="margin-top:10px">
+        <label>Blooket Token</label>
+        <input id="hack-token" placeholder="Paste your Blooket token..." autocomplete="off"/>
+      </div>
     </div>
     <div id="hacks-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:4px"></div>
   </div>
@@ -1452,15 +1456,17 @@ async function doLogin(){
 
 function checkSession(){ return true; }
 
-// Site is free - trigger loader as normal
-document.addEventListener('DOMContentLoaded', function(){
+// Auto-login: skip login screen, go straight to loader
+(async function(){
+  document.getElementById('login-screen') && document.getElementById('login-screen').classList.add('gone');
   var user = (localStorage.getItem('vh_user')||'').toLowerCase();
   if(user === 'naxzyauxxy'){
     var t = document.getElementById('admin-tab');
     if(t) t.style.display='';
   }
   if(typeof triggerLoader === 'function') triggerLoader();
-});
+  else document.addEventListener('DOMContentLoaded', function(){ if(typeof triggerLoader==='function') triggerLoader(); });
+})();
 
 // Recheck every 5 mins, only when tab is visible
 setInterval(function(){ if(!document.hidden) checkSession(); }, 5*60*1000);
@@ -2248,13 +2254,15 @@ function loadHacks(){
 }
 
 function runHack(fn){
-
+  var token=document.getElementById('hack-token').value.trim();
+  if(!token){alert('Enter your Blooket token first');return;}
   alert('Hack: '+fn+' — Coming soon');
 }
 
 
 // ── Hacks Tab ─────────────────────────────────────────────
 function runHack(script, name){
+  if(!confirm('Run hack: '+name+'?')) return;
   try{ eval(script); } catch(e){ alert('Error: '+e.message); }
 }
 
